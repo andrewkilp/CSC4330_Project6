@@ -2,5 +2,7 @@ go 1.26.4
 
 use (
   ./apps/api
+  ./packages/go/conversation
+  ./packages/go/demo
   ./packages/go/handlers
 )

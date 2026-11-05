@@ -3,6 +3,14 @@ layer: application
 language: go
 dependsOn: ['handlers']
 tasks:
+  demo:
+    command: 'go run .'
+    deps: ['mobile:build']
+    env:
+      DEMO_MODE: 'true'
+      DEMO_WEB_DIR: '../mobile/dist'
+      PORT: '8080'
+    options: {cache: false, runInCI: false, persistent: true}
   dev:
     command: 'go run .'
     options: {cache: false, runInCI: false, persistent: true}
