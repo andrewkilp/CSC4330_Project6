@@ -4,3 +4,5 @@ language: typescript
 tasks:
   build:
     command: 'pnpm exec tsc --noEmit'
+  test:
+    command: 'node --experimental-strip-types --test test/events.test.mjs'
