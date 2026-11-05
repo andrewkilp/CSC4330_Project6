@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          proto-version: '0.57.4'
+          auto-install: true
+      - run: pnpm install --frozen-lockfile
+      - run: moon run :build :lint :typecheck :test

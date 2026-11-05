@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+bin/
+.moon/cache/
+.moon/docker/
+apps/mobile/android/
+apps/mobile/ios/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db

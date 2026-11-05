@@ -1,0 +1,19 @@
+# Normalize line endings on checkin
+* text=auto
+
+# Lockfiles: collapse in diffs and exclude from language stats
+go.sum             linguist-generated=true
+go.work.sum        linguist-generated=true
+package-lock.json  linguist-generated=true
+pnpm-lock.yaml     linguist-generated=true
+yarn.lock          linguist-generated=true
+bun.lock           linguist-generated=true
+bun.lockb          binary
+
+# Common binary assets
+*.png   binary
+*.jpg   binary
+*.webp  binary
+*.woff2 binary
+*.icns  binary
+*.ico   binary

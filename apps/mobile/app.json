@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Switchboard",
+    "slug": "switchboard-csc4330",
+    "version": "0.1.0",
+    "scheme": "switchboard",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.csc4330.switchboard"
+    },
+    "android": {
+      "package": "com.csc4330.switchboard"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"]
+  }
+}

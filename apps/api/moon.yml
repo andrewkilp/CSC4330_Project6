@@ -1,0 +1,12 @@
+id: api
+layer: application
+language: go
+dependsOn: ['handlers']
+tasks:
+  dev:
+    command: 'go run .'
+    options: {cache: false, runInCI: false, persistent: true}
+  build:
+    command: 'go build -o bin/api .'
+    options: {mergeArgs: replace}
+    outputs: ['bin']

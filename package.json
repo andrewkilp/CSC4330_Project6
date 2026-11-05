@@ -1,0 +1,13 @@
+{
+  "name": "switchboard",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.4",
+  "scripts": {
+    "check": "moon run :build :lint :typecheck :test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.0",
+    "typescript": "~6.0.3"
+  }
+}

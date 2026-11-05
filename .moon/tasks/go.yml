@@ -1,0 +1,12 @@
+inheritedBy:
+  toolchains:
+    or: ['go']
+tasks:
+  build:
+    command: 'go build ./...'
+  lint:
+    command: 'go vet ./...'
+  test:
+    command: 'go test ./...'
+  format:
+    command: 'gofmt -w .'

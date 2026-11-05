@@ -1,0 +1,11 @@
+node: {}
+javascript:
+  packageManager: pnpm
+  inferTasksFromScripts: false
+  syncProjectWorkspaceDependencies: true
+pnpm: {}
+go:
+  inferRelationships: false
+  workspaces: true
+typescript:
+  syncProjectReferences: false

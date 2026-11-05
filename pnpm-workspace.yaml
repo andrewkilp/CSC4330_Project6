@@ -1,0 +1,8 @@
+packages:
+  - 'apps/*'
+  - 'packages/ts/*'
+nodeLinker: hoisted
+overrides:
+  react-dom: 19.2.3
+  '@react-native/metro-config': 0.86.3
+  react-native-worklets: 0.10.1

@@ -1,0 +1,4 @@
+projects: ['apps/*', 'packages/ts/*', 'packages/go/*']
+vcs:
+  defaultBranch: main
+  provider: github

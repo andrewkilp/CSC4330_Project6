@@ -1,0 +1,21 @@
+id: mobile
+layer: application
+language: typescript
+dependsOn: ['client']
+tasks:
+  dev:
+    command: 'pnpm exec expo start'
+    options: {cache: false, runInCI: false, persistent: true}
+  web:
+    command: 'pnpm exec expo start --web'
+    options: {cache: false, runInCI: false, persistent: true}
+  android:
+    command: 'pnpm exec expo run:android'
+    options: {cache: false, runInCI: false, persistent: true}
+  ios:
+    command: 'pnpm exec expo run:ios'
+    options: {cache: false, runInCI: false, persistent: true}
+  build:
+    command: 'pnpm exec expo export --platform web --output-dir dist'
+    inputs: ['src/**/*', 'app.json', 'package.json', '/packages/ts/api/src/**/*']
+    outputs: ['dist']

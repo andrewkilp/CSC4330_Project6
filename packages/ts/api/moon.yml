@@ -1,0 +1,6 @@
+id: client
+layer: library
+language: typescript
+tasks:
+  build:
+    command: 'pnpm exec tsc --noEmit'

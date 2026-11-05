@@ -1,0 +1,1784 @@
+{
+  "repository": "andrewkilp/CSC4330_Project6",
+  "created": "2026-11-05",
+  "schedule": "Relative days from kickoff; two weeks, five stages",
+  "stages": [
+    {
+      "number": 1,
+      "title": "Stage 1: Foundation",
+      "days": "Days 1–2",
+      "startDay": 1,
+      "endDay": 2
+    },
+    {
+      "number": 2,
+      "title": "Stage 2: Vertical slices",
+      "days": "Days 3–5",
+      "startDay": 3,
+      "endDay": 5
+    },
+    {
+      "number": 3,
+      "title": "Stage 3: Live conversation",
+      "days": "Days 6–8",
+      "startDay": 6,
+      "endDay": 8
+    },
+    {
+      "number": 4,
+      "title": "Stage 4: Complete workflows",
+      "days": "Days 9–11",
+      "startDay": 9,
+      "endDay": 11
+    },
+    {
+      "number": 5,
+      "title": "Stage 5: Hardening and delivery",
+      "days": "Days 12–14",
+      "startDay": 12,
+      "endDay": 14
+    }
+  ],
+  "people": [
+    "bengutow1",
+    "cadenlund",
+    "IvanR586",
+    "andrewkilp",
+    "Arthur2457"
+  ],
+  "tasks": [
+    {
+      "key": "T01",
+      "title": "Freeze call contracts and provider decision",
+      "needs": [],
+      "paths": "docs/contracts.md; packages/ts/api/src/types.ts; docs/provider-matrix.md",
+      "build": "Finalize request/domain/error schemas, state enums and limits; compare custom Twilio + STT + Claude + ElevenLabs with managed agents; test whether managed phone calls actually permit live operator observation and approval; record dated pricing sources and select one implementation path.",
+      "excludes": "No provider integration or UI implementation.",
+      "acceptance": "A reviewed schema fixture validates a restaurant goal, appointment goal, stale approval error and event envelope; the provider matrix includes measured feasibility and a three-minute cost example.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 1,
+      "unblocks": [
+        "T06",
+        "T07",
+        "T08",
+        "T09",
+        "T14",
+        "T15",
+        "T20"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** none · **Unblocks** T06, T07, T08, T09, T14, T15, T20\n\n**Goal.** Freeze call contracts and provider decision.\n\n**Build**\n\n- Places: `docs/contracts.md`, `packages/ts/api/src/types.ts`, `docs/provider-matrix.md`.\n- Finalize request/domain/error schemas, state enums and limits; compare custom Twilio + STT + Claude + ElevenLabs with managed agents; test whether managed phone calls actually permit live operator observation and approval; record dated pricing sources and select one implementation path.\n\n**Not in this issue**\n\n- No provider integration or UI implementation.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A reviewed schema fixture validates a restaurant goal, appointment goal, stale approval error and event envelope; the provider matrix includes measured feasibility and a three-minute cost example.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T01 -->\n"
+    },
+    {
+      "key": "T02",
+      "title": "Extract the mockup-based theme and UI primitives",
+      "needs": [],
+      "paths": "apps/mobile/src/theme.ts; apps/mobile/src/components; docs/design.md",
+      "build": "Turn the generated mockup into shared text, button, badge, ruled panel and input components; preserve the paper/forest/serif direction and add narrow/wide spacing tokens and loading/error states.",
+      "excludes": "No call API wiring or new visual direction.",
+      "acceptance": "A component gallery screenshot at 390 and 1440 px matches the reference hierarchy; all controls have labels and 48 px targets.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 1,
+      "unblocks": [
+        "T07",
+        "T10",
+        "T12"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** none · **Unblocks** T07, T10, T12\n\n**Goal.** Extract the mockup-based theme and UI primitives.\n\n**Build**\n\n- Places: `apps/mobile/src/theme.ts`, `apps/mobile/src/components`, `docs/design.md`.\n- Turn the generated mockup into shared text, button, badge, ruled panel and input components; preserve the paper/forest/serif direction and add narrow/wide spacing tokens and loading/error states.\n\n**Not in this issue**\n\n- No call API wiring or new visual direction.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A component gallery screenshot at 390 and 1440 px matches the reference hierarchy; all controls have labels and 48 px targets.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T02 -->\n"
+    },
+    {
+      "key": "T03",
+      "title": "Design call, instruction and event storage",
+      "needs": [],
+      "paths": "db/migrations/00001_calls.sql; docs/storage.md",
+      "build": "Define session owners, calls, goals, instructions, turns, responses and append-only events; add owner indexes, revision checks, event sequence uniqueness and idempotency-key uniqueness; document deletion order.",
+      "excludes": "No query implementation or session middleware.",
+      "acceptance": "Migration up/down runs on an empty local Postgres; constraints reject duplicate call event sequences and an invalid call state.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 1,
+      "unblocks": [
+        "T08",
+        "T13"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** none · **Unblocks** T08, T13\n\n**Goal.** Design call, instruction and event storage.\n\n**Build**\n\n- Places: `db/migrations/00001_calls.sql`, `docs/storage.md`.\n- Define session owners, calls, goals, instructions, turns, responses and append-only events; add owner indexes, revision checks, event sequence uniqueness and idempotency-key uniqueness; document deletion order.\n\n**Not in this issue**\n\n- No query implementation or session middleware.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Migration up/down runs on an empty local Postgres; constraints reject duplicate call event sequences and an invalid call state.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T03 -->\n"
+    },
+    {
+      "key": "T04",
+      "title": "Implement the pure call and response state machine",
+      "needs": [],
+      "paths": "packages/go/conversation; go.work",
+      "build": "Implement allowed call transitions and separate response states; define cancellation generation tokens and the connected/paused substate; model end as terminal and reject stale context revisions without I/O.",
+      "excludes": "No model HTTP requests, audio or persistence.",
+      "acceptance": "Table tests cover draft through end, pause/resume, end while dialing, a late provider event and a stale response after a newer instruction.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 1,
+      "unblocks": [
+        "T09",
+        "T19",
+        "T24",
+        "T26",
+        "T28",
+        "T29",
+        "T31"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** none · **Unblocks** T09, T19, T24, T26, T28, T29, T31\n\n**Goal.** Implement the pure call and response state machine.\n\n**Build**\n\n- Places: `packages/go/conversation`, `go.work`.\n- Implement allowed call transitions and separate response states; define cancellation generation tokens and the connected/paused substate; model end as terminal and reject stale context revisions without I/O.\n\n**Not in this issue**\n\n- No model HTTP requests, audio or persistence.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Table tests cover draft through end, pause/resume, end while dialing, a late provider event and a stale response after a newer instruction.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T04 -->\n"
+    },
+    {
+      "key": "T05",
+      "title": "Build deterministic restaurant and appointment scenarios",
+      "needs": [],
+      "paths": "packages/go/mock; docs/fixtures; scripts/scenarios",
+      "build": "Add scripted scenarios for a reservation time conflict and an appointment missing a detail; include partial/final turns, expected operator instructions and expected outcomes; ensure fixtures contain only fictional data.",
+      "excludes": "No live calls, paid model requests or completion of provider adapters.",
+      "acceptance": "The same seed produces identical ordered fixture events; both scenarios include an unanswered question and a path requiring operator input.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 1,
+      "unblocks": [
+        "T06",
+        "T09",
+        "T10"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** none · **Unblocks** T06, T09, T10\n\n**Goal.** Build deterministic restaurant and appointment scenarios.\n\n**Build**\n\n- Places: `packages/go/mock`, `docs/fixtures`, `scripts/scenarios`.\n- Add scripted scenarios for a reservation time conflict and an appointment missing a detail; include partial/final turns, expected operator instructions and expected outcomes; ensure fixtures contain only fictional data.\n\n**Not in this issue**\n\n- No live calls, paid model requests or completion of provider adapters.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] The same seed produces identical ordered fixture events; both scenarios include an unanswered question and a path requiring operator input.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T05 -->\n"
+    },
+    {
+      "key": "T06",
+      "title": "Define cancellable provider interfaces and mock adapters",
+      "needs": [
+        "T01",
+        "T05"
+      ],
+      "paths": "packages/go/providers; packages/go/mock; go.work",
+      "build": "Implement the documented Telephony, Transcriber, Responder and Synthesizer boundaries with cancellation and audio metadata; adapt the Stage 1 scenarios to all four interfaces without network access.",
+      "excludes": "No real provider SDKs or new transport.",
+      "acceptance": "A contract suite runs the same lifecycle against mock adapters and proves cancel stops callbacks and audio emission.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 1,
+      "unblocks": [
+        "T11",
+        "T14",
+        "T15",
+        "T16",
+        "T19",
+        "T20",
+        "T35",
+        "T40"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** T01, T05 · **Unblocks** T11, T14, T15, T16, T19, T20, T35, T40\n\n**Goal.** Define cancellable provider interfaces and mock adapters.\n\n**Build**\n\n- Places: `packages/go/providers`, `packages/go/mock`, `go.work`.\n- Implement the documented Telephony, Transcriber, Responder and Synthesizer boundaries with cancellation and audio metadata; adapt the Stage 1 scenarios to all four interfaces without network access.\n\n**Not in this issue**\n\n- No real provider SDKs or new transport.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A contract suite runs the same lifecycle against mock adapters and proves cancel stops callbacks and audio emission.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T06 -->\n"
+    },
+    {
+      "key": "T07",
+      "title": "Create goal entry and review routes (N1, N2)",
+      "needs": [
+        "T01",
+        "T02"
+      ],
+      "paths": "apps/mobile/src/app/new.tsx; apps/mobile/src/app/review.tsx; apps/mobile/src/screens",
+      "build": "Replace local New call navigation with restaurant/appointment forms, explicit time zone, constraints, business contact and review; default to mock and approval always; use fictional destinations in demos.",
+      "excludes": "No dialing, persistence or provider settings.",
+      "acceptance": "Screenshots and a recorded flow show both goal kinds, validation, review and back navigation without losing form input.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 1,
+      "unblocks": [
+        "T12",
+        "T18",
+        "T34"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** T01, T02 · **Unblocks** T12, T18, T34\n\n**Goal.** Create goal entry and review routes (N1, N2).\n\n**Build**\n\n- Places: `apps/mobile/src/app/new.tsx`, `apps/mobile/src/app/review.tsx`, `apps/mobile/src/screens`.\n- Replace local New call navigation with restaurant/appointment forms, explicit time zone, constraints, business contact and review; default to mock and approval always; use fictional destinations in demos.\n\n**Not in this issue**\n\n- No dialing, persistence or provider settings.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Screenshots and a recorded flow show both goal kinds, validation, review and back navigation without losing form input.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T07 -->\n"
+    },
+    {
+      "key": "T08",
+      "title": "Implement minimal sessions and owner middleware",
+      "needs": [
+        "T01",
+        "T03"
+      ],
+      "paths": "packages/go/auth; packages/go/handlers/session; apps/api/main.go",
+      "build": "Implement POST/DELETE /v1/session with server-owned identity, HttpOnly cookie, secure flags by environment and owner lookup; use the selected session store and document its dependency purpose.",
+      "excludes": "No external OAuth, profile page or public deployment.",
+      "acceptance": "Integration tests show session continuity, logout invalidation, missing-session rejection and production cookie flags; the app never supplies owner_id.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 1,
+      "unblocks": [
+        "T11",
+        "T13",
+        "T18",
+        "T43"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** T01, T03 · **Unblocks** T11, T13, T18, T43\n\n**Goal.** Implement minimal sessions and owner middleware.\n\n**Build**\n\n- Places: `packages/go/auth`, `packages/go/handlers/session`, `apps/api/main.go`.\n- Implement POST/DELETE /v1/session with server-owned identity, HttpOnly cookie, secure flags by environment and owner lookup; use the selected session store and document its dependency purpose.\n\n**Not in this issue**\n\n- No external OAuth, profile page or public deployment.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Integration tests show session continuity, logout invalidation, missing-session rejection and production cookie flags; the app never supplies owner_id.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T08 -->\n"
+    },
+    {
+      "key": "T09",
+      "title": "Define event reducer and reconnect rules",
+      "needs": [
+        "T01",
+        "T04",
+        "T05"
+      ],
+      "paths": "packages/ts/api/src/events.ts; docs/events.md",
+      "build": "Implement typed event validation and a pure reducer using seq, entity id and context_revision; replace partial turns by id, deduplicate replayed events and reject stale response updates; define expired-cursor recovery.",
+      "excludes": "No live SSE connection or event persistence.",
+      "acceptance": "Fixtures prove partial-to-final replacement, duplicate replay, out-of-order handling, stale suggestion rejection and resync after a sequence gap.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 1,
+      "unblocks": [
+        "T12",
+        "T17",
+        "T22",
+        "T23"
+      ],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** T01, T04, T05 · **Unblocks** T12, T17, T22, T23\n\n**Goal.** Define event reducer and reconnect rules.\n\n**Build**\n\n- Places: `packages/ts/api/src/events.ts`, `docs/events.md`.\n- Implement typed event validation and a pure reducer using seq, entity id and context_revision; replace partial turns by id, deduplicate replayed events and reject stale response updates; define expired-cursor recovery.\n\n**Not in this issue**\n\n- No live SSE connection or event persistence.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fixtures prove partial-to-final replacement, duplicate replay, out-of-order handling, stale suggestion rejection and resync after a sequence gap.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T09 -->\n"
+    },
+    {
+      "key": "T10",
+      "title": "Strengthen baseline CI and repeatable mock verification",
+      "needs": [
+        "T02",
+        "T05"
+      ],
+      "paths": ".github/workflows/CI.yaml; scripts/verify-fixtures; docs/contributing.md",
+      "build": "Keep the inherited moon workflow; add fixture validation and an offline check that no CI task can enable real calls; document one-issue branches and PR evidence for Codex and Claude Code.",
+      "excludes": "No deploy workflow, real phone calls or unrelated tooling migration.",
+      "acceptance": "A PR runs all baseline checks and intentionally malformed fixture input fails the validator with a clear message.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 1,
+      "unblocks": [],
+      "labels": [
+        "stage:1",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 1: Foundation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 1: Foundation (Days 1–2) · **Needs** T02, T05 · **Unblocks** none\n\n**Goal.** Strengthen baseline CI and repeatable mock verification.\n\n**Build**\n\n- Places: `.github/workflows/CI.yaml`, `scripts/verify-fixtures`, `docs/contributing.md`.\n- Keep the inherited moon workflow; add fixture validation and an offline check that no CI task can enable real calls; document one-issue branches and PR evidence for Codex and Claude Code.\n\n**Not in this issue**\n\n- No deploy workflow, real phone calls or unrelated tooling migration.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A PR runs all baseline checks and intentionally malformed fixture input fails the validator with a clear message.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T10 -->\n"
+    },
+    {
+      "key": "T11",
+      "title": "Implement outbound Twilio start behind the call gate",
+      "needs": [
+        "T06",
+        "T08",
+        "T18"
+      ],
+      "paths": "packages/go/telephony; packages/go/handlers/calls; apps/api/main.go",
+      "build": "Implement POST /v1/calls/{id}/start; require enabled real mode, allowed E.164 destination, consent acknowledgement and idempotency; create one provider call and associate its SID; mock mode uses the mock adapter.",
+      "excludes": "No automatic retries that create a second call; no media bridge.",
+      "acceptance": "HTTP fixtures prove one dial for repeated start keys, blocked destinations, no real adapter in mock mode and a safe provider-failure response.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 2,
+      "unblocks": [
+        "T16",
+        "T21",
+        "T31",
+        "T35"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T06, T08, T18 · **Unblocks** T16, T21, T31, T35\n\n**Goal.** Implement outbound Twilio start behind the call gate.\n\n**Build**\n\n- Places: `packages/go/telephony`, `packages/go/handlers/calls`, `apps/api/main.go`.\n- Implement POST /v1/calls/{id}/start; require enabled real mode, allowed E.164 destination, consent acknowledgement and idempotency; create one provider call and associate its SID; mock mode uses the mock adapter.\n\n**Not in this issue**\n\n- No automatic retries that create a second call; no media bridge.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] HTTP fixtures prove one dial for repeated start keys, blocked destinations, no real adapter in mock mode and a safe provider-failure response.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T11 -->\n"
+    },
+    {
+      "key": "T12",
+      "title": "Build the live call route from the generated mockup (L1)",
+      "needs": [
+        "T02",
+        "T07",
+        "T09"
+      ],
+      "paths": "apps/mobile/src/app/calls/[id].tsx; apps/mobile/src/screens/live-call",
+      "build": "Create the responsive transcript/goal/reply layout, mobile reading flow and composer region; render typed fixture state and visually distinguish connecting, awaiting approval, paused and ended.",
+      "excludes": "No direct vendor requests or live event subscription.",
+      "acceptance": "Narrow and wide screenshots match docs/design.md; unspoken suggestions are outside the transcript and all terminal controls have clear states.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 2,
+      "unblocks": [
+        "T17",
+        "T27",
+        "T32"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T02, T07, T09 · **Unblocks** T17, T27, T32\n\n**Goal.** Build the live call route from the generated mockup (L1).\n\n**Build**\n\n- Places: `apps/mobile/src/app/calls/[id].tsx`, `apps/mobile/src/screens/live-call`.\n- Create the responsive transcript/goal/reply layout, mobile reading flow and composer region; render typed fixture state and visually distinguish connecting, awaiting approval, paused and ended.\n\n**Not in this issue**\n\n- No direct vendor requests or live event subscription.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Narrow and wide screenshots match docs/design.md; unspoken suggestions are outside the transcript and all terminal controls have clear states.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T12 -->\n"
+    },
+    {
+      "key": "T13",
+      "title": "Implement owner-scoped call repositories",
+      "needs": [
+        "T03",
+        "T08"
+      ],
+      "paths": "packages/go/repository; db/migrations; docker/compose.yml",
+      "build": "Add transactional call/goal/turn/response/instruction CRUD and event append using owner fences; allocate per-call seq atomically and enforce idempotency at the database boundary.",
+      "excludes": "No HTTP handlers, business prompts or retention jobs.",
+      "acceptance": "Database integration tests prove another owner cannot read/write a call, concurrent appends get unique sequences and retried writes do not duplicate rows.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 2,
+      "unblocks": [
+        "T18",
+        "T23",
+        "T25",
+        "T28",
+        "T33",
+        "T38",
+        "T48"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T03, T08 · **Unblocks** T18, T23, T25, T28, T33, T38, T48\n\n**Goal.** Implement owner-scoped call repositories.\n\n**Build**\n\n- Places: `packages/go/repository`, `db/migrations`, `docker/compose.yml`.\n- Add transactional call/goal/turn/response/instruction CRUD and event append using owner fences; allocate per-call seq atomically and enforce idempotency at the database boundary.\n\n**Not in this issue**\n\n- No HTTP handlers, business prompts or retention jobs.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Database integration tests prove another owner cannot read/write a call, concurrent appends get unique sequences and retried writes do not duplicate rows.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T13 -->\n"
+    },
+    {
+      "key": "T14",
+      "title": "Implement the streaming Claude response adapter",
+      "needs": [
+        "T01",
+        "T06"
+      ],
+      "paths": "packages/go/claude; docs/providers/claude.md; .env.example",
+      "build": "Implement server-only Anthropic Messages streaming with configurable supported model, bounded output, context cancellation and user-safe error mapping; keep private instructions distinct from business transcript text.",
+      "excludes": "No TTS, approval UI or using Claude Code subscription credentials as an API key.",
+      "acceptance": "Recorded HTTP fixtures cover a complete response, partial stream failure, rate limit and cancellation; no API key appears in logs.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 2,
+      "unblocks": [
+        "T19",
+        "T24",
+        "T40",
+        "T45"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T01, T06 · **Unblocks** T19, T24, T40, T45\n\n**Goal.** Implement the streaming Claude response adapter.\n\n**Build**\n\n- Places: `packages/go/claude`, `docs/providers/claude.md`, `.env.example`.\n- Implement server-only Anthropic Messages streaming with configurable supported model, bounded output, context cancellation and user-safe error mapping; keep private instructions distinct from business transcript text.\n\n**Not in this issue**\n\n- No TTS, approval UI or using Claude Code subscription credentials as an API key.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Recorded HTTP fixtures cover a complete response, partial stream failure, rate limit and cancellation; no API key appears in logs.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T14 -->\n"
+    },
+    {
+      "key": "T15",
+      "title": "Implement ElevenLabs streaming speech synthesis",
+      "needs": [
+        "T01",
+        "T06"
+      ],
+      "paths": "packages/go/elevenlabs/tts; docs/providers/elevenlabs.md",
+      "build": "Add the Synthesizer adapter with configured voice/model, explicit telephony output encoding and cancellable streaming; bound text length and reject unsupported format rather than guessing.",
+      "excludes": "No Twilio playback queue or automatic speaking of draft text.",
+      "acceptance": "Fixture tests verify encoding metadata, streamed chunks, cancellation, unauthorized key and provider timeout without calling a paid endpoint.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 2,
+      "unblocks": [
+        "T30",
+        "T35",
+        "T40",
+        "T45"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T01, T06 · **Unblocks** T30, T35, T40, T45\n\n**Goal.** Implement ElevenLabs streaming speech synthesis.\n\n**Build**\n\n- Places: `packages/go/elevenlabs/tts`, `docs/providers/elevenlabs.md`.\n- Add the Synthesizer adapter with configured voice/model, explicit telephony output encoding and cancellable streaming; bound text length and reject unsupported format rather than guessing.\n\n**Not in this issue**\n\n- No Twilio playback queue or automatic speaking of draft text.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fixture tests verify encoding metadata, streamed chunks, cancellation, unauthorized key and provider timeout without calling a paid endpoint.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T15 -->\n"
+    },
+    {
+      "key": "T16",
+      "title": "Implement signed Twilio callbacks and status mapping",
+      "needs": [
+        "T06",
+        "T11"
+      ],
+      "paths": "packages/go/handlers/webhooks; packages/go/telephony",
+      "build": "Add voice/status routes, validate Twilio signatures against the configured public URL and original form body, map callback states monotonically and return the media-stream TwiML for the owned call.",
+      "excludes": "No unauthenticated browser callbacks or media audio processing.",
+      "acceptance": "Signed/unsigned fixtures prove rejection, duplicate callback idempotency and no regression from ended to connected on an out-of-order event.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 2,
+      "unblocks": [
+        "T21",
+        "T36"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T06, T11 · **Unblocks** T21, T36\n\n**Goal.** Implement signed Twilio callbacks and status mapping.\n\n**Build**\n\n- Places: `packages/go/handlers/webhooks`, `packages/go/telephony`.\n- Add voice/status routes, validate Twilio signatures against the configured public URL and original form body, map callback states monotonically and return the media-stream TwiML for the owned call.\n\n**Not in this issue**\n\n- No unauthenticated browser callbacks or media audio processing.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Signed/unsigned fixtures prove rejection, duplicate callback idempotency and no regression from ended to connected on an out-of-order event.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T16 -->\n"
+    },
+    {
+      "key": "T17",
+      "title": "Wire transcript rendering to the shared event reducer",
+      "needs": [
+        "T09",
+        "T12"
+      ],
+      "paths": "apps/mobile/src/screens/live-call/transcript.tsx; packages/ts/api/src/events.ts",
+      "build": "Render assistant/business finalized turns and separate provisional text; preserve reading position, allow jump to latest and display timestamps; suggestions enter transcript only after playback acknowledgement.",
+      "excludes": "No SSE network connection or response-generation logic.",
+      "acceptance": "A fixture replay shows a partial turn becoming final without duplicates, preserves a scrolled-up position and never labels an approved-but-unplayed reply as spoken.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 2,
+      "unblocks": [
+        "T22",
+        "T42"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T09, T12 · **Unblocks** T22, T42\n\n**Goal.** Wire transcript rendering to the shared event reducer.\n\n**Build**\n\n- Places: `apps/mobile/src/screens/live-call/transcript.tsx`, `packages/ts/api/src/events.ts`.\n- Render assistant/business finalized turns and separate provisional text; preserve reading position, allow jump to latest and display timestamps; suggestions enter transcript only after playback acknowledgement.\n\n**Not in this issue**\n\n- No SSE network connection or response-generation logic.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A fixture replay shows a partial turn becoming final without duplicates, preserves a scrolled-up position and never labels an approved-but-unplayed reply as spoken.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T17 -->\n"
+    },
+    {
+      "key": "T18",
+      "title": "Expose call draft/create/read and the typed client",
+      "needs": [
+        "T07",
+        "T08",
+        "T13"
+      ],
+      "paths": "packages/go/handlers/calls; packages/ts/api/src/calls.ts; apps/mobile/src/screens",
+      "build": "Implement POST /v1/calls and GET /v1/calls/{id}; validate both goal types, destination, time zone and body limits; wire review to draft creation while keeping start a separate action.",
+      "excludes": "No start implementation, list history or model generation.",
+      "acceptance": "Integration tests cover both goals, malformed dates, wrong-owner lookup and idempotent create; app opens the returned call id without dialing on create.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 2,
+      "unblocks": [
+        "T11",
+        "T23",
+        "T29",
+        "T33",
+        "T43"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T07, T08, T13 · **Unblocks** T11, T23, T29, T33, T43\n\n**Goal.** Expose call draft/create/read and the typed client.\n\n**Build**\n\n- Places: `packages/go/handlers/calls`, `packages/ts/api/src/calls.ts`, `apps/mobile/src/screens`.\n- Implement POST /v1/calls and GET /v1/calls/{id}; validate both goal types, destination, time zone and body limits; wire review to draft creation while keeping start a separate action.\n\n**Not in this issue**\n\n- No start implementation, list history or model generation.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Integration tests cover both goals, malformed dates, wrong-owner lookup and idempotent create; app opens the returned call id without dialing on create.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T18 -->\n"
+    },
+    {
+      "key": "T19",
+      "title": "Compose the mock conversation loop",
+      "needs": [
+        "T04",
+        "T06",
+        "T14"
+      ],
+      "paths": "packages/go/conversation; packages/go/mock; apps/api/main.go",
+      "build": "Connect finalized business turns to the Responder boundary; default to deterministic mock generation in mock calls; emit response states and pause at approval boundaries without TTS.",
+      "excludes": "No live audio or emitting unapproved speech.",
+      "acceptance": "An integration fixture reaches a suggested reply for each scenario, blocks pending approval and cancels generation after a newer context revision.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 2,
+      "unblocks": [
+        "T24",
+        "T28",
+        "T30"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T04, T06, T14 · **Unblocks** T24, T28, T30\n\n**Goal.** Compose the mock conversation loop.\n\n**Build**\n\n- Places: `packages/go/conversation`, `packages/go/mock`, `apps/api/main.go`.\n- Connect finalized business turns to the Responder boundary; default to deterministic mock generation in mock calls; emit response states and pause at approval boundaries without TTS.\n\n**Not in this issue**\n\n- No live audio or emitting unapproved speech.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] An integration fixture reaches a suggested reply for each scenario, blocks pending approval and cancels generation after a newer context revision.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T19 -->\n"
+    },
+    {
+      "key": "T20",
+      "title": "Select and implement a streaming STT adapter",
+      "needs": [
+        "T01",
+        "T06"
+      ],
+      "paths": "packages/go/transcription; docs/providers/stt.md",
+      "build": "Spike ElevenLabs realtime speech recognition and one practical alternative; record language, audio formats, trial limits and pricing; implement only the selected adapter with partial/final Turn mapping and cancellation.",
+      "excludes": "No second production STT provider or client microphone capture.",
+      "acceptance": "Fixture tests cover partial/final boundaries, silence, malformed audio and disconnect; the provider decision includes a measured sample and explicit codec conversion needs.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 2,
+      "unblocks": [
+        "T21",
+        "T25",
+        "T35",
+        "T40",
+        "T45"
+      ],
+      "labels": [
+        "stage:2",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 2: Vertical slices",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 2: Vertical slices (Days 3–5) · **Needs** T01, T06 · **Unblocks** T21, T25, T35, T40, T45\n\n**Goal.** Select and implement a streaming STT adapter.\n\n**Build**\n\n- Places: `packages/go/transcription`, `docs/providers/stt.md`.\n- Spike ElevenLabs realtime speech recognition and one practical alternative; record language, audio formats, trial limits and pricing; implement only the selected adapter with partial/final Turn mapping and cancellation.\n\n**Not in this issue**\n\n- No second production STT provider or client microphone capture.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fixture tests cover partial/final boundaries, silence, malformed audio and disconnect; the provider decision includes a measured sample and explicit codec conversion needs.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T20 -->\n"
+    },
+    {
+      "key": "T21",
+      "title": "Build the authenticated Twilio bidirectional media bridge",
+      "needs": [
+        "T11",
+        "T16",
+        "T20"
+      ],
+      "paths": "packages/go/telephony/media; packages/go/handlers/webhooks",
+      "build": "Handle connected/start/media/mark/stop; bind stream SID to the verified call; enforce 8 kHz mu-law metadata and bounded input/output buffers; feed audio through the Transcriber boundary.",
+      "excludes": "No provider audio recording or operator microphone.",
+      "acceptance": "A simulated Twilio WebSocket proves stream ownership, protocol rejection, bounded queue behavior and clean stop/cancel without a real call.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 3,
+      "unblocks": [
+        "T25",
+        "T26",
+        "T30",
+        "T31",
+        "T36"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T11, T16, T20 · **Unblocks** T25, T26, T30, T31, T36\n\n**Goal.** Build the authenticated Twilio bidirectional media bridge.\n\n**Build**\n\n- Places: `packages/go/telephony/media`, `packages/go/handlers/webhooks`.\n- Handle connected/start/media/mark/stop; bind stream SID to the verified call; enforce 8 kHz mu-law metadata and bounded input/output buffers; feed audio through the Transcriber boundary.\n\n**Not in this issue**\n\n- No provider audio recording or operator microphone.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A simulated Twilio WebSocket proves stream ownership, protocol rejection, bounded queue behavior and clean stop/cancel without a real call.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T21 -->\n"
+    },
+    {
+      "key": "T22",
+      "title": "Subscribe the app to the authenticated event stream",
+      "needs": [
+        "T09",
+        "T17",
+        "T23"
+      ],
+      "paths": "packages/ts/api/src/stream.ts; apps/mobile/src/screens/live-call",
+      "build": "Implement a cross-platform authenticated streaming client, with cookie credentials, explicit reconnect cursor, cleanup on route leave and focus recovery; feed validated events into the reducer.",
+      "excludes": "No raw EventSource assumption on native and no provider WebSocket in the app.",
+      "acceptance": "A transport fixture proves live updates, reconnect without duplicate turns, unauthorized disconnect, expired cursor resync and subscription cleanup on navigation.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 3,
+      "unblocks": [
+        "T27",
+        "T32",
+        "T37"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T09, T17, T23 · **Unblocks** T27, T32, T37\n\n**Goal.** Subscribe the app to the authenticated event stream.\n\n**Build**\n\n- Places: `packages/ts/api/src/stream.ts`, `apps/mobile/src/screens/live-call`.\n- Implement a cross-platform authenticated streaming client, with cookie credentials, explicit reconnect cursor, cleanup on route leave and focus recovery; feed validated events into the reducer.\n\n**Not in this issue**\n\n- No raw EventSource assumption on native and no provider WebSocket in the app.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A transport fixture proves live updates, reconnect without duplicate turns, unauthorized disconnect, expired cursor resync and subscription cleanup on navigation.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T22 -->\n"
+    },
+    {
+      "key": "T23",
+      "title": "Implement durable SSE fanout and replay",
+      "needs": [
+        "T09",
+        "T13",
+        "T18"
+      ],
+      "paths": "packages/go/events; packages/go/handlers/events",
+      "build": "Serve owner-gated GET events with strictly increasing seq, bounded replay, Last-Event-ID, explicit expired cursor, heartbeats and disconnect cleanup; commit durable events before publishing.",
+      "excludes": "No multi-instance broker or mobile UI.",
+      "acceptance": "Integration tests cover wrong-owner denial, replay cursor, two subscribers, disconnect cleanup and a durable event being replayable after a server restart.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 3,
+      "unblocks": [
+        "T22",
+        "T25",
+        "T28",
+        "T33",
+        "T43",
+        "T48"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T09, T13, T18 · **Unblocks** T22, T25, T28, T33, T43, T48\n\n**Goal.** Implement durable SSE fanout and replay.\n\n**Build**\n\n- Places: `packages/go/events`, `packages/go/handlers/events`.\n- Serve owner-gated GET events with strictly increasing seq, bounded replay, Last-Event-ID, explicit expired cursor, heartbeats and disconnect cleanup; commit durable events before publishing.\n\n**Not in this issue**\n\n- No multi-instance broker or mobile UI.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Integration tests cover wrong-owner denial, replay cursor, two subscribers, disconnect cleanup and a durable event being replayable after a server restart.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T23 -->\n"
+    },
+    {
+      "key": "T24",
+      "title": "Build the goal-aware prompt and response validation",
+      "needs": [
+        "T04",
+        "T14",
+        "T19"
+      ],
+      "paths": "packages/go/conversation/prompt; docs/prompts.md",
+      "build": "Combine authorized goal, final transcript and ordered private instructions; treat remote speech as untrusted context; request short responses and approval for missing facts or commitments outside constraints.",
+      "excludes": "No arbitrary tools, payments or invented customer details.",
+      "acceptance": "Golden fixtures cover a time conflict, unknown contact detail and malicious remote instruction; responses preserve constraints and flag required approval.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 3,
+      "unblocks": [
+        "T29",
+        "T34",
+        "T39"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T04, T14, T19 · **Unblocks** T29, T34, T39\n\n**Goal.** Build the goal-aware prompt and response validation.\n\n**Build**\n\n- Places: `packages/go/conversation/prompt`, `docs/prompts.md`.\n- Combine authorized goal, final transcript and ordered private instructions; treat remote speech as untrusted context; request short responses and approval for missing facts or commitments outside constraints.\n\n**Not in this issue**\n\n- No arbitrary tools, payments or invented customer details.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Golden fixtures cover a time conflict, unknown contact detail and malicious remote instruction; responses preserve constraints and flag required approval.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T24 -->\n"
+    },
+    {
+      "key": "T25",
+      "title": "Bridge real STT updates into durable transcript turns",
+      "needs": [
+        "T13",
+        "T20",
+        "T21",
+        "T23"
+      ],
+      "paths": "packages/go/transcription; packages/go/conversation; packages/go/events",
+      "build": "Persist final turns and publish partial updates with stable ids; trigger generation exactly once per finalized business turn; normalize provider timing and clean up recognition on end.",
+      "excludes": "No diarization of audio not supplied by the provider or fabricated assistant turns.",
+      "acceptance": "Audio/event fixtures prove partial replacement, one generation per final turn, disconnect recovery and no post-end transcript writes.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 3,
+      "unblocks": [
+        "T26",
+        "T34",
+        "T39",
+        "T41",
+        "T45"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T13, T20, T21, T23 · **Unblocks** T26, T34, T39, T41, T45\n\n**Goal.** Bridge real STT updates into durable transcript turns.\n\n**Build**\n\n- Places: `packages/go/transcription`, `packages/go/conversation`, `packages/go/events`.\n- Persist final turns and publish partial updates with stable ids; trigger generation exactly once per finalized business turn; normalize provider timing and clean up recognition on end.\n\n**Not in this issue**\n\n- No diarization of audio not supplied by the provider or fabricated assistant turns.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Audio/event fixtures prove partial replacement, one generation per final turn, disconnect recovery and no post-end transcript writes.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T25 -->\n"
+    },
+    {
+      "key": "T26",
+      "title": "Implement remote interruption and audio-buffer clearing",
+      "needs": [
+        "T04",
+        "T21",
+        "T25",
+        "T30"
+      ],
+      "paths": "packages/go/telephony/media; packages/go/conversation",
+      "build": "Detect remote speech using the selected STT/VAD signal; cancel active generation and synthesis, send Twilio clear, invalidate pending playback marks and preserve the already-spoken portion accurately.",
+      "excludes": "No continuous speech recording or new VAD dependency without evidence.",
+      "acceptance": "A deterministic race test interrupts speech, clears queued audio and proves a late old mark cannot finalize cancelled speech or restart it.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 3,
+      "unblocks": [
+        "T36",
+        "T41",
+        "T44"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T04, T21, T25, T30 · **Unblocks** T36, T41, T44\n\n**Goal.** Implement remote interruption and audio-buffer clearing.\n\n**Build**\n\n- Places: `packages/go/telephony/media`, `packages/go/conversation`.\n- Detect remote speech using the selected STT/VAD signal; cancel active generation and synthesis, send Twilio clear, invalidate pending playback marks and preserve the already-spoken portion accurately.\n\n**Not in this issue**\n\n- No continuous speech recording or new VAD dependency without evidence.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A deterministic race test interrupts speech, clears queued audio and proves a late old mark cannot finalize cancelled speech or restart it.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T26 -->\n"
+    },
+    {
+      "key": "T27",
+      "title": "Wire the private mid-call instruction composer",
+      "needs": [
+        "T12",
+        "T22",
+        "T28"
+      ],
+      "paths": "apps/mobile/src/screens/live-call/instructions.tsx; packages/ts/api/src/instructions.ts",
+      "build": "Send bounded private instructions with expected_revision and idempotency; show pending/applied/failed state, preserve failed input and display revised suggestion when received.",
+      "excludes": "No speaking the instruction literally or local-only fake model response.",
+      "acceptance": "A full mock flow sends a patio request mid-call, shows acknowledgement and a revised suggestion; stale revision is recoverable without losing the typed instruction.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 3,
+      "unblocks": [
+        "T32",
+        "T42"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T12, T22, T28 · **Unblocks** T32, T42\n\n**Goal.** Wire the private mid-call instruction composer.\n\n**Build**\n\n- Places: `apps/mobile/src/screens/live-call/instructions.tsx`, `packages/ts/api/src/instructions.ts`.\n- Send bounded private instructions with expected_revision and idempotency; show pending/applied/failed state, preserve failed input and display revised suggestion when received.\n\n**Not in this issue**\n\n- No speaking the instruction literally or local-only fake model response.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A full mock flow sends a patio request mid-call, shows acknowledgement and a revised suggestion; stale revision is recoverable without losing the typed instruction.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T27 -->\n"
+    },
+    {
+      "key": "T28",
+      "title": "Apply operator instructions with atomic context revisions",
+      "needs": [
+        "T04",
+        "T13",
+        "T19",
+        "T23"
+      ],
+      "paths": "packages/go/handlers/instructions; packages/go/conversation",
+      "build": "Implement instruction POST, transactional revision increment and event publication; invalidate older responses and cancel outstanding generation/audio; regenerate using the newest final transcript and instruction.",
+      "excludes": "No UI composer or approval bypass.",
+      "acceptance": "Race tests prove concurrent instructions have ordered revisions, duplicate idempotency keys do not increment twice and late generation cannot overwrite the new response.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 3,
+      "unblocks": [
+        "T27",
+        "T29",
+        "T31",
+        "T34",
+        "T43",
+        "T44"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T04, T13, T19, T23 · **Unblocks** T27, T29, T31, T34, T43, T44\n\n**Goal.** Apply operator instructions with atomic context revisions.\n\n**Build**\n\n- Places: `packages/go/handlers/instructions`, `packages/go/conversation`.\n- Implement instruction POST, transactional revision increment and event publication; invalidate older responses and cancel outstanding generation/audio; regenerate using the newest final transcript and instruction.\n\n**Not in this issue**\n\n- No UI composer or approval bypass.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Race tests prove concurrent instructions have ordered revisions, duplicate idempotency keys do not increment twice and late generation cannot overwrite the new response.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T28 -->\n"
+    },
+    {
+      "key": "T29",
+      "title": "Enforce response-specific approval and edited replies",
+      "needs": [
+        "T04",
+        "T18",
+        "T24",
+        "T28"
+      ],
+      "paths": "packages/go/handlers/responses; packages/go/conversation",
+      "build": "Implement approval by response id and context_revision, optional edited_text validation and idempotency; authorize only the call owner; hand only the current approved response to the synthesis boundary.",
+      "excludes": "No direct TTS endpoint that accepts arbitrary browser text.",
+      "acceptance": "Tests reject stale approval after an instruction, wrong owner and double approve; edited text binds to the same response and is the only approved text emitted.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 3,
+      "unblocks": [
+        "T30",
+        "T32",
+        "T34",
+        "T43",
+        "T44"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T04, T18, T24, T28 · **Unblocks** T30, T32, T34, T43, T44\n\n**Goal.** Enforce response-specific approval and edited replies.\n\n**Build**\n\n- Places: `packages/go/handlers/responses`, `packages/go/conversation`.\n- Implement approval by response id and context_revision, optional edited_text validation and idempotency; authorize only the call owner; hand only the current approved response to the synthesis boundary.\n\n**Not in this issue**\n\n- No direct TTS endpoint that accepts arbitrary browser text.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Tests reject stale approval after an instruction, wrong owner and double approve; edited text binds to the same response and is the only approved text emitted.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T29 -->\n"
+    },
+    {
+      "key": "T30",
+      "title": "Implement approved speech playback and acknowledgement",
+      "needs": [
+        "T15",
+        "T19",
+        "T21",
+        "T29"
+      ],
+      "paths": "packages/go/conversation/playback; packages/go/telephony/media",
+      "build": "Stream approved synthesis as Twilio media with bounded backpressure and marks; publish speaking/spoken states, create assistant transcript turns only for acknowledged playback and cancel on generation-token mismatch.",
+      "excludes": "No speaking suggestions before approval or treating a mark as reservation confirmation.",
+      "acceptance": "A protocol fixture proves unapproved text never reaches media, marks finalize only current audio and a failed partial playback does not create a full spoken transcript.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 3,
+      "unblocks": [
+        "T26",
+        "T31",
+        "T35",
+        "T41",
+        "T44",
+        "T45"
+      ],
+      "labels": [
+        "stage:3",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 3: Live conversation",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 3: Live conversation (Days 6–8) · **Needs** T15, T19, T21, T29 · **Unblocks** T26, T31, T35, T41, T44, T45\n\n**Goal.** Implement approved speech playback and acknowledgement.\n\n**Build**\n\n- Places: `packages/go/conversation/playback`, `packages/go/telephony/media`.\n- Stream approved synthesis as Twilio media with bounded backpressure and marks; publish speaking/spoken states, create assistant transcript turns only for acknowledged playback and cancel on generation-token mismatch.\n\n**Not in this issue**\n\n- No speaking suggestions before approval or treating a mark as reservation confirmation.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A protocol fixture proves unapproved text never reaches media, marks finalize only current audio and a failed partial playback does not create a full spoken transcript.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T30 -->\n"
+    },
+    {
+      "key": "T31",
+      "title": "Implement pause, resume and terminal end controls",
+      "needs": [
+        "T04",
+        "T11",
+        "T21",
+        "T28",
+        "T30"
+      ],
+      "paths": "packages/go/handlers/control; packages/go/conversation; packages/go/telephony",
+      "build": "Implement control POST atomically; pause cancels generation and clears speech while keeping the line; resume uses latest context; end hangs up provider, stops streams and publishes terminal state once.",
+      "excludes": "No call transfers, operator microphone takeover or new call on resume.",
+      "acceptance": "Race tests cover end during dial, pause during synthesis, repeated end keys and late callbacks; no audio or generation survives terminal end.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 4,
+      "unblocks": [
+        "T36",
+        "T37",
+        "T38",
+        "T39",
+        "T41",
+        "T43",
+        "T44"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T04, T11, T21, T28, T30 · **Unblocks** T36, T37, T38, T39, T41, T43, T44\n\n**Goal.** Implement pause, resume and terminal end controls.\n\n**Build**\n\n- Places: `packages/go/handlers/control`, `packages/go/conversation`, `packages/go/telephony`.\n- Implement control POST atomically; pause cancels generation and clears speech while keeping the line; resume uses latest context; end hangs up provider, stops streams and publishes terminal state once.\n\n**Not in this issue**\n\n- No call transfers, operator microphone takeover or new call on resume.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Race tests cover end during dial, pause during synthesis, repeated end keys and late callbacks; no audio or generation survives terminal end.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T31 -->\n"
+    },
+    {
+      "key": "T32",
+      "title": "Build suggested reply editing and approval UI",
+      "needs": [
+        "T12",
+        "T22",
+        "T27",
+        "T29"
+      ],
+      "paths": "apps/mobile/src/screens/live-call/suggested-reply.tsx",
+      "build": "Show current response generation state and reason for required approval; allow edit/approve on the current revision; disable stale actions and preserve edits when a conflict is reported.",
+      "excludes": "No bypass of server approval policy or putting draft speech into transcript.",
+      "acceptance": "A replay shows a new instruction replacing a stale suggestion; approving stale text shows recovery, and approved text matches the server-confirmed version.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 4,
+      "unblocks": [
+        "T37",
+        "T42"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T12, T22, T27, T29 · **Unblocks** T37, T42\n\n**Goal.** Build suggested reply editing and approval UI.\n\n**Build**\n\n- Places: `apps/mobile/src/screens/live-call/suggested-reply.tsx`.\n- Show current response generation state and reason for required approval; allow edit/approve on the current revision; disable stale actions and preserve edits when a conflict is reported.\n\n**Not in this issue**\n\n- No bypass of server approval policy or putting draft speech into transcript.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A replay shows a new instruction replacing a stale suggestion; approving stale text shows recovery, and approved text matches the server-confirmed version.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T32 -->\n"
+    },
+    {
+      "key": "T33",
+      "title": "Implement paged call history and detail navigation (H1)",
+      "needs": [
+        "T13",
+        "T18",
+        "T23"
+      ],
+      "paths": "packages/go/handlers/history; packages/ts/api/src/history.ts; apps/mobile/src/app/index.tsx",
+      "build": "Expose owner-scoped paged call list with bounded cursor; replace preview home with real mock/real mode badges, status and resume/detail links; supply empty/loading/retry states.",
+      "excludes": "No sharing or access to another member transcript.",
+      "acceptance": "Two-owner integration tests prove isolation and stable pagination; UI evidence covers empty history, active call and finished call navigation.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 4,
+      "unblocks": [
+        "T38",
+        "T47",
+        "T48"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T13, T18, T23 · **Unblocks** T38, T47, T48\n\n**Goal.** Implement paged call history and detail navigation (H1).\n\n**Build**\n\n- Places: `packages/go/handlers/history`, `packages/ts/api/src/history.ts`, `apps/mobile/src/app/index.tsx`.\n- Expose owner-scoped paged call list with bounded cursor; replace preview home with real mock/real mode badges, status and resume/detail links; supply empty/loading/retry states.\n\n**Not in this issue**\n\n- No sharing or access to another member transcript.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Two-owner integration tests prove isolation and stable pagination; UI evidence covers empty history, active call and finished call navigation.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T33 -->\n"
+    },
+    {
+      "key": "T34",
+      "title": "Handle reservations and appointment clarification end to end",
+      "needs": [
+        "T07",
+        "T24",
+        "T25",
+        "T28",
+        "T29"
+      ],
+      "paths": "packages/go/conversation; docs/fixtures; apps/mobile/src/screens",
+      "build": "Complete separate goal templates for party size/seating and service/time preference; gate unanswered questions for operator input, allow a revised time only inside constraints and record unresolved questions.",
+      "excludes": "No calendar provider, payment or medical details.",
+      "acceptance": "Both deterministic scenarios reach a valid outcome; an unavailable time and an unknown requested detail cause steering/approval rather than invented commitments.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 4,
+      "unblocks": [
+        "T39",
+        "T41",
+        "T49"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T07, T24, T25, T28, T29 · **Unblocks** T39, T41, T49\n\n**Goal.** Handle reservations and appointment clarification end to end.\n\n**Build**\n\n- Places: `packages/go/conversation`, `docs/fixtures`, `apps/mobile/src/screens`.\n- Complete separate goal templates for party size/seating and service/time preference; gate unanswered questions for operator input, allow a revised time only inside constraints and record unresolved questions.\n\n**Not in this issue**\n\n- No calendar provider, payment or medical details.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Both deterministic scenarios reach a valid outcome; an unavailable time and an unknown requested detail cause steering/approval rather than invented commitments.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T34 -->\n"
+    },
+    {
+      "key": "T35",
+      "title": "Enforce duration, concurrency and usage limits",
+      "needs": [
+        "T06",
+        "T11",
+        "T15",
+        "T20",
+        "T30"
+      ],
+      "paths": "packages/go/policy; packages/go/conversation; docs/costs.md",
+      "build": "Add configurable max duration, one concurrent real-call permit and provider timeout limits; estimate token/audio/minute usage with dated rates; publish usage.updated and end before configured limits.",
+      "excludes": "No promise that estimates equal bills or automated account upgrades.",
+      "acceptance": "Fake-clock tests prove timeout hangup, concurrent start rejection and permit release after failure; usage report includes a documented sample with estimate-only labeling.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 4,
+      "unblocks": [
+        "T40",
+        "T45",
+        "T46"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T06, T11, T15, T20, T30 · **Unblocks** T40, T45, T46\n\n**Goal.** Enforce duration, concurrency and usage limits.\n\n**Build**\n\n- Places: `packages/go/policy`, `packages/go/conversation`, `docs/costs.md`.\n- Add configurable max duration, one concurrent real-call permit and provider timeout limits; estimate token/audio/minute usage with dated rates; publish usage.updated and end before configured limits.\n\n**Not in this issue**\n\n- No promise that estimates equal bills or automated account upgrades.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fake-clock tests prove timeout hangup, concurrent start rejection and permit release after failure; usage report includes a documented sample with estimate-only labeling.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T35 -->\n"
+    },
+    {
+      "key": "T36",
+      "title": "Harden webhook delivery and provider failure recovery",
+      "needs": [
+        "T16",
+        "T21",
+        "T26",
+        "T31"
+      ],
+      "paths": "packages/go/telephony; packages/go/handlers/webhooks",
+      "build": "Handle retries, duplicate status events, invalid signatures, socket disconnect and orphan dialing with bounded cleanup; redact provider internals and record correlation ids without private transcript text.",
+      "excludes": "No automatic redial or silent provider switching.",
+      "acceptance": "Fault-injection fixtures show no duplicate call, no leaked media session, monotonically terminal status and a visible user-safe failure event.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 4,
+      "unblocks": [
+        "T46",
+        "T49"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T16, T21, T26, T31 · **Unblocks** T46, T49\n\n**Goal.** Harden webhook delivery and provider failure recovery.\n\n**Build**\n\n- Places: `packages/go/telephony`, `packages/go/handlers/webhooks`.\n- Handle retries, duplicate status events, invalid signatures, socket disconnect and orphan dialing with bounded cleanup; redact provider internals and record correlation ids without private transcript text.\n\n**Not in this issue**\n\n- No automatic redial or silent provider switching.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fault-injection fixtures show no duplicate call, no leaked media session, monotonically terminal status and a visible user-safe failure event.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T36 -->\n"
+    },
+    {
+      "key": "T37",
+      "title": "Wire live pause/end controls and recovery states",
+      "needs": [
+        "T22",
+        "T31",
+        "T32"
+      ],
+      "paths": "apps/mobile/src/screens/live-call/controls.tsx; packages/ts/api/src/control.ts",
+      "build": "Connect pause/resume/end to server state; distinguish queued action from acknowledged action; keep transcript readable while paused and present an end confirmation plus safe retry on transport failure.",
+      "excludes": "No cosmetic local-only state pretending the provider ended.",
+      "acceptance": "A mock journey pauses during speech, resumes after an instruction and ends; a failed request leaves accurate state and offers retry without duplicate effects.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 4,
+      "unblocks": [
+        "T42",
+        "T47"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T22, T31, T32 · **Unblocks** T42, T47\n\n**Goal.** Wire live pause/end controls and recovery states.\n\n**Build**\n\n- Places: `apps/mobile/src/screens/live-call/controls.tsx`, `packages/ts/api/src/control.ts`.\n- Connect pause/resume/end to server state; distinguish queued action from acknowledged action; keep transcript readable while paused and present an end confirmation plus safe retry on transport failure.\n\n**Not in this issue**\n\n- No cosmetic local-only state pretending the provider ended.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A mock journey pauses during speech, resumes after an instruction and ends; a failed request leaves accurate state and offers retry without duplicate effects.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T37 -->\n"
+    },
+    {
+      "key": "T38",
+      "title": "Implement transcript retention and deletion",
+      "needs": [
+        "T13",
+        "T31",
+        "T33"
+      ],
+      "paths": "packages/go/repository; packages/go/handlers/history; docs/retention.md",
+      "build": "Add configurable short text retention and explicit delete of terminal calls, cascading turns/events/responses; keep raw audio disabled; describe session expiry and prevent active-call deletion.",
+      "excludes": "No cloud recording, transcript sharing or legal guarantees.",
+      "acceptance": "Fake-clock integration tests expire text, delete one owner call without touching another and reject deletion of an active call; no transcript appears in logs.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 4,
+      "unblocks": [
+        "T43",
+        "T46",
+        "T48"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T13, T31, T33 · **Unblocks** T43, T46, T48\n\n**Goal.** Implement transcript retention and deletion.\n\n**Build**\n\n- Places: `packages/go/repository`, `packages/go/handlers/history`, `docs/retention.md`.\n- Add configurable short text retention and explicit delete of terminal calls, cascading turns/events/responses; keep raw audio disabled; describe session expiry and prevent active-call deletion.\n\n**Not in this issue**\n\n- No cloud recording, transcript sharing or legal guarantees.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fake-clock integration tests expire text, delete one owner call without touching another and reject deletion of an active call; no transcript appears in logs.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T38 -->\n"
+    },
+    {
+      "key": "T39",
+      "title": "Generate evidence-backed post-call summaries (H2)",
+      "needs": [
+        "T24",
+        "T25",
+        "T31",
+        "T34"
+      ],
+      "paths": "packages/go/conversation/summary; packages/go/handlers/summary; apps/mobile/src/app/calls/[id]/summary.tsx",
+      "build": "Generate outcome and confirmed details from final business turns only; preserve unknown fields and evidence ids; show summary with transcript navigation and unresolved next steps.",
+      "excludes": "No calendar writes or treating assistant intent as a confirmed booking.",
+      "acceptance": "Fixtures prove a confirmed reservation with evidence and a failed/incomplete appointment without invented confirmation; summary is unavailable before terminal state.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 4,
+      "unblocks": [
+        "T47",
+        "T49"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T24, T25, T31, T34 · **Unblocks** T47, T49\n\n**Goal.** Generate evidence-backed post-call summaries (H2).\n\n**Build**\n\n- Places: `packages/go/conversation/summary`, `packages/go/handlers/summary`, `apps/mobile/src/app/calls/[id]/summary.tsx`.\n- Generate outcome and confirmed details from final business turns only; preserve unknown fields and evidence ids; show summary with transcript navigation and unresolved next steps.\n\n**Not in this issue**\n\n- No calendar writes or treating assistant intent as a confirmed booking.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Fixtures prove a confirmed reservation with evidence and a failed/incomplete appointment without invented confirmation; summary is unavailable before terminal state.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T39 -->\n"
+    },
+    {
+      "key": "T40",
+      "title": "Expose provider readiness and explicit mock fallback",
+      "needs": [
+        "T06",
+        "T14",
+        "T15",
+        "T20",
+        "T35"
+      ],
+      "paths": "packages/go/handlers/providers; packages/ts/api/src/providers.ts; apps/mobile/src/app/settings.tsx",
+      "build": "Add secret-free provider availability; show disabled real calling when keys or capability are missing; offer an explicit new mock session rather than silently changing an in-progress real call.",
+      "excludes": "No client key entry, multiple production vendors or leaking account balances.",
+      "acceptance": "Missing-key and outage fixtures show accurate settings, real-start rejection and a clearly labelled operator-chosen mock session.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 4,
+      "unblocks": [
+        "T46",
+        "T47"
+      ],
+      "labels": [
+        "stage:4",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 4: Complete workflows",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 4: Complete workflows (Days 9–11) · **Needs** T06, T14, T15, T20, T35 · **Unblocks** T46, T47\n\n**Goal.** Expose provider readiness and explicit mock fallback.\n\n**Build**\n\n- Places: `packages/go/handlers/providers`, `packages/ts/api/src/providers.ts`, `apps/mobile/src/app/settings.tsx`.\n- Add secret-free provider availability; show disabled real calling when keys or capability are missing; offer an explicit new mock session rather than silently changing an in-progress real call.\n\n**Not in this issue**\n\n- No client key entry, multiple production vendors or leaking account balances.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Missing-key and outage fixtures show accurate settings, real-start rejection and a clearly labelled operator-chosen mock session.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T40 -->\n"
+    },
+    {
+      "key": "T41",
+      "title": "Run full restaurant and appointment integration journeys",
+      "needs": [
+        "T25",
+        "T26",
+        "T30",
+        "T31",
+        "T34"
+      ],
+      "paths": "packages/go/conversation/integration; docs/verification.md",
+      "build": "Exercise create/start, remote question, private steering, changed suggestion, approval, playback, end and summary across the complete mock provider stack; add an optional consenting-team real-call checklist.",
+      "excludes": "No automated real calls in CI or claims of provider validation from mocks.",
+      "acceptance": "Both end-to-end mock scenarios pass in CI with event transcripts; a separate report records real-call checks as passed, blocked or not run.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 5,
+      "unblocks": [
+        "T49",
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T25, T26, T30, T31, T34 · **Unblocks** T49, T50\n\n**Goal.** Run full restaurant and appointment integration journeys.\n\n**Build**\n\n- Places: `packages/go/conversation/integration`, `docs/verification.md`.\n- Exercise create/start, remote question, private steering, changed suggestion, approval, playback, end and summary across the complete mock provider stack; add an optional consenting-team real-call checklist.\n\n**Not in this issue**\n\n- No automated real calls in CI or claims of provider validation from mocks.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Both end-to-end mock scenarios pass in CI with event transcripts; a separate report records real-call checks as passed, blocked or not run.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T41 -->\n"
+    },
+    {
+      "key": "T42",
+      "title": "Complete keyboard, screen reader and mobile usability",
+      "needs": [
+        "T17",
+        "T27",
+        "T32",
+        "T37"
+      ],
+      "paths": "apps/mobile/src/components; apps/mobile/src/screens; docs/accessibility.md",
+      "build": "Audit labels, focus order, dynamic text, contrast and non-color status; keep composer/controls reachable above mobile keyboard; announce important status without reading every partial transcript update.",
+      "excludes": "No redesign or new UI library.",
+      "acceptance": "Keyboard-only web and native screen-reader checks are recorded; large text and reduced motion retain readable transcript and reachable end control.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 5,
+      "unblocks": [
+        "T47"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T17, T27, T32, T37 · **Unblocks** T47\n\n**Goal.** Complete keyboard, screen reader and mobile usability.\n\n**Build**\n\n- Places: `apps/mobile/src/components`, `apps/mobile/src/screens`, `docs/accessibility.md`.\n- Audit labels, focus order, dynamic text, contrast and non-color status; keep composer/controls reachable above mobile keyboard; announce important status without reading every partial transcript update.\n\n**Not in this issue**\n\n- No redesign or new UI library.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Keyboard-only web and native screen-reader checks are recorded; large text and reduced motion retain readable transcript and reachable end control.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T42 -->\n"
+    },
+    {
+      "key": "T43",
+      "title": "Close session, CSRF, owner and rate-limit gaps",
+      "needs": [
+        "T08",
+        "T18",
+        "T23",
+        "T28",
+        "T29",
+        "T31",
+        "T38"
+      ],
+      "paths": "packages/go/auth; packages/go/handlers; docs/security.md",
+      "build": "Apply origin/CSRF checks to cookie mutations, strict allowed CORS origins, body size limits, owner gating on streams/actions and rate limits on session/create/start; lock down production cookies.",
+      "excludes": "No speculative compliance certification or unrelated authentication rewrite.",
+      "acceptance": "Integration tests cover cross-origin mutation denial, owner mismatch, rate limit, oversize input and unauthorized SSE; public real-call mode cannot start without the guards.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 5,
+      "unblocks": [
+        "T46",
+        "T48"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T08, T18, T23, T28, T29, T31, T38 · **Unblocks** T46, T48\n\n**Goal.** Close session, CSRF, owner and rate-limit gaps.\n\n**Build**\n\n- Places: `packages/go/auth`, `packages/go/handlers`, `docs/security.md`.\n- Apply origin/CSRF checks to cookie mutations, strict allowed CORS origins, body size limits, owner gating on streams/actions and rate limits on session/create/start; lock down production cookies.\n\n**Not in this issue**\n\n- No speculative compliance certification or unrelated authentication rewrite.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Integration tests cover cross-origin mutation denial, owner mismatch, rate limit, oversize input and unauthorized SSE; public real-call mode cannot start without the guards.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T43 -->\n"
+    },
+    {
+      "key": "T44",
+      "title": "Verify conversation races and stale generation cancellation",
+      "needs": [
+        "T26",
+        "T28",
+        "T29",
+        "T30",
+        "T31"
+      ],
+      "paths": "packages/go/conversation; packages/go/telephony/media",
+      "build": "Run controlled interleavings for final turn versus instruction, approval versus new revision, pause versus audio chunk and end versus callback; fix state/token synchronization at the owning boundary.",
+      "excludes": "No new feature or flaky sleep-based tests.",
+      "acceptance": "Deterministic race tests and Go race detector pass; each interleaving proves obsolete text/audio is dropped and terminal state never reopens.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 5,
+      "unblocks": [
+        "T49"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T26, T28, T29, T30, T31 · **Unblocks** T49\n\n**Goal.** Verify conversation races and stale generation cancellation.\n\n**Build**\n\n- Places: `packages/go/conversation`, `packages/go/telephony/media`.\n- Run controlled interleavings for final turn versus instruction, approval versus new revision, pause versus audio chunk and end versus callback; fix state/token synchronization at the owning boundary.\n\n**Not in this issue**\n\n- No new feature or flaky sleep-based tests.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Deterministic race tests and Go race detector pass; each interleaving proves obsolete text/audio is dropped and terminal state never reopens.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T44 -->\n"
+    },
+    {
+      "key": "T45",
+      "title": "Measure latency and tune bounded pipeline performance",
+      "needs": [
+        "T14",
+        "T15",
+        "T20",
+        "T25",
+        "T30",
+        "T35"
+      ],
+      "paths": "packages/go/observability; scripts/benchmark; docs/performance.md",
+      "build": "Measure final-turn to suggestion, approval to first audio, instruction acknowledgement and interrupt-to-clear with redacted timing metrics; document mock and optional real results separately; tune bounded queues/timeouts.",
+      "excludes": "No guaranteed production SLA, speculative optimization or new provider.",
+      "acceptance": "Repeatable benchmark includes p50/p95, environment and sample count; simulated delay proves timeouts and interruption remain bounded.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 5,
+      "unblocks": [
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T14, T15, T20, T25, T30, T35 · **Unblocks** T50\n\n**Goal.** Measure latency and tune bounded pipeline performance.\n\n**Build**\n\n- Places: `packages/go/observability`, `scripts/benchmark`, `docs/performance.md`.\n- Measure final-turn to suggestion, approval to first audio, instruction acknowledgement and interrupt-to-clear with redacted timing metrics; document mock and optional real results separately; tune bounded queues/timeouts.\n\n**Not in this issue**\n\n- No guaranteed production SLA, speculative optimization or new provider.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Repeatable benchmark includes p50/p95, environment and sample count; simulated delay proves timeouts and interruption remain bounded.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T45 -->\n"
+    },
+    {
+      "key": "T46",
+      "title": "Package a single-instance demo deployment",
+      "needs": [
+        "T35",
+        "T36",
+        "T38",
+        "T40",
+        "T43"
+      ],
+      "paths": "apps/api/Dockerfile; docker; docs/deployment.md; .github/workflows",
+      "build": "Package the API and static Expo web preview, document TLS/WSS reverse proxy, cookie/origin settings, public callback URL, secrets and durable Postgres; keep real calling disabled until explicit manual enabling.",
+      "excludes": "No paid infrastructure provisioning, public deployment without configuration or multi-instance fanout.",
+      "acceptance": "Container smoke check reaches health and the web preview; runbook validates an allowed-origin SSE connection and documents rollback plus environment requirements.",
+      "owner": "bengutow1",
+      "ownerName": "Ben",
+      "stage": 5,
+      "unblocks": [
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:bengutow1"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ben (@bengutow1) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T35, T36, T38, T40, T43 · **Unblocks** T50\n\n**Goal.** Package a single-instance demo deployment.\n\n**Build**\n\n- Places: `apps/api/Dockerfile`, `docker`, `docs/deployment.md`, `.github/workflows`.\n- Package the API and static Expo web preview, document TLS/WSS reverse proxy, cookie/origin settings, public callback URL, secrets and durable Postgres; keep real calling disabled until explicit manual enabling.\n\n**Not in this issue**\n\n- No paid infrastructure provisioning, public deployment without configuration or multi-instance fanout.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Container smoke check reaches health and the web preview; runbook validates an allowed-origin SSE connection and documents rollback plus environment requirements.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T46 -->\n"
+    },
+    {
+      "key": "T47",
+      "title": "Validate the final UI against the generated reference",
+      "needs": [
+        "T33",
+        "T37",
+        "T39",
+        "T40",
+        "T42"
+      ],
+      "paths": "apps/mobile/src/screens; docs/design; docs/verification.md",
+      "build": "Capture 390 px and 1440 px routes, compare typography, hierarchy and transcript/rail layout with the mockup; fix overflow and inconsistent states, including long business names and keyboard layout.",
+      "excludes": "No new design system or decorative dashboard features.",
+      "acceptance": "Before/after screenshots and route checklist cover home, new/review, live, paused, ended, summary and settings with no clipped controls.",
+      "owner": "cadenlund",
+      "ownerName": "Caden",
+      "stage": 5,
+      "unblocks": [
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:cadenlund"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Caden (@cadenlund) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T33, T37, T39, T40, T42 · **Unblocks** T50\n\n**Goal.** Validate the final UI against the generated reference.\n\n**Build**\n\n- Places: `apps/mobile/src/screens`, `docs/design`, `docs/verification.md`.\n- Capture 390 px and 1440 px routes, compare typography, hierarchy and transcript/rail layout with the mockup; fix overflow and inconsistent states, including long business names and keyboard layout.\n\n**Not in this issue**\n\n- No new design system or decorative dashboard features.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Before/after screenshots and route checklist cover home, new/review, live, paused, ended, summary and settings with no clipped controls.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T47 -->\n"
+    },
+    {
+      "key": "T48",
+      "title": "Verify persistence, restart recovery and deletion",
+      "needs": [
+        "T13",
+        "T23",
+        "T33",
+        "T38",
+        "T43"
+      ],
+      "paths": "packages/go/repository; packages/go/events; docs/storage.md",
+      "build": "Exercise process restart with durable call state, event replay, idempotency records and retention; reconcile real calls as interrupted rather than automatically redialing; verify migration from empty DB.",
+      "excludes": "No multi-region recovery or automatic call recreation.",
+      "acceptance": "Integration suite proves restart replay, stable history cursor, no duplicate start after retry and deletion removing all private event payloads.",
+      "owner": "IvanR586",
+      "ownerName": "Ivan",
+      "stage": 5,
+      "unblocks": [
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:IvanR586"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Ivan (@IvanR586) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T13, T23, T33, T38, T43 · **Unblocks** T50\n\n**Goal.** Verify persistence, restart recovery and deletion.\n\n**Build**\n\n- Places: `packages/go/repository`, `packages/go/events`, `docs/storage.md`.\n- Exercise process restart with durable call state, event replay, idempotency records and retention; reconcile real calls as interrupted rather than automatically redialing; verify migration from empty DB.\n\n**Not in this issue**\n\n- No multi-region recovery or automatic call recreation.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] Integration suite proves restart replay, stable history cursor, no duplicate start after retry and deletion removing all private event payloads.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T48 -->\n"
+    },
+    {
+      "key": "T49",
+      "title": "Finish failure messaging and release acceptance",
+      "needs": [
+        "T34",
+        "T36",
+        "T39",
+        "T41",
+        "T44"
+      ],
+      "paths": "packages/go/handlers; apps/mobile/src/screens; docs/release-checklist.md",
+      "build": "Map provider/network/stale-conflict errors to useful recovery actions; run acceptance against both use cases; verify no invented booking confirmation and no hidden switch from real to mock.",
+      "excludes": "No adding stretch features to meet the deadline.",
+      "acceptance": "A release checklist links evidence for both journeys, unknown-question steering, partial provider failure and no-confirmation outcome; remaining limitations are stated accurately.",
+      "owner": "andrewkilp",
+      "ownerName": "Andrew",
+      "stage": 5,
+      "unblocks": [
+        "T50"
+      ],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:andrewkilp"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/design.md",
+        "docs/design/switchboard-mockup.png",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Andrew (@andrewkilp) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T34, T36, T39, T41, T44 · **Unblocks** T50\n\n**Goal.** Finish failure messaging and release acceptance.\n\n**Build**\n\n- Places: `packages/go/handlers`, `apps/mobile/src/screens`, `docs/release-checklist.md`.\n- Map provider/network/stale-conflict errors to useful recovery actions; run acceptance against both use cases; verify no invented booking confirmation and no hidden switch from real to mock.\n\n**Not in this issue**\n\n- No adding stretch features to meet the deadline.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/design.md`, `docs/design/switchboard-mockup.png`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A release checklist links evidence for both journeys, unknown-question steering, partial provider failure and no-confirmation outcome; remaining limitations are stated accurately.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T49 -->\n"
+    },
+    {
+      "key": "T50",
+      "title": "Prepare the two-week handoff and recorded demo",
+      "needs": [
+        "T41",
+        "T45",
+        "T46",
+        "T47",
+        "T48",
+        "T49"
+      ],
+      "paths": "README.md; docs/demo.md; docs/verification.md; scripts/issues-publication.json",
+      "build": "Write setup/demo/handoff instructions for all five members, include a scripted reservation and appointment with visible steering, costs and limitations; record a working mock demo and optional consented real-call evidence.",
+      "excludes": "No claiming real provider calls worked unless the recorded check passed.",
+      "acceptance": "A fresh checkout follows the runbook; demo shows live transcript events, instruction, revised suggestion and outcome; every task links its PR/evidence or an explicit unfinished status.",
+      "owner": "Arthur2457",
+      "ownerName": "Arthur",
+      "stage": 5,
+      "unblocks": [],
+      "labels": [
+        "stage:5",
+        "enhancement",
+        "owner:Arthur2457"
+      ],
+      "milestone": "Stage 5: Hardening and delivery",
+      "readFirst": [
+        "AGENTS.md",
+        "docs/contracts.md",
+        "docs/architecture.md",
+        "docs/development-plan.md"
+      ],
+      "body": "> **For your AI.** Read `AGENTS.md`, then `docs/contracts.md`, then every file under *Read first*. Build only what *Build* lists, in the places it names. Anything under *Not in this issue* is out of scope. If a prerequisite owns something you need, use its documented mock and coordinate in the issue. Do not invent a new route, field or provider. Done means each *Done when* box has real evidence in the PR.\n\n**Owner** Arthur (@Arthur2457) · **Phase** Stage 5: Hardening and delivery (Days 12–14) · **Needs** T41, T45, T46, T47, T48, T49 · **Unblocks** none\n\n**Goal.** Prepare the two-week handoff and recorded demo.\n\n**Build**\n\n- Places: `README.md`, `docs/demo.md`, `docs/verification.md`, `scripts/issues-publication.json`.\n- Write setup/demo/handoff instructions for all five members, include a scripted reservation and appointment with visible steering, costs and limitations; record a working mock demo and optional consented real-call evidence.\n\n**Not in this issue**\n\n- No claiming real provider calls worked unless the recorded check passed.\n\n**Read first:** `AGENTS.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/development-plan.md`. Read the linked prerequisite issues before changing their boundaries.\n\n**Done when**\n\n- [ ] A fresh checkout follows the runbook; demo shows live transcript events, instruction, revised suggestion and outcome; every task links its PR/evidence or an explicit unfinished status.\n- [ ] Applicable negative/failure cases have meaningful test or manual evidence; the PR links exact commands and output.\n- [ ] UI changes include narrow/wide screenshots compared with the generated mockup; provider changes use fixtures in CI and label any real-call check separately.\n- [ ] `moon run :build :lint :typecheck :test` passes.\n\n<!-- switchboard-task:T50 -->\n"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+inheritedBy:
+  toolchains:
+    or: ['javascript']
+tasks:
+  lint:
+    command: 'pnpm exec biome check .'
+  format:
+    command: 'pnpm exec biome format --write .'
+  typecheck:
+    command: 'pnpm exec tsc --noEmit'
