@@ -1,3 +1,5 @@
+export * from "./events.ts";
+
 export interface Health {
   status: "ok";
   mode: "template";
