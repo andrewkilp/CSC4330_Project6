@@ -1,3 +1,4 @@
+export * from "./demo.ts";
 export * from "./events.ts";
 
 export interface Health {

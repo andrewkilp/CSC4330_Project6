@@ -4,7 +4,7 @@ A base template for an AI phone concierge: restaurant reservations and appointme
 
 ![Switchboard design direction](docs/design/switchboard-mockup.png)
 
-**Current behavior:** a responsive Expo design preview with local controls and a Go `/health` endpoint. It makes no calls, generates no AI responses and stores no data. The GitHub issues implement those features in five balanced stages over two weeks.
+**Current behavior:** an interactive local demo with streamed transcript text, private steering instructions, editable suggestions, approval, pause/resume, and simulated outcomes for restaurant reservations and appointments. It runs through the Go API using in-memory fictional data. It does not make real calls, invoke a language model or create real bookings.
 
 ## Start
 
@@ -13,10 +13,12 @@ Install [proto](https://moonrepo.dev/docs/proto/install), then:
 ```sh
 proto install
 pnpm install --frozen-lockfile
-moon run mobile:web
+moon run api:demo
 ```
 
-In a second terminal: `moon run api:dev`. The API listens on port 8080; `GET /health` returns `{"status":"ok","mode":"template"}`. The preview works without the API. Settings includes an optional readiness check.
+Open **http://127.0.0.1:8080**. The command builds the Expo web app and serves it with the demo API from one local origin. No keys or Docker are required. Stop the terminal command with Ctrl+C. Follow the [demo walkthrough](docs/demo.md).
+
+For the normal health-only API, use `moon run api:dev`. `GET /health` returns `{"status":"ok","mode":"template"}`. The demo routes are mounted only with DEMO_MODE=true and bind to loopback.
 
 For native development use `moon run mobile:dev`, or `moon run mobile:android` / `moon run mobile:ios` with the appropriate Android SDK / Xcode installed. For a phone or Android emulator set `EXPO_PUBLIC_API_URL` as documented in `.env.example`. Expo loads the app's local environment; the Go baseline reads shell environment variables directly. Do not copy server secrets into the mobile app.
 

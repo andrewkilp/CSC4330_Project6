@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/demo"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers"
 )
 
@@ -18,7 +19,16 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	server := &http.Server{Addr: ":" + port, Handler: handlers.NewRouter(), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
+	address, router := ":"+port, handlers.NewRouter()
+	if os.Getenv("DEMO_MODE") == "true" {
+		webDir := os.Getenv("DEMO_WEB_DIR")
+		if webDir == "" {
+			webDir = "../mobile/dist"
+		}
+		address = "127.0.0.1:" + port
+		router = handlers.NewDemoRouter(webDir, demo.New(0))
+	}
+	server := &http.Server{Addr: address, Handler: router, ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
@@ -29,7 +39,7 @@ func main() {
 			slog.Error("shutdown failed", "error", err)
 		}
 	}()
-	slog.Info("Switchboard template listening", "port", port)
+	slog.Info("Switchboard listening", "address", address, "demo", os.Getenv("DEMO_MODE") == "true")
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("server failed", "error", err)
 		os.Exit(1)

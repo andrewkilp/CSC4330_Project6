@@ -16,7 +16,7 @@ Read this file, `docs/contracts.md`, `docs/architecture.md`, and the issue's Rea
 
 - Build one issue per branch from main. Include the issue number in the branch and PR. Respect Build and Not in this issue. Coordinate contract changes with their owner.
 - This repository preserves Project 5's apps, packages, proto, db, docker and moon layout. Its food app, vendor clients, native camera/location/sharing modules, old migrations, generated types and credentials are intentionally absent.
-- The starter implements only `/health` and an honest local design preview. The 50 issues implement the product. Do not mark an issue done because a mock exists.
+- The starter includes `/health`, the pure conversation state machine, event projection code, and an explicitly enabled local demo. `moon run api:demo` serves the mockup-based UI and fictional conversations on loopback. The 50 issues implement the production product; do not mark those issues done because the demo simulates their behavior.
 - Thin deployables in apps; reusable code in packages/go and packages/ts. Keep SQL in packages/go/repository, provider HTTP/audio integrations in separate Go packages, transport in handlers.
 - Only packages/ts/api calls our API. Never call vendors or ship secrets from the app. Never store a provider key in an EXPO_PUBLIC variable.
 - The server owns call state, goal revisions, response versions, approval checks, idempotency and billing limits. Instructions are context, not literal speech. Approval binds to one response and context revision.
@@ -34,6 +34,7 @@ Install proto, run `proto install`, `pnpm install --frozen-lockfile`, then use m
 | Purpose | Command |
 | --- | --- |
 | Check everything | `moon run :build :lint :typecheck :test` |
+| Run the complete local demo | `moon run api:demo`, then open `http://127.0.0.1:8080` |
 | API on port 8080 | `moon run api:dev` |
 | Expo app | `moon run mobile:dev` |
 | Browser preview | `moon run mobile:web` |
@@ -41,6 +42,8 @@ Install proto, run `proto install`, `pnpm install --frozen-lockfile`, then use m
 | Format | `moon run :format` |
 
 No Docker or provider keys are needed for the baseline. See docker/README.md when implementing persistence.
+
+The user-requested demo lives in `packages/go/demo` and the `/demo/` transport. It uses in-memory fictional data, the Go state machine, and the TypeScript reducer. Its polling transport and scripted response rules are demonstration adapters. Production sessions, provider clients, SSE transport and persistence remain governed by their assigned issues. See `docs/demo.md` for the walkthrough and limits. Keep DEMO_MODE disabled for the normal API; the demo listener must remain loopback-only.
 
 ## Done means
 

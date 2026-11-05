@@ -1,3 +1,4 @@
 id: handlers
 layer: library
 language: go
+dependsOn: ['demo']
