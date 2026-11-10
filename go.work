@@ -1,6 +1,7 @@
 go 1.26.4
 
 use (
+  ./packages/go/claude
   ./apps/api
   ./packages/go/conversation
   ./packages/go/handlers
