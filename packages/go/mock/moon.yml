@@ -1,0 +1,4 @@
+id: mock
+layer: library
+language: go
+dependsOn: ['conversation']

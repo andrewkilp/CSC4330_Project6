@@ -5,4 +5,5 @@ use (
   ./apps/api
   ./packages/go/conversation
   ./packages/go/handlers
+  ./packages/go/mock
 )

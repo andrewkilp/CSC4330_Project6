@@ -1,0 +1,716 @@
+{
+  "scenario": "appointment-missing-detail",
+  "description": "A haircut slot is open, but the salon needs a callback number the goal does not contain. The operator declines to share one, so the call needs follow-up.",
+  "seed": 4330,
+  "fictional": true,
+  "expected": {
+    "operator_inputs": [
+      {
+        "kind": "instruction",
+        "response_id": "87bdcacd-878e-4ef7-b0e4-fa13e31f16e9",
+        "text": "Don't share a phone number. Ask if they can hold it under the name only.",
+        "reason": "Only the operator can decide whether to share contact details."
+      },
+      {
+        "kind": "approval",
+        "response_id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "reason": "The reply commits Sam to a follow-up call."
+      }
+    ],
+    "unanswered_questions": [
+      "What callback number should the salon use to hold the appointment?"
+    ],
+    "outcome": "needs_follow_up"
+  },
+  "events": [
+    {
+      "id": "36d68092-4396-4671-b044-a904059303c6",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 1,
+      "type": "call.updated",
+      "occurred_at": "2026-11-13T15:30:00.000Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "owner_id": "2c0eae90-0d47-4c3e-9ad8-6cb8fc7a3345",
+        "mode": "mock",
+        "destination": "+12255550187",
+        "business_name": "Cypress Lane Salon (mock)",
+        "goal": {
+          "kind": "appointment",
+          "preferred_at": "2026-11-17T10:00:00-06:00",
+          "timezone": "America/Chicago",
+          "service": "Haircut",
+          "constraints": [
+            "Weekday mornings only"
+          ],
+          "contact_name": "Sam Rivera"
+        },
+        "status": "draft",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-13T15:30:00.000Z",
+        "updated_at": "2026-11-13T15:30:00.000Z"
+      }
+    },
+    {
+      "id": "17cdb207-fb6e-4e75-a399-fc1ca2efb283",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 2,
+      "type": "call.updated",
+      "occurred_at": "2026-11-13T15:30:00.828Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "owner_id": "2c0eae90-0d47-4c3e-9ad8-6cb8fc7a3345",
+        "mode": "mock",
+        "destination": "+12255550187",
+        "business_name": "Cypress Lane Salon (mock)",
+        "goal": {
+          "kind": "appointment",
+          "preferred_at": "2026-11-17T10:00:00-06:00",
+          "timezone": "America/Chicago",
+          "service": "Haircut",
+          "constraints": [
+            "Weekday mornings only"
+          ],
+          "contact_name": "Sam Rivera"
+        },
+        "status": "dialing",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-13T15:30:00.000Z",
+        "updated_at": "2026-11-13T15:30:00.828Z"
+      }
+    },
+    {
+      "id": "041d71dc-26fd-47b3-8663-d17f7ea2909e",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 3,
+      "type": "call.updated",
+      "occurred_at": "2026-11-13T15:30:01.738Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "owner_id": "2c0eae90-0d47-4c3e-9ad8-6cb8fc7a3345",
+        "mode": "mock",
+        "destination": "+12255550187",
+        "business_name": "Cypress Lane Salon (mock)",
+        "goal": {
+          "kind": "appointment",
+          "preferred_at": "2026-11-17T10:00:00-06:00",
+          "timezone": "America/Chicago",
+          "service": "Haircut",
+          "constraints": [
+            "Weekday mornings only"
+          ],
+          "contact_name": "Sam Rivera"
+        },
+        "status": "connected",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-13T15:30:00.000Z",
+        "updated_at": "2026-11-13T15:30:01.738Z"
+      }
+    },
+    {
+      "id": "1da0ae8e-d2d7-48b2-b4d0-c9172062b63c",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 4,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:03.096Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "9ce93b62-cc58-4e4a-bfbe-91f2571bcd6f",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Cypress Lane",
+        "is_final": false,
+        "started_at_ms": 579
+      }
+    },
+    {
+      "id": "c4e3bae8-5ce9-4d3a-9d72-268504a87a05",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 5,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:03.943Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "9ce93b62-cc58-4e4a-bfbe-91f2571bcd6f",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Cypress Lane Salon, this is the front desk.",
+        "is_final": true,
+        "started_at_ms": 579,
+        "ended_at_ms": 2205
+      }
+    },
+    {
+      "id": "6d45c8f1-a148-41ba-8f8c-36623bc26140",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 6,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:04.376Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "",
+        "context_revision": 0,
+        "status": "generating",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "35d6caeb-f1ef-4554-b348-7a9b795a74a8",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 7,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:05.507Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Hi, this is an AI assistant calling for Sam Rivera. I'd like to book a haircut on Tuesday at 10 AM.",
+        "context_revision": 0,
+        "status": "suggested",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "cbefb09e-021d-44c5-b85d-86688ad9b8cd",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 8,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:05.850Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Hi, this is an AI assistant calling for Sam Rivera. I'd like to book a haircut on Tuesday at 10 AM.",
+        "context_revision": 0,
+        "status": "approved",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "c97fd1b5-a330-4d71-b193-62a7d3fadf9e",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 9,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:06.237Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Hi, this is an AI assistant calling for Sam Rivera. I'd like to book a haircut on Tuesday at 10 AM.",
+        "context_revision": 0,
+        "status": "speaking",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "b40d6604-74c9-4775-8eae-53eee46d1fa9",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 10,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:11.888Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Hi, this is an AI assistant calling for Sam Rivera. I'd like to book a haircut on Tuesday at 10 AM.",
+        "context_revision": 0,
+        "status": "spoken",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "cbc28256-de8d-4840-9d9b-720b43ffc9fe",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 11,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:11.888Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "9a87d5ee-9a51-43f3-9af6-7c805a58733c",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "assistant",
+        "text": "Hi, this is an AI assistant calling for Sam Rivera. I'd like to book a haircut on Tuesday at 10 AM.",
+        "is_final": true,
+        "started_at_ms": 4499,
+        "ended_at_ms": 10150,
+        "response_id": "43fd313a-11d4-47c7-85de-f40aed3c6c2b"
+      }
+    },
+    {
+      "id": "7929f8c4-f0e9-4080-8864-72421a96cd73",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 12,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:12.986Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d7e7b414-bd7c-4f76-88d2-51cad260a165",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Tuesday at ten",
+        "is_final": false,
+        "started_at_ms": 10599
+      }
+    },
+    {
+      "id": "73476ff8-0fb3-47d2-9a67-3976daf6ac4e",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 13,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:13.632Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d7e7b414-bd7c-4f76-88d2-51cad260a165",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Tuesday at ten is open. I just need",
+        "is_final": false,
+        "started_at_ms": 10599
+      }
+    },
+    {
+      "id": "e05c5f3d-afa1-4126-9676-9c74aa0bf991",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 14,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:14.413Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d7e7b414-bd7c-4f76-88d2-51cad260a165",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Tuesday at ten is open. I just need a callback number to hold it.",
+        "is_final": true,
+        "started_at_ms": 10599,
+        "ended_at_ms": 12675
+      }
+    },
+    {
+      "id": "2e6eac5a-abdb-4d8d-8a66-909a047d79b7",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 15,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:14.827Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "87bdcacd-878e-4ef7-b0e4-fa13e31f16e9",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "",
+        "context_revision": 0,
+        "status": "generating",
+        "needs_approval": true,
+        "reason": "The business asked for a callback number; the goal has no contact phone and the assistant must not invent one."
+      }
+    },
+    {
+      "id": "18e04a40-6012-4e91-923d-ddc6d5e4ed01",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 16,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:15.924Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "87bdcacd-878e-4ef7-b0e4-fa13e31f16e9",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "One moment while I check on that.",
+        "context_revision": 0,
+        "status": "suggested",
+        "needs_approval": true,
+        "reason": "The business asked for a callback number; the goal has no contact phone and the assistant must not invent one."
+      }
+    },
+    {
+      "id": "93f1ec00-c647-49c0-82e8-92b1236b4ad2",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 17,
+      "type": "instruction.updated",
+      "occurred_at": "2026-11-13T15:30:20.105Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "a25ae52a-ff6c-4b2b-8eb9-72b3c1e08d9c",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Don't share a phone number. Ask if they can hold it under the name only.",
+        "context_revision": 0,
+        "status": "pending",
+        "created_at": "2026-11-13T15:30:20.105Z"
+      }
+    },
+    {
+      "id": "a934b535-7003-4364-91fb-5e130b61f2c8",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 18,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:20.388Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "87bdcacd-878e-4ef7-b0e4-fa13e31f16e9",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "One moment while I check on that.",
+        "context_revision": 0,
+        "status": "cancelled",
+        "needs_approval": true,
+        "reason": "The business asked for a callback number; the goal has no contact phone and the assistant must not invent one."
+      }
+    },
+    {
+      "id": "5357b2a0-de4e-40a2-9a02-c8af97f77a1a",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 19,
+      "type": "instruction.updated",
+      "occurred_at": "2026-11-13T15:30:20.736Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a25ae52a-ff6c-4b2b-8eb9-72b3c1e08d9c",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Don't share a phone number. Ask if they can hold it under the name only.",
+        "context_revision": 1,
+        "status": "applied",
+        "created_at": "2026-11-13T15:30:20.105Z"
+      }
+    },
+    {
+      "id": "c36470ab-547e-471e-bd15-0da7ebfec1bf",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 20,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:21.109Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "970111bd-eada-4398-a10f-d28136eb8fc0",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "",
+        "context_revision": 1,
+        "status": "generating",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "23c37921-4d20-4aa4-8b56-1942c6ea89ee",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 21,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:22.209Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "970111bd-eada-4398-a10f-d28136eb8fc0",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Sam would prefer not to share a number on this call. Could you hold Tuesday at 10 under the name Sam Rivera?",
+        "context_revision": 1,
+        "status": "suggested",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "4d2043a4-9cfd-456f-b74d-7affc2aad7dc",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 22,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:22.439Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "970111bd-eada-4398-a10f-d28136eb8fc0",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Sam would prefer not to share a number on this call. Could you hold Tuesday at 10 under the name Sam Rivera?",
+        "context_revision": 1,
+        "status": "approved",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "d2969163-19ff-48fe-a422-71dac7cd895a",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 23,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:22.748Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "970111bd-eada-4398-a10f-d28136eb8fc0",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Sam would prefer not to share a number on this call. Could you hold Tuesday at 10 under the name Sam Rivera?",
+        "context_revision": 1,
+        "status": "speaking",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "82e319a4-3888-48b4-8e7e-43e359f90bce",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 24,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:28.911Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "970111bd-eada-4398-a10f-d28136eb8fc0",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Sam would prefer not to share a number on this call. Could you hold Tuesday at 10 under the name Sam Rivera?",
+        "context_revision": 1,
+        "status": "spoken",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "795bfd8f-081b-4371-b6fc-936aa3f82d7b",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 25,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:28.911Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "95ee212f-d984-4d7a-b199-9b03557483cc",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "assistant",
+        "text": "Sam would prefer not to share a number on this call. Could you hold Tuesday at 10 under the name Sam Rivera?",
+        "is_final": true,
+        "started_at_ms": 21010,
+        "ended_at_ms": 27173,
+        "response_id": "970111bd-eada-4398-a10f-d28136eb8fc0"
+      }
+    },
+    {
+      "id": "9e72f730-3627-4315-b8b3-c9adf9180e31",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 26,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:30.277Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "198b396a-2f5e-4f0c-ad87-ed2e29fe5f96",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Sorry, we can't",
+        "is_final": false,
+        "started_at_ms": 27756
+      }
+    },
+    {
+      "id": "d6249b51-9796-48ac-b514-efa73bb2b646",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 27,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:31.084Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "198b396a-2f5e-4f0c-ad87-ed2e29fe5f96",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Sorry, we can't hold an appointment",
+        "is_final": false,
+        "started_at_ms": 27756
+      }
+    },
+    {
+      "id": "87b58db1-6d43-4dc3-b0f0-ba712cf65dac",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 28,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:31.786Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "198b396a-2f5e-4f0c-ad87-ed2e29fe5f96",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Sorry, we can't hold an appointment without a phone number. Can Sam call us back to finish booking?",
+        "is_final": true,
+        "started_at_ms": 27756,
+        "ended_at_ms": 30048
+      }
+    },
+    {
+      "id": "9168075c-de9d-4c74-9f70-3cf8d23ba08c",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 29,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:32.172Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "",
+        "context_revision": 1,
+        "status": "generating",
+        "needs_approval": true,
+        "reason": "Agreeing to a follow-up call is a commitment outside the authorized goal."
+      }
+    },
+    {
+      "id": "b8079e2a-15f8-4da8-87fd-c0fef15264a8",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 30,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:33.270Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Yes, Sam will call back to finish booking. Thank you.",
+        "context_revision": 1,
+        "status": "suggested",
+        "needs_approval": true,
+        "reason": "Agreeing to a follow-up call is a commitment outside the authorized goal."
+      }
+    },
+    {
+      "id": "53f7b537-b157-4268-99b4-62ed3d4c6c5c",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 31,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:36.050Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Yes, Sam will call back to finish booking. Thank you.",
+        "context_revision": 1,
+        "status": "approved",
+        "needs_approval": true,
+        "reason": "Agreeing to a follow-up call is a commitment outside the authorized goal."
+      }
+    },
+    {
+      "id": "72c66955-22bb-40d5-8c0e-2153f8accb38",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 32,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:36.481Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Yes, Sam will call back to finish booking. Thank you.",
+        "context_revision": 1,
+        "status": "speaking",
+        "needs_approval": true,
+        "reason": "Agreeing to a follow-up call is a commitment outside the authorized goal."
+      }
+    },
+    {
+      "id": "60cd7877-5c01-4363-8d38-4f7d7847612c",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 33,
+      "type": "response.updated",
+      "occurred_at": "2026-11-13T15:30:39.620Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "text": "Yes, Sam will call back to finish booking. Thank you.",
+        "context_revision": 1,
+        "status": "spoken",
+        "needs_approval": true,
+        "reason": "Agreeing to a follow-up call is a commitment outside the authorized goal."
+      }
+    },
+    {
+      "id": "1d06b9e0-90ec-4b42-a2b8-b42ed3a214a0",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 34,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:39.620Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "1d614572-e906-480e-8040-d9273730f6e7",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "assistant",
+        "text": "Yes, Sam will call back to finish booking. Thank you.",
+        "is_final": true,
+        "started_at_ms": 34743,
+        "ended_at_ms": 37882,
+        "response_id": "76b66c9e-199c-45d4-b5d5-9995b2ffe227"
+      }
+    },
+    {
+      "id": "75b14746-807a-4d97-ab72-c64978b9980a",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 35,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-13T15:30:40.914Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "eff6439e-64c9-4cb8-8cfb-402e67656625",
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "speaker": "business",
+        "text": "Okay, thanks. Bye.",
+        "is_final": true,
+        "started_at_ms": 38379,
+        "ended_at_ms": 39176
+      }
+    },
+    {
+      "id": "a90ae60b-0476-4efb-b602-9263f11176fa",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 36,
+      "type": "usage.updated",
+      "occurred_at": "2026-11-13T15:30:41.537Z",
+      "context_revision": 1,
+      "payload": {
+        "elapsed_seconds": 39,
+        "estimated_cost_usd": 0,
+        "estimate_only": true
+      }
+    },
+    {
+      "id": "63251085-9a7e-4223-8f0d-1f8a7b45752f",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 37,
+      "type": "call.updated",
+      "occurred_at": "2026-11-13T15:30:42.470Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "owner_id": "2c0eae90-0d47-4c3e-9ad8-6cb8fc7a3345",
+        "mode": "mock",
+        "destination": "+12255550187",
+        "business_name": "Cypress Lane Salon (mock)",
+        "goal": {
+          "kind": "appointment",
+          "preferred_at": "2026-11-17T10:00:00-06:00",
+          "timezone": "America/Chicago",
+          "service": "Haircut",
+          "constraints": [
+            "Weekday mornings only"
+          ],
+          "contact_name": "Sam Rivera"
+        },
+        "status": "ended",
+        "approval_mode": "uncertain",
+        "context_revision": 1,
+        "created_at": "2026-11-13T15:30:00.000Z",
+        "updated_at": "2026-11-13T15:30:42.470Z"
+      }
+    },
+    {
+      "id": "89973744-5766-419e-be7c-5ebf3bf6a6d8",
+      "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+      "seq": 38,
+      "type": "summary.ready",
+      "occurred_at": "2026-11-13T15:30:43.791Z",
+      "context_revision": 1,
+      "payload": {
+        "call_id": "fb2a5a19-2013-49aa-a794-35bf22ab6270",
+        "outcome": "needs_follow_up",
+        "confirmed_details": {
+          "business_name": "Cypress Lane Salon (mock)",
+          "timezone": "America/Chicago",
+          "service": "Haircut"
+        },
+        "evidence_turn_ids": [
+          "198b396a-2f5e-4f0c-ad87-ed2e29fe5f96"
+        ],
+        "unresolved_questions": [
+          "What callback number should the salon use to hold the appointment?"
+        ],
+        "next_steps": [
+          "Sam calls the salon to finish booking Tuesday at 10:00 AM."
+        ]
+      }
+    }
+  ]
+}

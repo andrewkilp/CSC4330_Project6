@@ -1,0 +1,718 @@
+{
+  "scenario": "restaurant-time-conflict",
+  "description": "Dinner for four at 7:00 PM is full. The operator chooses 8:45 PM, and the business asks an allergy question the goal cannot answer.",
+  "seed": 4330,
+  "fictional": true,
+  "expected": {
+    "operator_inputs": [
+      {
+        "kind": "instruction",
+        "response_id": "bdc13daa-cda3-463d-bc04-3336db079132",
+        "text": "8:45 is fine. Do not accept 6:15.",
+        "reason": "Choosing an alternative time is outside the authorized goal."
+      },
+      {
+        "kind": "approval",
+        "response_id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "reason": "The reply defers a question the goal cannot answer."
+      }
+    ],
+    "unanswered_questions": [
+      "Will anyone in the party need a high chair or have allergies we should know about?"
+    ],
+    "outcome": "confirmed"
+  },
+  "events": [
+    {
+      "id": "872d0f96-f2d7-410f-9d3a-156222d567d1",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 1,
+      "type": "call.updated",
+      "occurred_at": "2026-11-12T23:00:00.000Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "owner_id": "4a434c8c-9583-493a-8f0d-a3ce4b09177a",
+        "mode": "mock",
+        "destination": "+12255550142",
+        "business_name": "Bayou Lantern Bistro (mock)",
+        "goal": {
+          "kind": "restaurant",
+          "preferred_at": "2026-11-14T19:00:00-06:00",
+          "timezone": "America/Chicago",
+          "party_size": 4,
+          "constraints": [
+            "Indoor seating"
+          ],
+          "contact_name": "Jordan Lee"
+        },
+        "status": "draft",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-12T23:00:00.000Z",
+        "updated_at": "2026-11-12T23:00:00.000Z"
+      }
+    },
+    {
+      "id": "218d1ba1-6e16-4a30-8d1c-569bb535bf93",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 2,
+      "type": "call.updated",
+      "occurred_at": "2026-11-12T23:00:00.949Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "owner_id": "4a434c8c-9583-493a-8f0d-a3ce4b09177a",
+        "mode": "mock",
+        "destination": "+12255550142",
+        "business_name": "Bayou Lantern Bistro (mock)",
+        "goal": {
+          "kind": "restaurant",
+          "preferred_at": "2026-11-14T19:00:00-06:00",
+          "timezone": "America/Chicago",
+          "party_size": 4,
+          "constraints": [
+            "Indoor seating"
+          ],
+          "contact_name": "Jordan Lee"
+        },
+        "status": "dialing",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-12T23:00:00.000Z",
+        "updated_at": "2026-11-12T23:00:00.949Z"
+      }
+    },
+    {
+      "id": "127f6aed-1fe6-495c-9c82-467540bcb9f0",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 3,
+      "type": "call.updated",
+      "occurred_at": "2026-11-12T23:00:01.804Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "owner_id": "4a434c8c-9583-493a-8f0d-a3ce4b09177a",
+        "mode": "mock",
+        "destination": "+12255550142",
+        "business_name": "Bayou Lantern Bistro (mock)",
+        "goal": {
+          "kind": "restaurant",
+          "preferred_at": "2026-11-14T19:00:00-06:00",
+          "timezone": "America/Chicago",
+          "party_size": 4,
+          "constraints": [
+            "Indoor seating"
+          ],
+          "contact_name": "Jordan Lee"
+        },
+        "status": "connected",
+        "approval_mode": "uncertain",
+        "context_revision": 0,
+        "created_at": "2026-11-12T23:00:00.000Z",
+        "updated_at": "2026-11-12T23:00:01.804Z"
+      }
+    },
+    {
+      "id": "db81b51d-9ad6-403e-936c-cd4234301140",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 4,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:03.120Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "487e6d41-173c-44b7-a82a-337d2afec52e",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Bayou Lantern",
+        "is_final": false,
+        "started_at_ms": 558
+      }
+    },
+    {
+      "id": "9f6632db-ce50-47da-9950-740652132b0d",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 5,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:04.037Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "487e6d41-173c-44b7-a82a-337d2afec52e",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Bayou Lantern Bistro, how can I help you?",
+        "is_final": true,
+        "started_at_ms": 558,
+        "ended_at_ms": 2233
+      }
+    },
+    {
+      "id": "e3ff19d1-7c3c-4bc2-95e1-4160b37c7172",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 6,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:04.534Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "",
+        "context_revision": 0,
+        "status": "generating",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "f72954ab-664c-4ef4-8f18-664780fb253b",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 7,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:05.578Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Hi, this is an AI assistant calling for Jordan Lee. I'd like to book an indoor table for four this Saturday at 7 PM.",
+        "context_revision": 0,
+        "status": "suggested",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "77b215d0-228c-4e83-a3e9-c35326cb4221",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 8,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:05.870Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Hi, this is an AI assistant calling for Jordan Lee. I'd like to book an indoor table for four this Saturday at 7 PM.",
+        "context_revision": 0,
+        "status": "approved",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "1871b072-8c96-4db8-8d70-25a28de86c81",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 9,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:06.267Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Hi, this is an AI assistant calling for Jordan Lee. I'd like to book an indoor table for four this Saturday at 7 PM.",
+        "context_revision": 0,
+        "status": "speaking",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "733e61bb-f880-4e04-b329-ed9a0d849668",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 10,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:12.870Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Hi, this is an AI assistant calling for Jordan Lee. I'd like to book an indoor table for four this Saturday at 7 PM.",
+        "context_revision": 0,
+        "status": "spoken",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "e0fd09b6-35b9-4a3f-83c3-4df5b3b5e2ed",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 11,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:12.870Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "620a9ec2-a686-4f1d-9ad0-6ca2fc1b1423",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "assistant",
+        "text": "Hi, this is an AI assistant calling for Jordan Lee. I'd like to book an indoor table for four this Saturday at 7 PM.",
+        "is_final": true,
+        "started_at_ms": 4463,
+        "ended_at_ms": 11066,
+        "response_id": "5d9749ef-2eb3-44b9-968d-c84307f4afb1"
+      }
+    },
+    {
+      "id": "9494af73-2a07-4f00-a4dc-b7157f774796",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 12,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:13.960Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d1eed725-ec5c-42fb-b4d2-8bdf625c40f6",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Let me check",
+        "is_final": false,
+        "started_at_ms": 11511
+      }
+    },
+    {
+      "id": "1e89558e-0258-491c-9446-64eb8606941d",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 13,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:14.770Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d1eed725-ec5c-42fb-b4d2-8bdf625c40f6",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Let me check. Seven is fully booked",
+        "is_final": false,
+        "started_at_ms": 11511
+      }
+    },
+    {
+      "id": "98c02f20-e208-4683-abdc-152db8f90040",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 14,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:15.604Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "d1eed725-ec5c-42fb-b4d2-8bdf625c40f6",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Let me check. Seven is fully booked for four. I can do 6:15 or 8:45.",
+        "is_final": true,
+        "started_at_ms": 11511,
+        "ended_at_ms": 13800
+      }
+    },
+    {
+      "id": "82371440-2294-4be3-89a9-37c503f8ff43",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 15,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:15.975Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "bdc13daa-cda3-463d-bc04-3336db079132",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "",
+        "context_revision": 0,
+        "status": "generating",
+        "needs_approval": true,
+        "reason": "The business offered 6:15 PM or 8:45 PM; the authorized goal only covers 7:00 PM."
+      }
+    },
+    {
+      "id": "45adc807-b31f-4236-932c-255852f6fbe6",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 16,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:17.077Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "bdc13daa-cda3-463d-bc04-3336db079132",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Could you hold on one moment while I check which time works?",
+        "context_revision": 0,
+        "status": "suggested",
+        "needs_approval": true,
+        "reason": "The business offered 6:15 PM or 8:45 PM; the authorized goal only covers 7:00 PM."
+      }
+    },
+    {
+      "id": "01e02294-b6e0-4b7d-9fb0-888264707ccc",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 17,
+      "type": "instruction.updated",
+      "occurred_at": "2026-11-12T23:00:21.171Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "5815d986-efe7-4f70-b14a-08e06b6f7d2e",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 is fine. Do not accept 6:15.",
+        "context_revision": 0,
+        "status": "pending",
+        "created_at": "2026-11-12T23:00:21.171Z"
+      }
+    },
+    {
+      "id": "32680d91-2a7a-43ef-9baf-e2634c0d5a6f",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 18,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:21.431Z",
+      "context_revision": 0,
+      "payload": {
+        "id": "bdc13daa-cda3-463d-bc04-3336db079132",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "Could you hold on one moment while I check which time works?",
+        "context_revision": 0,
+        "status": "cancelled",
+        "needs_approval": true,
+        "reason": "The business offered 6:15 PM or 8:45 PM; the authorized goal only covers 7:00 PM."
+      }
+    },
+    {
+      "id": "992131b8-3092-4315-ad9d-3d45d5b19c91",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 19,
+      "type": "instruction.updated",
+      "occurred_at": "2026-11-12T23:00:21.696Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "5815d986-efe7-4f70-b14a-08e06b6f7d2e",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 is fine. Do not accept 6:15.",
+        "context_revision": 1,
+        "status": "applied",
+        "created_at": "2026-11-12T23:00:21.171Z"
+      }
+    },
+    {
+      "id": "f8c54cdb-5be1-4b15-b6e2-28f68b081566",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 20,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:22.075Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "",
+        "context_revision": 1,
+        "status": "generating",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "c80db504-977f-49b3-a95a-54c13e25e72d",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 21,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:22.991Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 works. Please book an indoor table for four at 8:45 under Jordan Lee.",
+        "context_revision": 1,
+        "status": "suggested",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "e75afd0f-546f-4ea5-8f12-bff33fc0272f",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 22,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:23.397Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 works. Please book an indoor table for four at 8:45 under Jordan Lee.",
+        "context_revision": 1,
+        "status": "approved",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "cd4015ff-c26f-42ef-8b22-edeea4f7e441",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 23,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:23.801Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 works. Please book an indoor table for four at 8:45 under Jordan Lee.",
+        "context_revision": 1,
+        "status": "speaking",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "d5caa390-4db2-4f94-99d6-b8878fe85e4f",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 24,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:27.945Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "8:45 works. Please book an indoor table for four at 8:45 under Jordan Lee.",
+        "context_revision": 1,
+        "status": "spoken",
+        "needs_approval": false
+      }
+    },
+    {
+      "id": "6cbabc88-0e1e-42fc-8399-e18afe385986",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 25,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:27.945Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "cbe0a626-1974-4ada-98c6-d296ec389dc9",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "assistant",
+        "text": "8:45 works. Please book an indoor table for four at 8:45 under Jordan Lee.",
+        "is_final": true,
+        "started_at_ms": 21997,
+        "ended_at_ms": 26141,
+        "response_id": "19968777-cdf7-4b27-ab75-ead1d1f3b7bd"
+      }
+    },
+    {
+      "id": "19e590a7-1e46-47ba-a58e-6ad1a0d75af5",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 26,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:29.405Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "ad3ab66c-8673-42e2-a3ab-000250fe3168",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Okay, you're booked",
+        "is_final": false,
+        "started_at_ms": 26771
+      }
+    },
+    {
+      "id": "f5ff6902-2135-46ef-97bd-45546ac8f5e9",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 27,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:30.123Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "ad3ab66c-8673-42e2-a3ab-000250fe3168",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Okay, you're booked for four at 8:45 Saturday",
+        "is_final": false,
+        "started_at_ms": 26771
+      }
+    },
+    {
+      "id": "42998162-aae3-4ab7-878a-b75007229f0e",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 28,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:31.069Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "ad3ab66c-8673-42e2-a3ab-000250fe3168",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "Okay, you're booked for four at 8:45 Saturday under Jordan Lee. Your confirmation is BLB-2048. Will anyone in the party need a high chair or have allergies we should know about?",
+        "is_final": true,
+        "started_at_ms": 26771,
+        "ended_at_ms": 29265
+      }
+    },
+    {
+      "id": "8cfbfbfe-fa58-4446-a9d7-2928493934c4",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 29,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:31.447Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "",
+        "context_revision": 1,
+        "status": "generating",
+        "needs_approval": true,
+        "reason": "The business asked about allergies and a high chair; the goal has no such details and the assistant must not invent them."
+      }
+    },
+    {
+      "id": "66bcf750-9ddf-44e0-a756-65cd02d434b7",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 30,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:32.575Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "I don't have that information right now. Jordan will let you know before Saturday.",
+        "context_revision": 1,
+        "status": "suggested",
+        "needs_approval": true,
+        "reason": "The business asked about allergies and a high chair; the goal has no such details and the assistant must not invent them."
+      }
+    },
+    {
+      "id": "a74d2898-161e-4ce8-aed9-7bc30b6aa4dc",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 31,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:35.681Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "I don't have that information right now. Jordan will let you know before Saturday.",
+        "context_revision": 1,
+        "status": "approved",
+        "needs_approval": true,
+        "reason": "The business asked about allergies and a high chair; the goal has no such details and the assistant must not invent them."
+      }
+    },
+    {
+      "id": "fd28e155-ff36-4eb2-85eb-554635229de2",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 32,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:35.977Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "I don't have that information right now. Jordan will let you know before Saturday.",
+        "context_revision": 1,
+        "status": "speaking",
+        "needs_approval": true,
+        "reason": "The business asked about allergies and a high chair; the goal has no such details and the assistant must not invent them."
+      }
+    },
+    {
+      "id": "a10e8dd3-30ef-4b07-92f1-c474c3ae66dd",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 33,
+      "type": "response.updated",
+      "occurred_at": "2026-11-12T23:00:40.638Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a60c772e-fd50-4f92-93ad-b39f4739c311",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "text": "I don't have that information right now. Jordan will let you know before Saturday.",
+        "context_revision": 1,
+        "status": "spoken",
+        "needs_approval": true,
+        "reason": "The business asked about allergies and a high chair; the goal has no such details and the assistant must not invent them."
+      }
+    },
+    {
+      "id": "a57c53cd-5101-4a3d-ac04-9d45f10eee4d",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 34,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:40.638Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "db30fc98-f6cf-41d1-a91a-c399a6ae496d",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "assistant",
+        "text": "I don't have that information right now. Jordan will let you know before Saturday.",
+        "is_final": true,
+        "started_at_ms": 34173,
+        "ended_at_ms": 38834,
+        "response_id": "a60c772e-fd50-4f92-93ad-b39f4739c311"
+      }
+    },
+    {
+      "id": "8c2f5eff-9f85-471a-ad8b-4c597eed42f0",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 35,
+      "type": "turn.updated",
+      "occurred_at": "2026-11-12T23:00:41.900Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "2abf5d77-56d9-4265-bf17-4b3c45178de5",
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "speaker": "business",
+        "text": "No problem. See you Saturday.",
+        "is_final": true,
+        "started_at_ms": 39315,
+        "ended_at_ms": 40096
+      }
+    },
+    {
+      "id": "31824da6-664f-4b18-b920-3d670e11b2f6",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 36,
+      "type": "usage.updated",
+      "occurred_at": "2026-11-12T23:00:42.707Z",
+      "context_revision": 1,
+      "payload": {
+        "elapsed_seconds": 40,
+        "estimated_cost_usd": 0,
+        "estimate_only": true
+      }
+    },
+    {
+      "id": "f1ebd5d8-a8f7-46bd-9299-fe36a99c796b",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 37,
+      "type": "call.updated",
+      "occurred_at": "2026-11-12T23:00:43.560Z",
+      "context_revision": 1,
+      "payload": {
+        "id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "owner_id": "4a434c8c-9583-493a-8f0d-a3ce4b09177a",
+        "mode": "mock",
+        "destination": "+12255550142",
+        "business_name": "Bayou Lantern Bistro (mock)",
+        "goal": {
+          "kind": "restaurant",
+          "preferred_at": "2026-11-14T19:00:00-06:00",
+          "timezone": "America/Chicago",
+          "party_size": 4,
+          "constraints": [
+            "Indoor seating"
+          ],
+          "contact_name": "Jordan Lee"
+        },
+        "status": "ended",
+        "approval_mode": "uncertain",
+        "context_revision": 1,
+        "created_at": "2026-11-12T23:00:00.000Z",
+        "updated_at": "2026-11-12T23:00:43.560Z"
+      }
+    },
+    {
+      "id": "4256d7d6-bf09-490b-966d-f91e1df4c95a",
+      "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+      "seq": 38,
+      "type": "summary.ready",
+      "occurred_at": "2026-11-12T23:00:44.994Z",
+      "context_revision": 1,
+      "payload": {
+        "call_id": "a93164a0-1103-4267-824c-71a11b64c8a7",
+        "outcome": "confirmed",
+        "confirmed_details": {
+          "business_name": "Bayou Lantern Bistro (mock)",
+          "scheduled_at": "2026-11-14T20:45:00-06:00",
+          "timezone": "America/Chicago",
+          "party_size": 4,
+          "confirmation_reference": "BLB-2048"
+        },
+        "evidence_turn_ids": [
+          "ad3ab66c-8673-42e2-a3ab-000250fe3168"
+        ],
+        "unresolved_questions": [
+          "Will anyone in the party need a high chair or have allergies we should know about?"
+        ],
+        "next_steps": [
+          "Tell the restaurant about any allergies or a high chair before Saturday."
+        ]
+      }
+    }
+  ]
+}
