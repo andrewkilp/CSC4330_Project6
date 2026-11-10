@@ -1,0 +1,10 @@
+event: message_start
+data: {"type":"message_start"}
+
+event: content_block_delta
+data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Is 7 pm"}}
+
+event: error
+data: {"type":"error","error":{"type":"overloaded_error","message":"fixture secret must never escape"}}
+
+
