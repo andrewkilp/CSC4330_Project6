@@ -1,4 +1,5 @@
 export * from "./events.ts";
+export * from "./types.ts";
 
 export interface Health {
   status: "ok";
