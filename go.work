@@ -6,4 +6,5 @@ use (
   ./packages/go/conversation
   ./packages/go/handlers
   ./packages/go/mock
+  ./packages/go/providers
 )
