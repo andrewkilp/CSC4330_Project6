@@ -9,6 +9,8 @@ goose -dir db/migrations postgres "$DATABASE_URL" down
 
 `session_owners` stores the stable owner identity. Calls reference that identity, and the owner, creation time and call ID index supports paged history. Session credentials and authorization belong to the session and repository implementations.
 
+The local API uses a standard-library, in-memory session store so the demo can issue and revoke credentials without PostgreSQL. It keeps only token hashes and server-generated owner UUIDs. Sessions expire after 24 hours and restarting the process invalidates them. The repository must persist the owner identity before inserting an owned call. Set `APP_ENV=production` behind HTTPS to issue Secure cookies. An unset value or `development` supports local HTTP.
+
 Create a call and its initial goal at revision zero in one transaction. Goal rows preserve snapshots and can skip revisions when instructions change without changing the goal. Read the latest goal at or below the call revision. Lock the call or compare its expected revision when applying an instruction, and commit the revision change, instruction and event together. The database allows one applied instruction per call revision. State transitions, approval and stale response checks belong to the service.
 
 Insert durable events in the same transaction as their corresponding state changes. Serialize sequence allocation on the call row to keep per-call sequence numbers strictly increasing under concurrent writes. The unique call and sequence index also supports ordered replay. Events reject updates. Deletes are reserved for retention and call erasure.
