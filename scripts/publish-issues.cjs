@@ -54,7 +54,7 @@ async function main() {
   const info = await api(`/repos/${repo}`);
   if (!info.permissions?.push) throw Error("Repository write access is required");
   const assignees = new Set((await list(`/repos/${repo}/assignees`)).map((a) => a.login.toLowerCase()));
-  let existing = (await list(`/repos/${repo}/issues?state=all`)).filter((i) => !i.pull_request);
+  const existing = (await list(`/repos/${repo}/issues?state=all`)).filter((i) => !i.pull_request);
   const report = { repository: repo, published_at: new Date().toISOString(), tasks: [] };
   function save() { fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`); }
   const issues = new Map();
