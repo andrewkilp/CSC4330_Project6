@@ -245,6 +245,26 @@ func (l *Loop) Resume(ctx context.Context) error {
 	return l.generateLocked(ctx)
 }
 
+// maxRequestBytes mirrors the Claude adapter's 128 KiB cap on the marshalled Input.
+const maxRequestBytes = 128 * 1024
+
+// fitRequest drops the oldest finalized turns until the marshalled request fits
+// the adapter's aggregate cap. The newest turn is always kept so the reply stays
+// grounded in what the business just said; goal and instructions are never cut.
+func fitRequest(in claude.Input) []claude.Turn {
+	b, err := json.Marshal(in)
+	if err != nil {
+		return in.Transcript
+	}
+	size, turns := len(b), in.Transcript
+	for size > maxRequestBytes && len(turns) > 1 {
+		t, _ := json.Marshal(turns[0])
+		size -= len(t) + 1 // the element and its trailing comma
+		turns = turns[1:]
+	}
+	return turns
+}
+
 // generateLocked consumes the lock and always releases it before returning.
 func (l *Loop) generateLocked(parent context.Context) error {
 	if len(l.events) >= 4094 {
@@ -261,6 +281,7 @@ func (l *Loop) generateLocked(parent context.Context) error {
 		l.mu.Unlock()
 		return nil
 	}
+	in.Transcript = fitRequest(in)
 	id := uuid()
 	next, token, err := l.state.BeginResponse(id)
 	if err != nil {

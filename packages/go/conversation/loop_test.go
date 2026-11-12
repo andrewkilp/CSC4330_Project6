@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -283,5 +284,33 @@ func TestParentCancellationAndWrongCall(t *testing.T) {
 	}
 	if l.Snapshot().Response.Status != ResponseFailed {
 		t.Fatal("cancelled parent left active response")
+	}
+}
+
+func TestLongTranscriptFitsRequestCap(t *testing.T) {
+	var last claude.Input
+	l := connectedLoop(t, responderFunc(func(ctx context.Context, in claude.Input, emit func(claude.Update) error) error {
+		last = in
+		return finalReply(ctx, in, emit)
+	}))
+	ctx := context.Background()
+	for i := range 40 {
+		text := strings.Repeat(string(rune('a'+i%26)), 5000)
+		if err := l.ObserveBusinessTurn(ctx, business("turn-"+strconv.Itoa(i), text, true)); err != nil {
+			t.Fatalf("turn %d: %v", i, err)
+		}
+	}
+	b, err := json.Marshal(last)
+	if err != nil || len(b) > maxRequestBytes {
+		t.Fatalf("request is %d bytes, want <= %d", len(b), maxRequestBytes)
+	}
+	if n := len(last.Transcript); n == 40 || n < 2 {
+		t.Fatalf("expected oldest turns trimmed, kept %d", n)
+	}
+	if got := last.Transcript[len(last.Transcript)-1].Text; got != strings.Repeat("n", 5000) {
+		t.Fatal("newest business turn was not kept last")
+	}
+	if l.Snapshot().Response.Status != Suggested {
+		t.Fatal("long call should still reach a suggestion")
 	}
 }
