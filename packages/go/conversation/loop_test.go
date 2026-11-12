@@ -285,3 +285,48 @@ func TestParentCancellationAndWrongCall(t *testing.T) {
 		t.Fatal("cancelled parent left active response")
 	}
 }
+
+func TestRegenerationWaitsForUnfinishedBusinessTurn(t *testing.T) {
+	for _, action := range []string{"instruction", "resume"} {
+		t.Run(action, func(t *testing.T) {
+			var inputs []claude.Input
+			l := connectedLoop(t, responderFunc(func(ctx context.Context, in claude.Input, emit func(claude.Update) error) error {
+				inputs = append(inputs, in)
+				return finalReply(ctx, in, emit)
+			}))
+			ctx := context.Background()
+			if err := l.ObserveBusinessTurn(ctx, business("first", "Old question", true)); err != nil {
+				t.Fatal(err)
+			}
+			if err := l.ObserveBusinessTurn(ctx, business("second", "Actually, wait", false)); err != nil {
+				t.Fatal(err)
+			}
+			if action == "resume" {
+				if err := l.Pause(); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := l.Instruct(ctx, "Ask about indoor seating", 0); err != nil {
+				t.Fatal(err)
+			}
+			if action == "resume" {
+				if err := l.Resume(ctx); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if len(inputs) != 1 || l.Snapshot().Response.Status != ResponseCancelled {
+				t.Fatal("regenerated before the business finished speaking")
+			}
+			if err := l.ObserveBusinessTurn(ctx, business("second", "Actually, indoor seating is available", true)); err != nil {
+				t.Fatal(err)
+			}
+			if len(inputs) != 2 {
+				t.Fatalf("expected generation after final turn, got %d calls", len(inputs))
+			}
+			in := inputs[1]
+			if len(in.Transcript) != 2 || in.Transcript[1].Text != "Actually, indoor seating is available" || in.ContextRevision != 1 || len(in.Instructions) != 1 || in.Instructions[0] != "Ask about indoor seating" || l.Snapshot().Response.Status != Suggested {
+				t.Fatalf("generation lost the newest context: %+v", in)
+			}
+		})
+	}
+}

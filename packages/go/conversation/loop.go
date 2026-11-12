@@ -247,6 +247,14 @@ func (l *Loop) Resume(ctx context.Context) error {
 
 // generateLocked consumes the lock and always releases it before returning.
 func (l *Loop) generateLocked(parent context.Context) error {
+	// Instructions and resume must not answer an older question while a
+	// business turn is still arriving. Its final update will trigger generation.
+	for _, turn := range l.turns {
+		if !turn.IsFinal {
+			l.mu.Unlock()
+			return nil
+		}
+	}
 	if len(l.events) >= 4094 {
 		l.mu.Unlock()
 		return ErrInvalidInput
