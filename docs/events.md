@@ -16,7 +16,7 @@ Import these through `@switchboard/api`. All accepted payloads are copied from d
 
 The parser validates all seven event types: `call.updated`, `turn.updated`, `instruction.updated`, `response.updated`, `summary.ready`, `provider.error`, `usage.updated`. It checks UUIDs, safe integer sequences/revisions, timestamp forms, booleans, closed enums, text bounds and entity identity. Payload call IDs and context revisions must match the envelope. Envelope and server metadata timestamps are UTC with `Z`; business preferences may carry an offset and a valid named time zone. Zero-based durations are integers. No invalid event changes the cursor or enters the projection.
 
-The `Event*` payload interfaces are scoped projections of the existing documented fields. #1 still owns final shared request/domain types in `types.ts`. Review them against these projections before freezing that contract, then reuse the canonical types without changing reducer semantics. The parser enforces the currently documented field limits; it is not a substitute for server validation or session ownership.
+The `Event*` names are aliases of the canonical types in `types.ts` frozen by #1, and the entity parsers live there; new code should import `Call`, `Turn`, `Response` and so on directly. `EventValidationError` is an alias of `ContractValidationError`. #1 added `paused` as a call status: the reducer allows `connected <-> paused`, retires the active suggestion on pause, never reopens a terminal call, and treats a paused snapshot as having no actionable response. The parser enforces the currently documented field limits; it is not a substitute for server validation or session ownership.
 
 ## Ordering and invalidation
 

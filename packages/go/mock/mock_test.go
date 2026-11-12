@@ -237,3 +237,56 @@ func renumber(f *Fixture) {
 		f.Events[i].Seq = uint64(i + 1)
 	}
 }
+
+// withPause inserts call.updated events with the given statuses right after the call
+// first connects.
+func withPause(t *testing.T, statuses ...string) Fixture {
+	t.Helper()
+	f := mustGenerate(t, RestaurantTimeConflict, DefaultSeed)
+	at := -1
+	for i, e := range f.Events {
+		if c, ok := e.Payload.(Call); ok && c.Status == "connected" {
+			at = i
+			break
+		}
+	}
+	if at < 0 {
+		t.Fatal("scenario never connects")
+	}
+	var inserted []Event
+	for _, status := range statuses {
+		e := f.Events[at]
+		c := e.Payload.(Call)
+		c.Status = status
+		e.Payload = c
+		inserted = append(inserted, e)
+	}
+	events := append([]Event(nil), f.Events[:at+1]...)
+	events = append(events, inserted...)
+	f.Events = append(events, f.Events[at+1:]...)
+	renumber(&f)
+	return f
+}
+
+func TestPausedIsAConnectedSubstate(t *testing.T) {
+	if err := Validate(withPause(t, "paused", "connected")); err != nil {
+		t.Fatalf("pause then resume: %v", err)
+	}
+	cases := []struct {
+		name, field string
+		statuses    []string
+	}{
+		// The first business turn is transcribed while paused, but the next response
+		// event starts a generation, which a paused call cannot do.
+		{"generate while paused", "payload.status", []string{"paused"}},
+		{"paused cannot redial", "payload.status", []string{"paused", "dialing"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var ve *ValidationError
+			if err := Validate(withPause(t, tc.statuses...)); !errors.As(err, &ve) || ve.Field != tc.field {
+				t.Fatalf("Validate() = %v, want ValidationError on %s", err, tc.field)
+			}
+		})
+	}
+}

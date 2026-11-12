@@ -238,7 +238,9 @@ func (v *validator) callEvent(e Event, c Call) error {
 		"":          {"draft"},
 		"draft":     {"draft", "dialing", "ended", "failed", "cancelled"},
 		"dialing":   {"dialing", "connected", "ended", "failed", "cancelled"},
-		"connected": {"connected", "ended", "failed", "cancelled"},
+		"connected": {"connected", "paused", "ended", "failed", "cancelled"},
+		// Paused is a substate of connected (#1): the line stays open, the assistant is silent.
+		"paused": {"paused", "connected", "ended", "failed", "cancelled"},
 	}
 	if !slices.Contains(allowed[v.callStatus], c.Status) {
 		return v.bad("payload.status", "illegal call transition %q -> %q", v.callStatus, c.Status)
@@ -273,7 +275,7 @@ func (v *validator) goal(g Goal) error {
 }
 
 func (v *validator) turnEvent(t Turn) error {
-	if v.callStatus != "connected" {
+	if v.callStatus != "connected" && v.callStatus != "paused" {
 		return v.bad("type", "transcript turn before the call connected")
 	}
 	if !uuidPattern.MatchString(t.ID) || t.CallID != v.callID {
@@ -335,8 +337,11 @@ func (v *validator) instructionEvent(e Event, n Instruction) error {
 }
 
 func (v *validator) responseEvent(e Event, r Response) error {
-	if v.callStatus != "connected" {
+	if v.callStatus != "connected" && v.callStatus != "paused" {
 		return v.bad("type", "response before the call connected")
+	}
+	if v.callStatus == "paused" && r.Status != "cancelled" {
+		return v.bad("payload.status", "a paused call can only cancel responses, not %q them", r.Status)
 	}
 	if r.CallID != v.callID || !uuidPattern.MatchString(r.ID) || r.ContextRevision != e.ContextRevision {
 		return v.bad("payload", "response needs a UUID, the envelope call id and the envelope revision")
