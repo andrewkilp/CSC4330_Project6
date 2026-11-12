@@ -52,8 +52,10 @@ func TestSessionLifecycle(t *testing.T) {
 
 	request("GET", "/owner", "", http.StatusUnauthorized, nil)
 	request("POST", "/v1/session", `{"owner_id":"claimed"}`, http.StatusBadRequest, nil)
-	request("POST", "/v1/session", "{}"+strings.Repeat(" ", 1024), http.StatusBadRequest, nil)
-	created := request("POST", "/v1/session", "{}", http.StatusCreated, nil)
+	const maxBodyBytes = 16 * 1024
+	maxBody := "{}" + strings.Repeat(" ", maxBodyBytes-2)
+	request("POST", "/v1/session", maxBody+" ", http.StatusBadRequest, nil)
+	created := request("POST", "/v1/session", maxBody, http.StatusCreated, nil)
 	var account struct {
 		ID string `json:"account_id"`
 	}
@@ -77,7 +79,8 @@ func TestSessionLifecycle(t *testing.T) {
 			t.Fatalf("owner = %q, want %q, decode error %v", owner, account.ID, err)
 		}
 	}
-	logout := request("DELETE", "/v1/session", "{}", http.StatusNoContent, nil)
+	request("DELETE", "/v1/session", maxBody+" ", http.StatusBadRequest, nil)
+	logout := request("DELETE", "/v1/session", maxBody, http.StatusNoContent, nil)
 	if cleared := logout.Cookies(); len(cleared) != 1 || cleared[0].MaxAge >= 0 ||
 		!cleared[0].Secure || !cleared[0].HttpOnly || cleared[0].Path != "/" {
 		t.Fatal("logout did not clear the session cookie")

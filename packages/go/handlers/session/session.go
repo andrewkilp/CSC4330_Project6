@@ -44,7 +44,7 @@ func Register(mux *http.ServeMux, sessions *auth.Sessions, secure bool) {
 }
 
 func emptyObject(w http.ResponseWriter, r *http.Request, allowEmpty bool) bool {
-	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024))
+	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 16*1024))
 	var body map[string]json.RawMessage
 	err := decoder.Decode(&body)
 	if allowEmpty && err == io.EOF {
