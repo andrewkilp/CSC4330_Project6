@@ -81,8 +81,14 @@ bodies. Pending/conflicting attempts return 409; an unconfirmed provider attempt
 returns a fixed 503 message without implying a safe redial. Parent API composition
 must apply the shared browser Origin/CORS policy before mounting this mutation.
 
-Parent #18 owns API pool/session composition and the create/read routes. It
-constructs this service explicitly, with real provider disabled by default:
+The API now mounts the start route alongside #18's create/read routes, using the
+same session store, optional database pool and browser Origin guard. The
+`configuredRouter` wrapper remains available for existing tests; a separate
+builder injects parsed start configuration. It constructs the real REST client
+only when `ENABLE_REAL_CALLS` is exactly `true`. Empty/`false` means mock-only;
+other spellings fail startup with a stable configuration error. Invalid enabled
+provider/callback/allowlist configuration also fails startup instead of silently
+falling back. Irrelevant provider credentials are ignored while real mode is off.
 
 | Server setting | Meaning |
 | --- | --- |
@@ -93,7 +99,8 @@ constructs this service explicitly, with real provider disabled by default:
 | `TWILIO_FROM_NUMBER` | Server-owned E.164 caller number |
 
 A nil store fails closed with a safe unavailable result; it never substitutes
-in-memory persistence. No startup, constructor, install script, build or test
+in-memory persistence. Optional typed-nil stores are normalized before mounting.
+No startup, constructor, install script, build or test
 dials a phone. Creating a draft is a separate operation and never starts it.
 
 ## Verification
@@ -118,12 +125,15 @@ rearm an attempt; blocked/disabled/wrong-owner/consentless calls cannot start;
 mock mode never touches the real adapter; callbacks can bind before REST returns;
 wrong token/account/attempt/SID/mode and callback regressions are rejected. HTTP
 handler fixtures also cover authentication, strict input and safe failure mapping.
+API composition tests cover shared session ownership/revocation, Origin rejection,
+mounted-but-unavailable starts without a database, strict real opt-in settings,
+invalid enabled configuration, and preservation of health/session routes.
 No Twilio endpoint, paid account, real phone, microphone or audio stream was used.
 
 Verified November 13, 2026 with Go 1.26.4 on Windows: the real Postgres/local HTTP
 race suites passed three repetitions; inherited moon checks completed **41 tasks**
-including web export (initial full run 72.178 seconds, latest run 35 cached tasks
-and six rechecked tasks in 6.580 seconds). The database was an isolated PostgreSQL
+including web export (initial full run 72.178 seconds; API-composed run completed
+with 24 cached tasks in 17.565 seconds). The database was an isolated PostgreSQL
 17.12 container with no persistent volume. JSON/provider fixtures are synthetic
 documented protocol examples, not a live Twilio recording or real-call evidence.
 

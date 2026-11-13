@@ -8,6 +8,7 @@ import (
 )
 
 func TestConfiguredOriginProtectsSessionAndDraftRoutes(t *testing.T) {
+	t.Setenv("ENABLE_REAL_CALLS", "false")
 	h, err := configuredRouter("development", nil, "http://localhost:8081")
 	if err != nil {
 		t.Fatal(err)
