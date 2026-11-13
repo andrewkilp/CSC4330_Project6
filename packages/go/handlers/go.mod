@@ -3,6 +3,7 @@ module github.com/andrewkilp/CSC4330_Project6/packages/go/handlers
 go 1.26.4
 
 require (
+	github.com/andrewkilp/CSC4330_Project6/packages/go/events v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/auth v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/claude v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/conversation v0.0.0
@@ -20,6 +21,8 @@ require (
 )
 
 replace github.com/andrewkilp/CSC4330_Project6/packages/go/auth => ../auth
+
+replace github.com/andrewkilp/CSC4330_Project6/packages/go/events => ../events
 
 replace github.com/andrewkilp/CSC4330_Project6/packages/go/conversation => ../conversation
 
