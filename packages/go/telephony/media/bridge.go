@@ -227,6 +227,10 @@ func Serve(ctx context.Context, conn Conn, cfg Config) error {
 			}
 		case "stop":
 			out.Close()
+			// A peer may acknowledge our last frame before Write has returned.
+			// Join that writer before deferred cancellation; cancelling its socket
+			// context first can abort the WebSocket before the handler sends Close.
+			<-out.done
 			emit(providers.MediaEvent{Kind: providers.MediaStop})
 			return nil
 		case "dtmf":
@@ -450,7 +454,10 @@ func (o *outbound) run() error {
 			}
 			continue
 		}
-		if err := o.conn.Write(o.ctx, next.data); err != nil {
+		write, cancel := context.WithTimeout(o.ctx, 5*time.Second)
+		err := o.conn.Write(write, next.data)
+		cancel()
+		if err != nil {
 			if o.ctx.Err() != nil {
 				return nil
 			}
