@@ -5,10 +5,12 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/auth"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/calls"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/providers"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/session"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
 )
@@ -47,6 +49,8 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/", handlers.NewRouter())
+	// The complete real conversation pipeline is not mounted in this build.
+	providers.Register(mux, providers.New(providers.FromEnv(os.LookupEnv, providers.Implemented{STT: true, LLM: true, TTS: true}), nil))
 	sessions := auth.NewSessions()
 	session.Register(mux, sessions, environment != "" && environment != "development")
 	calls.RegisterDrafts(mux, calls.NewDraftHandler(store, sessions))
