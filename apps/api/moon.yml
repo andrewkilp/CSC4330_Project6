@@ -1,7 +1,7 @@
 id: api
 layer: application
 language: go
-dependsOn: ['auth', 'handlers', 'repository', 'telephony']
+dependsOn: ['auth', 'handlers', 'repository', 'telephony', 'events']
 tasks:
   dev:
     command: 'go run .'

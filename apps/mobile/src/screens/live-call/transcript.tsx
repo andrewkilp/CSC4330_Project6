@@ -38,7 +38,13 @@ function TranscriptTurn({
     </View>
   );
 }
-export function Transcript({ state }: { state: EventState }) {
+export function Transcript({
+  state,
+  preview = false,
+}: {
+  state: EventState;
+  preview?: boolean;
+}) {
   const { finalized, provisional } = selectTranscript(state);
   const scroll = useRef<ScrollView>(null);
   const following = useRef(true);
@@ -48,7 +54,9 @@ export function Transcript({ state }: { state: EventState }) {
   return (
     <View style={s.container}>
       <AppText variant="label" tone="muted">
-        ON THE LINE / SAMPLE TRANSCRIPT
+        {preview
+          ? "ON THE LINE / SAMPLE TRANSCRIPT"
+          : "ON THE LINE / TRANSCRIPT"}
       </AppText>
       <ScrollView
         ref={scroll}

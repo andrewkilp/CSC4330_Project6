@@ -72,6 +72,10 @@ func fail(w http.ResponseWriter, status int, code, message, field string) {
 }
 
 func storeError(w http.ResponseWriter, err error) {
+	if errors.Is(err, repository.ErrUnavailable) {
+		fail(w, 503, "provider_unavailable", "The call service is unavailable.", "")
+		return
+	}
 	// A malformed id is indistinguishable from a missing or foreign call.
 	if errors.Is(err, repository.ErrNotFound) || errors.Is(err, repository.ErrInvalid) {
 		fail(w, http.StatusNotFound, "not_found", "Call not found.", "")
@@ -238,10 +242,27 @@ func (cfg Config) stream(w http.ResponseWriter, r *http.Request) {
 	}
 	heartbeat := time.NewTicker(cfg.Heartbeat)
 	defer heartbeat.Stop()
+	// Durable polling also catches committed events whose optional fanout hint
+	// was lost or whose producer is not connected to this process-local hub.
+	poll := time.NewTicker(time.Second)
+	defer poll.Stop()
 	for {
 		select {
 		case <-r.Context().Done():
 			return
+		case <-poll.C:
+			committed, err := cfg.Store.EventsAfter(r.Context(), owner, callID, sent, page)
+			if err != nil {
+				return
+			}
+			for _, e := range committed {
+				if e.Seq != sent+1 || write(e) != nil {
+					return
+				}
+			}
+			if len(committed) > 0 && rc.Flush() != nil {
+				return
+			}
 		case <-heartbeat.C:
 			if _, err := fmt.Fprint(w, ": heartbeat\n\n"); err != nil || rc.Flush() != nil {
 				return
