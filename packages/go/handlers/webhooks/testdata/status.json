@@ -1,0 +1,7 @@
+{
+  "description": "Synthetic signed Twilio outbound call status fixture; all identifiers and reserved phone numbers are fictional.",
+  "auth_token": "fixture-auth-token-not-real",
+  "url": "https://callbacks.example.invalid/webhooks/twilio/status?call_id=00000000-0000-4000-8000-000000000100&attempt_id=00000000-0000-4000-8000-000000000200&token=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "body": "CallStatus=in-progress&To=%2B12255550110&CallSid=CAbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&From=%2B12255550111&AccountSid=ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&ApiVersion=2010-04-01&Direction=outbound-api&SequenceNumber=2&FutureField=two&FutureField=one&FutureField=two&Empty=&Label=%20caf%C3%A9%20",
+  "signature": "c/e0OYE+y7dlT6qca40raejA1ds="
+}
