@@ -1,0 +1,4 @@
+id: telephony
+layer: library
+language: go
+dependsOn: ['providers']
