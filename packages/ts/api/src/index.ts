@@ -1,4 +1,5 @@
 export * from "./calls.ts";
+export * from "./control.ts";
 export * from "./events.ts";
 export * from "./instructions.ts";
 export * from "./providers.ts";
