@@ -5,9 +5,11 @@ import {
 } from "@switchboard/api";
 import { fetch as expoFetch } from "expo/fetch";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AccessibilityInfo,
   AppState,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -17,9 +19,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText, Badge, Button, RuledPanel } from "../../components";
 import { theme as t } from "../../theme";
+import {
+  type AnnounceSnapshot,
+  announcementsBetween,
+  announceSnapshot,
+} from "./announce";
 import { API_URL } from "./api-url";
 import { CallControls } from "./controls";
-import { InstructionComposer } from "./instructions";
+import { InstructionComposer, InstructionHistory } from "./instructions";
 import { SuggestedReply } from "./suggested-reply";
 import { Transcript } from "./transcript";
 
@@ -35,9 +42,16 @@ const messages = {
   not_found: "This call was not found in your session.",
   error: "The call updates could not be read. Try reconnecting.",
 };
+// Short screens and large text keep only Pause and End docked; the composer moves into
+// the page so the transcript is never squeezed out.
+const COMPACT_HEIGHT = 640;
+const COMPACT_FONT_SCALE = 1.5;
+
 export default function ConnectedCall({ id }: { id: string }) {
-  const router = useRouter(),
-    wide = useWindowDimensions().width >= t.layout.breakpoint;
+  const router = useRouter();
+  const { width, height, fontScale } = useWindowDimensions();
+  const wide = width >= t.layout.breakpoint;
+  const compact = height < COMPACT_HEIGHT || fontScale >= COMPACT_FONT_SCALE;
   const [retry, setRetry] = useState(0);
   const [update, setUpdate] = useState<StreamUpdate | null>(null);
   useFocusEffect(
@@ -79,82 +93,109 @@ export default function ConnectedCall({ id }: { id: string }) {
     }, [id, retry]),
   );
   const call = update?.state.call;
+  useAnnouncements(update);
+  const live = update?.status === "live";
   return (
     <SafeAreaView style={s.safe}>
-      <ScrollView contentContainerStyle={s.content}>
-        <View style={s.heading}>
-          <AppText variant="heading">Switchboard</AppText>
-          <Button
-            label="Calls"
-            variant="secondary"
-            onPress={() => router.push("/")}
-          />
-        </View>
-        <AppText variant="display" accessibilityRole="header">
-          {call?.business_name ?? "Your call"}
-        </AppText>
-        {call && (
-          <Badge
-            label={`${call.mode.toUpperCase()} · ${call.status.toUpperCase()}`}
-            tone={call.mode === "mock" ? "warning" : "neutral"}
-          />
-        )}
-        <AppText
-          accessibilityLiveRegion="polite"
-          tone={
-            update?.status === "unauthenticated" || update?.status === "error"
-              ? "danger"
-              : "muted"
-          }
+      <KeyboardAvoidingView
+        style={s.safe}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          style={s.safe}
+          contentContainerStyle={s.content}
+          keyboardShouldPersistTaps="handled"
         >
-          {update ? messages[update.status] : "This call could not be loaded."}
-        </AppText>
-        <View style={[s.workspace, wide && s.wide]}>
-          <View style={s.transcript}>
-            {update?.state.call && <Transcript key={id} state={update.state} />}
+          <View style={s.heading}>
+            <AppText variant="heading">Switchboard</AppText>
+            <Button
+              label="Calls"
+              variant="secondary"
+              onPress={() => router.push("/")}
+            />
           </View>
+          <AppText variant="display" accessibilityRole="header">
+            {call?.business_name ?? "Your call"}
+          </AppText>
           {call && (
-            <View style={[s.rail, wide && { width: 300 }]}>
-              <RuledPanel title="Current goal">
-                <AppText>
-                  {call.goal.kind === "restaurant"
-                    ? `Table for ${call.goal.party_size}`
-                    : call.goal.service}
-                </AppText>
-                <AppText>
-                  {call.goal.preferred_at} · {call.goal.timezone}
-                </AppText>
-                {call.goal.constraints.map((text, index) => (
-                  <AppText key={`${index}-${text}`}>{text}</AppText>
-                ))}
-              </RuledPanel>
-              {update && (
-                <SuggestedReply
-                  state={update.state}
-                  live={update.status === "live"}
-                />
+            <Badge
+              label={`${call.mode.toUpperCase()} · ${call.status.toUpperCase()}`}
+              tone={call.mode === "mock" ? "warning" : "neutral"}
+            />
+          )}
+          <AppText
+            tone={
+              update?.status === "unauthenticated" || update?.status === "error"
+                ? "danger"
+                : "muted"
+            }
+          >
+            {update
+              ? messages[update.status]
+              : "This call could not be loaded."}
+          </AppText>
+          <View style={[s.workspace, wide && s.wide]}>
+            <View style={s.transcript}>
+              {update?.state.call && (
+                <Transcript key={id} state={update.state} />
               )}
             </View>
-          )}
-        </View>
-        {update?.state.call && (
-          <>
-            <InstructionComposer
-              state={update.state}
-              live={update.status === "live"}
-            />
-            <CallControls state={update.state} />
-          </>
-        )}
-        <Button
-          label="Reconnect call updates"
-          variant="secondary"
-          onPress={() => setRetry((value) => value + 1)}
-        />
-        <AppText variant="caption" tone="muted">
-          Opening or reconnecting this page never places a call.
-        </AppText>
-      </ScrollView>
+            {call && (
+              <View style={[s.rail, wide && { width: 300 }]}>
+                <RuledPanel title="Current goal">
+                  <AppText>
+                    {call.goal.kind === "restaurant"
+                      ? `Table for ${call.goal.party_size}`
+                      : call.goal.service}
+                  </AppText>
+                  <AppText>
+                    {call.goal.preferred_at} · {call.goal.timezone}
+                  </AppText>
+                  {call.goal.constraints.map((text, index) => (
+                    <AppText key={`${index}-${text}`}>{text}</AppText>
+                  ))}
+                </RuledPanel>
+                {update && (
+                  <>
+                    <SuggestedReply state={update.state} live={live} />
+                    <InstructionHistory state={update.state} />
+                  </>
+                )}
+              </View>
+            )}
+          </View>
+          {compact && update?.state.call ? (
+            <InstructionComposer state={update.state} live={live} />
+          ) : null}
+          <Button
+            label="Reconnect call updates"
+            variant="secondary"
+            onPress={() => setRetry((value) => value + 1)}
+          />
+          <AppText variant="caption" tone="muted">
+            Opening or reconnecting this page never places a call.
+          </AppText>
+        </ScrollView>
+        {update?.state.call ? (
+          <View style={[s.dock, wide && s.dockWide]}>
+            {compact ? null : (
+              <ScrollView
+                style={[
+                  { maxHeight: Math.round(height * 0.28) },
+                  wide && s.dockComposerWide,
+                ]}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled
+              >
+                <InstructionComposer state={update.state} live={live} docked />
+              </ScrollView>
+            )}
+            <View style={wide ? s.dockControlsWide : undefined}>
+              <CallControls state={update.state} />
+            </View>
+          </View>
+        ) : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -177,4 +218,37 @@ const s = StyleSheet.create({
   wide: { flexDirection: "row" },
   transcript: { flex: 1, minWidth: 0 },
   rail: { gap: 24 },
+  dock: {
+    borderTopWidth: 1,
+    borderColor: t.line,
+    backgroundColor: t.paper,
+    paddingHorizontal: t.layout.narrow.pagePadding,
+    paddingVertical: t.space.md,
+    gap: t.space.sm,
+  },
+  dockWide: {
+    paddingHorizontal: t.layout.wide.pagePadding,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: t.space.xl,
+  },
+  dockComposerWide: { flex: 1 },
+  dockControlsWide: { maxWidth: 360 },
 });
+
+// Screen readers hear status changes, a reply awaiting approval, each finished business
+// turn and stream problems. Partial speech is never announced.
+function useAnnouncements(update: StreamUpdate | null) {
+  const previous = useRef<AnnounceSnapshot | null>(null);
+  useEffect(() => {
+    if (!update?.state.call) return;
+    const next = announceSnapshot(update.state, update.status);
+    for (const message of announcementsBetween(
+      previous.current,
+      next,
+      update.state,
+    ))
+      AccessibilityInfo.announceForAccessibility(message);
+    previous.current = next;
+  }, [update]);
+}

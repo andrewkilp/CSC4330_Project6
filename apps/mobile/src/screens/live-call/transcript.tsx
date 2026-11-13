@@ -1,6 +1,11 @@
 import { type EventState, selectTranscript, type Turn } from "@switchboard/api";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { AppText, Button } from "../../components";
 import { theme as t } from "../../theme";
 
@@ -13,6 +18,14 @@ function Timestamp({ ms }: { ms: number }) {
     </AppText>
   );
 }
+// From this text scale up, timestamps sit above the words instead of beside them.
+const LARGE_TEXT = 1.3;
+function clockLabel(ms: number) {
+  const seconds = Math.floor(ms / 1000);
+  const m = Math.floor(seconds / 60),
+    r = seconds % 60;
+  return `${m} minute${m === 1 ? "" : "s"} ${r} second${r === 1 ? "" : "s"}`;
+}
 function TranscriptTurn({
   turn,
   provisional = false,
@@ -20,8 +33,16 @@ function TranscriptTurn({
   turn: Turn;
   provisional?: boolean;
 }) {
+  const stacked = useWindowDimensions().fontScale >= LARGE_TEXT;
+  const speaker = turn.speaker === "assistant" ? "AI" : "Business";
   return (
-    <View testID={`turn-${turn.id}`} style={s.turn}>
+    <View
+      testID={`turn-${turn.id}`}
+      style={[s.turn, stacked && s.stacked]}
+      // Read as one item: speaker, time and words, instead of three fragments.
+      accessible
+      accessibilityLabel={`${speaker}${provisional ? ", still being transcribed" : ""}, at ${clockLabel(turn.started_at_ms)}: ${turn.text || "listening"}`}
+    >
       <Timestamp ms={turn.started_at_ms} />
       <View style={[s.body, turn.speaker === "business" && s.business]}>
         <AppText
@@ -62,6 +83,8 @@ export function Transcript({
         ref={scroll}
         testID="transcript-scroll"
         accessibilityLabel="Call transcript"
+        // Keyboard users can focus the transcript and scroll it with the arrow keys.
+        focusable
         style={s.scroll}
         contentContainerStyle={s.content}
         nestedScrollEnabled
@@ -126,6 +149,7 @@ const s = StyleSheet.create({
   scroll: { height: 420, flexGrow: 0 },
   content: { gap: 28, paddingVertical: 12, paddingRight: 8 },
   turn: { flexDirection: "row", gap: 12 },
+  stacked: { flexDirection: "column", gap: 4 },
   body: {
     flex: 1,
     minWidth: 0,

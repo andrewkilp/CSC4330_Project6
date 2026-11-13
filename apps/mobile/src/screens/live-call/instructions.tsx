@@ -26,10 +26,13 @@ const STATUS_BADGE = {
 export function InstructionComposer({
   state,
   live,
+  docked = false,
 }: {
   state: EventState;
   // False while the stream reconnects or resyncs, so nothing is sent against stale state.
   live: boolean;
+  // The docked form drops the large heading so the transcript keeps most of the screen.
+  docked?: boolean;
 }) {
   const [text, setText] = useState("");
   const [attempt, setAttempt] = useState<InstructionAttempt | null>(null);
@@ -75,11 +78,8 @@ export function InstructionComposer({
   }
 
   const ready = open && live && !sending && Boolean(text.trim());
-  const history = Object.values(state.instructions)
-    .slice()
-    .sort((a, b) => a.created_at.localeCompare(b.created_at));
-  return (
-    <RuledPanel title="Guide the next response">
+  const body = (
+    <>
       <Field
         label="Private instruction"
         hint={`Never read aloud. ${text.length} / ${LIMITS.instructionText} characters.`}
@@ -92,6 +92,7 @@ export function InstructionComposer({
         maxLength={LIMITS.instructionText}
         editable={open && !sending}
         multiline
+        inputStyle={docked ? s.dockedInput : undefined}
       />
       {problem ? (
         <AppText
@@ -135,17 +136,35 @@ export function InstructionComposer({
           Sending waits until call updates are current again.
         </AppText>
       ) : null}
-      {history.length > 0 ? (
-        <View style={s.history}>
-          <AppText variant="label" tone="muted" accessibilityRole="header">
-            YOUR INSTRUCTIONS
-          </AppText>
-          {history.map((item) => (
-            <HistoryRow key={item.id} instruction={item} />
-          ))}
-        </View>
-      ) : null}
-    </RuledPanel>
+    </>
+  );
+  return docked ? (
+    <View style={s.docked}>
+      <AppText variant="label" accessibilityRole="header">
+        GUIDE THE NEXT RESPONSE
+      </AppText>
+      {body}
+    </View>
+  ) : (
+    <RuledPanel title="Guide the next response">{body}</RuledPanel>
+  );
+}
+
+// Every instruction sent this call with its server-reported state.
+export function InstructionHistory({ state }: { state: EventState }) {
+  const history = Object.values(state.instructions)
+    .slice()
+    .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  if (history.length === 0) return null;
+  return (
+    <View style={s.history}>
+      <AppText variant="label" tone="muted" accessibilityRole="header">
+        YOUR INSTRUCTIONS
+      </AppText>
+      {history.map((item) => (
+        <HistoryRow key={item.id} instruction={item} />
+      ))}
+    </View>
   );
 }
 
@@ -190,6 +209,8 @@ function HistoryRow({ instruction }: { instruction: Instruction }) {
 const s = StyleSheet.create({
   actions: { flexDirection: "row", flexWrap: "wrap", gap: t.space.md },
   history: { gap: t.space.sm },
+  docked: { gap: t.space.sm },
+  dockedInput: { minHeight: t.target },
   row: { flexDirection: "row", gap: t.space.md, alignItems: "flex-start" },
   rowText: { flex: 1, minWidth: 0 },
 });

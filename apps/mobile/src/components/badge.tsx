@@ -30,6 +30,8 @@ export function Badge({ label, tone = "neutral" }: BadgeProps) {
 const s = StyleSheet.create({
   badge: {
     alignSelf: "flex-start",
+    // Long labels wrap inside narrow screens instead of running off the edge.
+    maxWidth: "100%",
     backgroundColor: t.wash,
     borderWidth: 1,
     borderColor: t.line,
