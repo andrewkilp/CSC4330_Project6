@@ -68,3 +68,23 @@ moon run :build :lint :typecheck :test
 
 Tests use an in-memory socket for protocol and ownership cases and a real WebSocket
 client that plays Twilio for the end-to-end stream. No real call was placed.
+
+## Remote interruption (#26)
+
+**Detection.** The selected recognizer (#20, Deepgram with `interim_results=true`) delivers interim text within a few hundred milliseconds of the business starting to talk. `telephony.Calls.ObserveRemoteSpeech` treats the first non-empty transcript update while the assistant's audio is still playing as an interruption. No separate voice-activity dependency is used. The API runs this check on every update before forwarding it.
+
+**Playback tracking.** Each approved reply is sent chunk by chunk with its own mark (`media.Playback`, mark `<responseID>.<n>`). Twilio reports marks in buffer order, so the acknowledged marks are exactly the audio that played.
+
+**On interruption:**
+1. The ledger is frozen, which makes every outstanding mark stale.
+2. Twilio `clear` drops the unplayed audio.
+3. `Loop.InterruptPlayback` cancels the reply and retires its generation token.
+4. The caller gets the words actually heard (`conversation.SpokenPortion`, rounded down to a whole word) to record as the assistant's turn.
+
+**Late marks.** A late mark for cleared audio is `media.ErrStaleMark`. It can neither complete nor restart the cancelled reply, and the loop rejects `CompletePlayback`, `BeginPlayback` and a second synthesis for it. Pause and end freeze the ledger the same way.
+
+**Evidence:**
+- `packages/go/telephony/interrupt_test.go`: deterministic interruption after two acknowledged chunks, plus a 24-run race in which marks arrive while the business speaks and exactly one of interrupt or complete wins each run, with both outcomes exercised.
+- `packages/go/telephony/media/playback_test.go`
+- `packages/go/conversation/interrupt_test.go`
+- `apps/api/media_routes_test.go`

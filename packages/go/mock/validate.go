@@ -119,6 +119,8 @@ type validator struct {
 	callStatus   string
 	turns        map[string]Turn
 	responses    map[string]Response
+	// played holds each response's text once approved, for interrupted speech (#26).
+	played       map[string]string
 	instructions map[string]Instruction
 	summary      *Summary
 }
@@ -130,7 +132,7 @@ func (v *validator) bad(field, format string, args ...any) error {
 // Validate checks contract shape, ordering, state progressions, fictional data and the
 // scenario requirements (an unanswered question and a path that needs operator input).
 func Validate(f Fixture) error {
-	v := &validator{f: f, turns: map[string]Turn{}, responses: map[string]Response{}, instructions: map[string]Instruction{}}
+	v := &validator{f: f, turns: map[string]Turn{}, responses: map[string]Response{}, played: map[string]string{}, instructions: map[string]Instruction{}}
 	if strings.TrimSpace(f.Scenario) == "" {
 		return v.bad("scenario", "is required")
 	}
@@ -300,8 +302,14 @@ func (v *validator) turnEvent(t Turn) error {
 	}
 	if t.Speaker == "assistant" {
 		r, ok := v.responses[t.ResponseID]
-		if !t.IsFinal || !ok || r.Status != "spoken" || r.Text != t.Text {
-			return v.bad("payload.response_id", "assistant speech must be the final text of a spoken response")
+		spoken := ok && r.Status == "spoken" && r.Text == t.Text
+		// Interrupted speech (#26): the words heard before the business cut in, a
+		// whole-word prefix of a response that was playing and then cancelled.
+		full := v.played[t.ResponseID]
+		interrupted := ok && r.Status == "cancelled" && full != "" && t.Text != "" && strings.HasPrefix(full, t.Text) &&
+			(len(t.Text) == len(full) || full[len(t.Text)] == ' ')
+		if !t.IsFinal || !(spoken || interrupted) {
+			return v.bad("payload.response_id", "assistant speech must be the final text of a spoken response, or the heard prefix of interrupted speech")
 		}
 	} else if t.ResponseID != "" {
 		return v.bad("payload.response_id", "business turns cannot reference a response")
@@ -380,6 +388,9 @@ func (v *validator) responseEvent(e Event, r Response) error {
 		if prev.Status != "generating" && !retired && prev.Text != r.Text {
 			return v.bad("payload.text", "suggested text changed without a new response")
 		}
+	}
+	if r.Status == "approved" || r.Status == "speaking" {
+		v.played[r.ID] = r.Text
 	}
 	v.responses[r.ID] = r
 	return nil

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/webhooks"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
@@ -31,6 +32,9 @@ type ActiveCallLookup interface {
 type MediaSink interface {
 	Transcript(callID string, u providers.TranscriptUpdate) error
 	Event(callID string, e providers.MediaEvent)
+	// Interrupted reports speech the business cut off (#26); record Spoken as the
+	// assistant's turn for ResponseID when it is not empty.
+	Interrupted(callID string, i telephony.Interruption)
 }
 
 // liveMedia registers each live call's outbound stream in the shared live-call
@@ -61,12 +65,21 @@ func (l *liveMedia) attach(callID string, out providers.MediaStream) {
 	_ = l.calls.AttachMedia(callID, out)
 }
 
+// transcript runs the interruption detector (#26) on every recognition update before
+// the sink sees it, so remote speech stops the assistant's audio at once even when no
+// runtime is attached.
 func (l *liveMedia) transcript(callID string, u providers.TranscriptUpdate) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	interrupted, _ := l.calls.ObserveRemoteSpeech(ctx, callID, u)
+	cancel()
 	l.mu.Lock()
 	sink := l.sink
 	l.mu.Unlock()
 	if sink == nil {
 		return nil
+	}
+	if interrupted != nil {
+		sink.Interrupted(callID, *interrupted)
 	}
 	return sink.Transcript(callID, u)
 }

@@ -87,7 +87,7 @@ Related automated evidence lives with each issue:
 - Persistence is in memory. The Postgres path for the same controls is covered by `packages/go/handlers/control/integration_test.go`, which runs only when `SWITCHBOARD_REPOSITORY_TEST_DATABASE_URL` is set. CI does not set it.
 - The journal is the in-process equivalent of the repository event log. Its envelopes are the same, but they are not written through `repository.Update`.
 - The summary is scripted (#39 is open).
-- Remote interruption mid-speech (#26) and real STT-to-turn persistence (#25) are not exercised.
+- Remote interruption mid-speech is not part of the scripted journeys. It is covered by the #26 race tests (`packages/go/telephony/interrupt_test.go`). Real STT-to-turn persistence (#25) is not exercised.
 - The HTTP routes are covered by their own handler tests, not by this journey.
 
 ## Real-call checks (manual, consenting team members only)

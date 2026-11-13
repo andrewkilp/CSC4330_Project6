@@ -331,3 +331,52 @@ func TestValidateAcceptsContractResponseUpdates(t *testing.T) {
 		}
 	}
 }
+
+// Interrupted speech (#26) records the heard prefix of a cancelled response.
+func TestValidateAcceptsInterruptedSpeechPrefix(t *testing.T) {
+	base := mustGenerate(t, RestaurantTimeConflict, DefaultSeed)
+	// Find the first spoken response and its assistant turn.
+	spokenAt, turnAt := -1, -1
+	for i, e := range base.Events {
+		if r, ok := e.Payload.(Response); ok && r.Status == "spoken" && spokenAt < 0 {
+			spokenAt = i
+		}
+		if tr, ok := e.Payload.(Turn); ok && tr.Speaker == "assistant" && turnAt < 0 {
+			turnAt = i
+		}
+	}
+	full := base.Events[spokenAt].Payload.(Response).Text
+	build := func(prefix string) Fixture {
+		f := base
+		f.Events = append([]Event(nil), base.Events...)
+		r := f.Events[spokenAt].Payload.(Response)
+		r.Status, r.Text = "cancelled", ""
+		f.Events[spokenAt].Payload = r
+		tr := f.Events[turnAt].Payload.(Turn)
+		tr.Text = prefix
+		f.Events[turnAt].Payload = tr
+		// The scripted approval input targets this response, which is now cancelled.
+		var inputs []OperatorInput
+		for _, in := range f.Expected.OperatorInputs {
+			if in.ResponseID != r.ID {
+				inputs = append(inputs, in)
+			}
+		}
+		f.Expected.OperatorInputs = inputs
+		return f
+	}
+	words := strings.Fields(full)
+	if err := Validate(build(strings.Join(words[:3], " "))); err != nil {
+		t.Fatalf("heard prefix rejected: %v", err)
+	}
+	for name, text := range map[string]string{
+		"half a word":  full[:len(strings.Join(words[:3], " "))+2],
+		"not a prefix": "Something never said",
+		"empty":        "",
+	} {
+		var ve *ValidationError
+		if err := Validate(build(text)); !errors.As(err, &ve) || ve.Field != "payload.response_id" && ve.Field != "payload.text" {
+			t.Errorf("%s accepted: %v", name, err)
+		}
+	}
+}

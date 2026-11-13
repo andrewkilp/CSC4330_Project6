@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/conversation"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 )
 
 // Calls is the in-process registry of live provider work for each call: the
@@ -33,6 +35,7 @@ type liveCall struct {
 	providerID string
 	media      providers.MediaStream
 	loop       *conversation.Loop
+	playback   *media.Playback
 	ctx        context.Context
 	cancel     context.CancelFunc
 }
@@ -190,6 +193,7 @@ func (c *Calls) snapshot(callID string) (loop *conversation.Loop, media provider
 // Pause cancels in-flight generation and synthesis and drops queued speech while
 // keeping the line open. Already-spoken audio is unaffected.
 func (c *Calls) Pause(ctx context.Context, callID string) error {
+	c.takePlayback(callID)
 	loop, media, _ := c.snapshot(callID)
 	if loop != nil {
 		// A loop that is not connected has nothing to cancel.
@@ -237,6 +241,9 @@ func (c *Calls) End(ctx context.Context, callID string) error {
 		return nil
 	}
 	e.cancel()
+	if e.playback != nil {
+		e.playback.Clear()
+	}
 	if e.loop != nil {
 		_ = e.loop.Transition(conversation.Ended)
 	}
@@ -259,4 +266,130 @@ func (c *Calls) End(ctx context.Context, callID string) error {
 		return fmt.Errorf("%w: hang up", providers.ErrUnavailable)
 	}
 	return nil
+}
+
+// ---------------------------------------------------------------------------
+// Playback and remote interruption (#26).
+
+// BeginSpeech registers the playback ledger of the response now being sent to the
+// call. A previous ledger is frozen, so its outstanding marks become stale.
+func (c *Calls) BeginSpeech(callID string, p *media.Playback) error {
+	if p == nil {
+		return providers.ErrInvalid
+	}
+	c.mu.Lock()
+	if c.isEndedLocked(callID) {
+		c.mu.Unlock()
+		p.Clear()
+		return ErrCallEnded
+	}
+	e := c.entryLocked(callID)
+	previous := e.playback
+	e.playback = p
+	c.mu.Unlock()
+	if previous != nil && previous != p {
+		previous.Clear()
+	}
+	return nil
+}
+
+// Acknowledge applies a playback mark reported by the provider. It returns the
+// response id and whether its playback is complete (the caller then calls
+// Loop.CompletePlayback). A mark for audio that was cleared, or for any response other
+// than the one playing, is media.ErrStaleMark and must be ignored.
+func (c *Calls) Acknowledge(callID, mark string) (responseID string, complete bool, err error) {
+	c.mu.Lock()
+	e := c.calls[callID]
+	var p *media.Playback
+	if e != nil {
+		p = e.playback
+	}
+	c.mu.Unlock()
+	if p == nil {
+		return "", false, media.ErrStaleMark
+	}
+	complete, err = p.Acknowledge(mark)
+	if err != nil {
+		return "", false, err
+	}
+	if complete {
+		c.mu.Lock()
+		if e := c.calls[callID]; e != nil && e.playback == p {
+			e.playback = nil
+		}
+		c.mu.Unlock()
+	}
+	return p.ResponseID(), complete, nil
+}
+
+// Interruption describes speech cut off by the business.
+type Interruption struct {
+	ResponseID string
+	// Spoken is what the business actually heard, at a word boundary. Record it as
+	// the assistant's turn for ResponseID when it is not empty.
+	Spoken string
+	// PlayedBytes and DroppedBytes are the acknowledged and cleared outbound audio.
+	PlayedBytes, DroppedBytes int
+}
+
+func (c *Calls) takePlayback(callID string) *media.Playback {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	e := c.calls[callID]
+	if e == nil || e.playback == nil {
+		return nil
+	}
+	p := e.playback
+	e.playback = nil
+	p.Clear()
+	return p
+}
+
+// ObserveRemoteSpeech is the interruption detector. The selected recognizer (#20)
+// streams interim results, so the first non-empty transcript update while the
+// assistant's audio is still playing means the business has started talking. It then
+// interrupts: the playback ledger is frozen (outstanding marks become stale), Twilio's
+// buffer is cleared, and the response is cancelled with the words actually heard.
+// It returns nil when nothing was playing. Call it before passing the update to the
+// conversation loop, which would otherwise cancel the response without its spoken part.
+func (c *Calls) ObserveRemoteSpeech(ctx context.Context, callID string, u providers.TranscriptUpdate) (*Interruption, error) {
+	if strings.TrimSpace(u.Text) == "" {
+		return nil, nil
+	}
+	c.mu.Lock()
+	e := c.calls[callID]
+	active := e != nil && e.playback != nil && e.playback.Active()
+	c.mu.Unlock()
+	if !active {
+		return nil, nil
+	}
+	return c.Interrupt(ctx, callID)
+}
+
+// Interrupt stops the playing response now. It is idempotent: with nothing playing
+// it returns nil.
+func (c *Calls) Interrupt(ctx context.Context, callID string) (*Interruption, error) {
+	p := c.takePlayback(callID)
+	if p == nil {
+		return nil, nil
+	}
+	played, queued := p.Progress()
+	loop, stream, _ := c.snapshot(callID)
+	out := &Interruption{ResponseID: p.ResponseID(), PlayedBytes: played}
+	var clearErr error
+	if stream != nil {
+		dropped, err := stream.Clear(ctx)
+		out.DroppedBytes = dropped
+		if err != nil && !errors.Is(err, providers.ErrClosed) {
+			clearErr = fmt.Errorf("%w: clear queued audio", providers.ErrUnavailable)
+		}
+	}
+	if loop != nil {
+		got, err := loop.InterruptPlayback(p.ResponseID(), played, queued)
+		if err != nil && !errors.Is(err, conversation.ErrStaleGeneration) {
+			return out, err
+		}
+		out.Spoken = got.Spoken
+	}
+	return out, clearErr
 }

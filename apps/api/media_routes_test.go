@@ -178,10 +178,11 @@ func (s finalSession) Push(context.Context, providers.AudioChunk) error {
 func (finalSession) Close() error { return nil }
 
 type recordingSink struct {
-	mu          sync.Mutex
-	transcripts []string
-	events      []providers.MediaEventKind
-	changed     chan struct{}
+	mu            sync.Mutex
+	transcripts   []string
+	events        []providers.MediaEventKind
+	interruptions []telephony.Interruption
+	changed       chan struct{}
 }
 
 func (s *recordingSink) Transcript(callID string, u providers.TranscriptUpdate) error {
@@ -190,6 +191,11 @@ func (s *recordingSink) Transcript(callID string, u providers.TranscriptUpdate) 
 	s.mu.Unlock()
 	s.changed <- struct{}{}
 	return nil
+}
+func (s *recordingSink) Interrupted(callID string, i telephony.Interruption) {
+	s.mu.Lock()
+	s.interruptions = append(s.interruptions, i)
+	s.mu.Unlock()
 }
 func (s *recordingSink) Event(callID string, e providers.MediaEvent) {
 	s.mu.Lock()
@@ -315,3 +321,46 @@ func (*closeCounter) Send(context.Context, providers.AudioChunk) error { return 
 func (*closeCounter) Mark(context.Context, string) error               { return errors.New("unused") }
 func (*closeCounter) Clear(context.Context) (int, error)               { return 0, nil }
 func (c *closeCounter) Close() error                                   { c.closed.Add(1); return nil }
+
+// Remote speech on a live call clears the assistant's queued audio before the sink
+// sees the transcript, and the sink learns what was heard.
+func TestTranscriptsInterruptPlayingSpeech(t *testing.T) {
+	calls := telephony.NewCalls()
+	live := newLiveMedia(calls)
+	sink := &recordingSink{changed: make(chan struct{}, 16)}
+	live.SetSink(sink)
+	stream := &clearCounter{}
+	if err := calls.AttachMedia(mediaCallID, stream); err != nil {
+		t.Fatal(err)
+	}
+	p, _ := media.NewPlayback("00000000-0000-4000-8000-0000000000aa")
+	first, _ := p.Queue(1600)
+	_, _ = p.Queue(1600)
+	if err := calls.BeginSpeech(mediaCallID, p); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := calls.Acknowledge(mediaCallID, first); err != nil {
+		t.Fatal(err)
+	}
+	if err := live.transcript(mediaCallID, providers.TranscriptUpdate{TurnID: "b", Text: "Wait"}); err != nil {
+		t.Fatal(err)
+	}
+	if stream.clears.Load() != 1 || len(sink.interruptions) != 1 || sink.interruptions[0].PlayedBytes != 1600 {
+		t.Fatalf("clears=%d interruptions=%+v", stream.clears.Load(), sink.interruptions)
+	}
+	if len(sink.transcripts) != 1 {
+		t.Fatal("the interrupting transcript was not forwarded")
+	}
+	// Further speech with nothing playing does not clear again.
+	_ = live.transcript(mediaCallID, providers.TranscriptUpdate{TurnID: "b", Text: "Wait, one"})
+	if stream.clears.Load() != 1 || len(sink.interruptions) != 1 {
+		t.Fatal("interrupted twice")
+	}
+}
+
+type clearCounter struct{ clears atomic.Int32 }
+
+func (*clearCounter) Send(context.Context, providers.AudioChunk) error { return nil }
+func (*clearCounter) Mark(context.Context, string) error               { return nil }
+func (c *clearCounter) Clear(context.Context) (int, error)             { c.clears.Add(1); return 1600, nil }
+func (*clearCounter) Close() error                                     { return nil }
