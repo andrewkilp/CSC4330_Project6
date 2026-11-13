@@ -32,3 +32,17 @@ func TestSessionCookieEnvironment(t *testing.T) {
 		})
 	}
 }
+
+func TestProvidersRouteIsSecretFreeAndMock(t *testing.T) {
+	t.Setenv("CALL_MODE", "real")
+	t.Setenv("ENABLE_REAL_CALLS", "false")
+	t.Setenv("ANTHROPIC_API_KEY", "sk-test-SENTINEL")
+	t.Setenv("CLAUDE_MODEL", "claude-test-model")
+	recorder := httptest.NewRecorder()
+	newRouter("development").ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/v1/providers", nil))
+	body := recorder.Body.String()
+	if recorder.Code != http.StatusOK || strings.Contains(body, "SENTINEL") || !strings.Contains(body, `"mode":"mock"`) ||
+		!strings.Contains(body, `"llm":{"available":true}`) || !strings.Contains(body, `"telephony":{"available":false`) {
+		t.Fatalf("providers route: %d %s", recorder.Code, body)
+	}
+}
