@@ -1,3 +1,5 @@
+import { CallRequestError, createCall } from "@switchboard/api";
+import { randomUUID } from "expo-crypto";
 import { useRouter } from "expo-router";
 import {
   type ReactNode,
@@ -378,8 +380,48 @@ export function NewGoalScreen() {
 
 export function ReviewGoalScreen() {
   const router = useRouter();
-  const { draft } = useGoalDraft();
+  const { draft, intent, setIntent } = useGoalDraft();
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => () => controller.current?.abort(), []);
   const { review } = validateDraft(draft);
+  const fingerprint = review ? JSON.stringify(review) : "";
+  const saved = intent?.fingerprint === fingerprint ? intent.call : undefined;
+  async function saveDraft() {
+    if (!review || controller.current) return;
+    if (saved) {
+      router.push(`/calls/${saved.id}`);
+      return;
+    }
+    setCreateError("");
+    setCreating(true);
+    const abort = new AbortController();
+    controller.current = abort;
+    try {
+      const key =
+        intent?.fingerprint === fingerprint ? intent.key : randomUUID();
+      setIntent({ fingerprint, key });
+      const call = await createCall(
+        process.env.EXPO_PUBLIC_API_URL || "http://localhost:8080",
+        { ...review, consent_acknowledged: true, idempotency_key: key },
+        abort.signal,
+      );
+      if (abort.signal.aborted) return;
+      setIntent({ fingerprint, key, call });
+      router.push(`/calls/${call.id}`);
+    } catch (error) {
+      if (!abort.signal.aborted)
+        setCreateError(
+          error instanceof CallRequestError
+            ? error.message
+            : "The draft could not be saved. Your goal is still here; try again.",
+        );
+    } finally {
+      controller.current = null;
+      if (!abort.signal.aborted) setCreating(false);
+    }
+  }
   if (!review)
     return (
       <GoalShell title="Let's start with a goal." subtitle="02 / REVIEW">
@@ -397,8 +439,9 @@ export function ReviewGoalScreen() {
       subtitle="02 / REVIEW YOUR GOAL"
     >
       <AppText tone="muted">
-        These are the details your assistant would use. Nothing has been saved
-        or dialed.
+        {saved
+          ? "A draft has been saved. Starting a call is always a separate action."
+          : "These are the details your assistant would use. Nothing has been saved or dialed."}
       </AppText>
       <View style={s.columns}>
         <View style={s.column}>
@@ -452,6 +495,19 @@ export function ReviewGoalScreen() {
                 booking name above.
               </AppText>
               <Button
+                label={saved ? "Open saved draft" : "Save call draft"}
+                loading={creating}
+                loadingLabel="Saving draft…"
+                onPress={() => {
+                  void saveDraft();
+                }}
+              />
+              {createError && (
+                <AppText accessibilityRole="alert" tone="danger">
+                  {createError}
+                </AppText>
+              )}
+              <Button
                 label="Edit goal"
                 variant="secondary"
                 onPress={() => router.dismissTo("/new")}
@@ -461,8 +517,8 @@ export function ReviewGoalScreen() {
                 onPress={() => router.push("/")}
               />
               <AppText variant="caption" tone="muted">
-                Creating a call draft will be available when the call service is
-                connected.
+                Saving a draft stores these details. It does not dial the
+                business or generate speech.
               </AppText>
             </View>
           </RuledPanel>
