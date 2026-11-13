@@ -88,6 +88,25 @@ and pause controls. The state selector opens a fresh visual example. Existing
 `/calls/{uuid}` draft reads retain their owner-gated behavior. No event subscription
 or vendor request is added.
 
+## Transcript fixture replay (#17)
+
+The live preview's Next fixture event control feeds validated events through the
+shared reducer. A provisional business turn becomes one finalized turn without
+duplication. Subsequent fixture steps show suggested, approved, speaking and
+spoken response states; only a separate acknowledged assistant turn appears in
+the transcript. Editing/approving the local sample field does not manufacture
+playback. Reset fixture replay starts a new fictional example.
+
+The transcript has an independent bounded scroll region, follows the latest text
+when already at the bottom, and preserves a scrolled-up position. Jump to latest
+explicitly resumes following. Provisional wording has a separate labelled region;
+speaker names and timestamps accompany every turn. No network subscription is
+introduced (#22). Browser checks at 390 and 1440 px cover replacement, approval
+separation, reading position, jump, terminal controls and zero API requests.
+Screenshots are under `docs/design/live-call/` (`transcript-partial-*`,
+`transcript-final-*`, `ended-controls-*`). Native screen-reader and keyboard
+behavior still require device verification in #42.
+
 ## Source prompt
 
 Use case: ui-mockup. A mobile-first AI phone concierge named Switchboard for restaurant reservations and appointments. Show desktop and narrow mobile live-call workspaces. Editorial telephone exchange aesthetic: ivory paper, dark ink, forest green, restrained vermilion and brass; thin ruled borders; serif headings, humanist body, monospaced timestamps. Reservation at Marigold, transcript with AI and Restaurant labels, current goal table for four Friday around seven, editable suggested reply, Approve, instruction composer with “Accept 7:30, but ask for the patio,” Pause AI and End call. Avoid generic card grids, purple gradients and glowing AI orbs. Flat crisp interface reference.

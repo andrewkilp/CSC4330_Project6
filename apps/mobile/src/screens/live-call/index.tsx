@@ -15,13 +15,16 @@ import {
   type PreviewPhase,
   previewCall,
   previewReply,
-  previewTurns,
+  replayLabels,
+  replayTranscript,
 } from "./fixture";
+import { Transcript } from "./transcript";
 
 export default function LiveCallPreview() {
   const router = useRouter();
   const wide = useWindowDimensions().width >= t.layout.breakpoint;
   const [phase, setPhase] = useState<PreviewPhase>("approval");
+  const [replayStep, setReplayStep] = useState(0);
   const [instruction, setInstruction] = useState("");
   const [reply, setReply] = useState(previewReply.text);
   const [notice, setNotice] = useState(
@@ -106,46 +109,33 @@ export default function LiveCallPreview() {
             </View>
             <View style={[s.workspace, wide && s.horizontal]}>
               <View style={s.transcript}>
-                <AppText variant="label" tone="muted">
-                  ON THE LINE / SAMPLE TRANSCRIPT
-                </AppText>
                 {phase === "connecting" ? (
                   <AppText>
                     Waiting for the fictional business to answer.
                   </AppText>
                 ) : (
-                  previewTurns.map((turn) => (
-                    <View key={turn.id} style={s.turn}>
-                      <AppText variant="mono" tone="muted">
-                        [
-                        {String(
-                          Math.floor(turn.started_at_ms / 60000),
-                        ).padStart(2, "0")}
-                        :
-                        {String(
-                          Math.floor(turn.started_at_ms / 1000) % 60,
-                        ).padStart(2, "0")}
-                        ]
-                      </AppText>
-                      <View
-                        style={[
-                          s.turnBody,
-                          turn.speaker === "business" && s.business,
-                        ]}
-                      >
-                        <AppText
-                          variant="label"
-                          tone={
-                            turn.speaker === "assistant" ? "green" : "danger"
-                          }
-                        >
-                          {turn.speaker === "assistant" ? "AI" : "RESTAURANT"}
-                        </AppText>
-                        <AppText>{turn.text}</AppText>
-                      </View>
-                    </View>
-                  ))
+                  <Transcript state={replayTranscript(replayStep)} />
                 )}
+                <AppText
+                  variant="caption"
+                  tone="muted"
+                  accessibilityLiveRegion="polite"
+                >
+                  Fixture replay: {replayLabels[replayStep]}
+                </AppText>
+                <Button
+                  label="Next fixture event"
+                  variant="secondary"
+                  disabled={phase !== "approval" || replayStep === 6}
+                  onPress={() =>
+                    setReplayStep((value) => Math.min(6, value + 1))
+                  }
+                />
+                <Button
+                  label="Reset fixture replay"
+                  variant="secondary"
+                  onPress={() => setReplayStep(0)}
+                />
               </View>
               <View style={[s.rail, wide && s.railWide]}>
                 <RuledPanel title="Current goal">
@@ -158,11 +148,13 @@ export default function LiveCallPreview() {
                 </RuledPanel>
                 <RuledPanel title="Suggested reply">
                   <AppText variant="caption" tone="muted">
-                    {phase === "ended"
-                      ? "Call ended. This sample was not spoken."
-                      : phase === "paused"
-                        ? "AI paused. Approval is unavailable."
-                        : "Not spoken. Your approval is required."}
+                    {replayStep === 6
+                      ? "Fixture playback acknowledged. The sample turn is now in the transcript."
+                      : phase === "ended"
+                        ? "Call ended. This sample was not spoken."
+                        : phase === "paused"
+                          ? "AI paused. Approval is unavailable."
+                          : "Not spoken. Your approval is required."}
                   </AppText>
                   <Field
                     label="Suggested reply"
@@ -174,7 +166,7 @@ export default function LiveCallPreview() {
                   />
                   <Button
                     label="Approve sample reply"
-                    disabled={inactive || !reply.trim()}
+                    disabled={inactive || replayStep >= 4 || !reply.trim()}
                     onPress={() =>
                       setNotice(
                         "Approved locally for preview. No audio was played; the reply stays outside the transcript.",

@@ -142,6 +142,28 @@ export function createEventState(callId: string): EventState {
     recovery: null,
   };
 }
+
+// Response text alone is never a transcript turn. A linked assistant turn is
+// visible only after the server reports playback acknowledgement as spoken.
+export function selectTranscript(state: EventState): {
+  finalized: readonly Turn[];
+  provisional: readonly Turn[];
+} {
+  const turns = state.turnOrder
+    .map((id) => state.turns[id])
+    .filter(
+      (turn): turn is Turn =>
+        !!turn &&
+        (turn.speaker !== "assistant" ||
+          !turn.response_id ||
+          state.responses[turn.response_id]?.status === "spoken"),
+    )
+    .sort((a, b) => a.started_at_ms - b.started_at_ms);
+  return {
+    finalized: turns.filter((turn) => turn.is_final),
+    provisional: turns.filter((turn) => !turn.is_final),
+  };
+}
 const terminal = isTerminalCallStatus,
   responseTerminal = isTerminalResponseStatus;
 function retireCurrent(state: EventState): EventState {
