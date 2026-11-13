@@ -1,1 +1,1 @@
-export { default } from "../screens/call-preview";
+export { default } from "../screens/home";
