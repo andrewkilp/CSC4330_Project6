@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"regexp"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -294,3 +295,94 @@ func (r *Repository) ActiveProviderCallID(ctx context.Context, callID string) (s
 	}
 	return sid, nil
 }
+
+// ---------------------------------------------------------------------------
+// Provider failure recovery (#36). These are internal boundaries for verified
+// provider paths and the dial reconciler; they never take user input directly.
+
+// ProviderFailure is a user-safe provider.error. Code is a stable snake_case value
+// (for example dial_timeout), never a vendor message.
+type ProviderFailure struct {
+	Provider  string `json:"provider"`
+	Code      string `json:"code"`
+	Retryable bool   `json:"retryable"`
+	// FailCall also moves a call that is not yet terminal to failed.
+	FailCall bool `json:"-"`
+}
+
+var failureCode = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
+
+// RecordProviderFailure appends a provider.error event for the call and, with
+// FailCall, moves a non-terminal call to failed after it, in one transaction. It
+// returns the committed events for publishing.
+func (r *Repository) RecordProviderFailure(ctx context.Context, callID string, f ProviderFailure) ([]Event, error) {
+	if !uuidPattern.MatchString(callID) || !oneOf(f.Provider, "telephony", "stt", "llm", "tts") || !failureCode.MatchString(f.Code) {
+		return nil, ErrInvalid
+	}
+	db, err := r.pool.Begin(ctx)
+	if err != nil {
+		return nil, safe(err)
+	}
+	defer rollback(db)
+	var owner string
+	if err = db.QueryRow(ctx, `SELECT owner_id::text FROM calls WHERE id=$1 FOR UPDATE`, callID).Scan(&owner); err != nil {
+		return nil, safe(err)
+	}
+	t := &Tx{ctx: ctx, db: db, owner: owner, id: callID, active: true}
+	defer func() { t.active = false }()
+	if t.call, err = t.loadCall(); err != nil {
+		return nil, err
+	}
+	e, err := t.AppendEvent("provider.error", f)
+	if err != nil {
+		return nil, err
+	}
+	events := []Event{e}
+	if f.FailCall && !oneOf(t.call.Status, "ended", "failed", "cancelled") {
+		if err = t.SetCall(t.call.ContextRevision, "failed", t.call.ContextRevision); err != nil {
+			return nil, err
+		}
+		if e, err = t.AppendEvent("call.updated", t.Call()); err != nil {
+			return nil, err
+		}
+		events = append(events, e)
+	}
+	if err = db.Commit(ctx); err != nil {
+		return nil, safe(err)
+	}
+	return events, nil
+}
+
+// StaleCall is a call that has been dialing too long.
+type StaleCall struct {
+	CallID, Mode string
+	// ProviderSID is empty when the provider never acknowledged the start.
+	ProviderSID string
+}
+
+// StaleDialing lists calls that have been dialing for longer than olderThan, oldest
+// first, at most limit (1..100).
+func (r *Repository) StaleDialing(ctx context.Context, olderThan time.Duration, limit int) ([]StaleCall, error) {
+	if olderThan <= 0 || limit < 1 || limit > 100 {
+		return nil, ErrInvalid
+	}
+	rows, err := r.pool.Query(ctx, `SELECT c.id::text, c.mode, COALESCE(s.provider_sid, '') FROM calls c LEFT JOIN call_starts s ON s.call_id=c.id
+		WHERE c.status='dialing' AND c.updated_at < clock_timestamp() - make_interval(secs => $1) ORDER BY c.updated_at, c.id LIMIT $2`, olderThan.Seconds(), limit)
+	if err != nil {
+		return nil, safe(err)
+	}
+	defer rows.Close()
+	var out []StaleCall
+	for rows.Next() {
+		var s StaleCall
+		if err := rows.Scan(&s.CallID, &s.Mode, &s.ProviderSID); err != nil {
+			return nil, safe(err)
+		}
+		out = append(out, s)
+	}
+	return out, safe(rows.Err())
+}
+
+// TwilioStatus maps a Twilio CallStatus onto the current call status the way
+// ApplyTwilioCallback does: terminal states never change and nothing regresses.
+func TwilioStatus(current, status string) string { return twilioStatus(current, status) }

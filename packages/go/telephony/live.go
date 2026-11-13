@@ -393,3 +393,11 @@ func (c *Calls) Interrupt(ctx context.Context, callID string) (*Interruption, er
 	}
 	return out, clearErr
 }
+
+// placed reports whether this process recorded a provider call for callID.
+func (c *Calls) placed(callID string) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	e := c.calls[callID]
+	return e != nil && e.provider != nil
+}

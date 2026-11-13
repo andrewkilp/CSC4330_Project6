@@ -11,6 +11,7 @@ import (
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/calls"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/control"
 	eventroutes "github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/events"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
 )
@@ -55,7 +56,7 @@ type updateStore interface {
 
 // registerCallRuntime mounts the durable event stream (#23) and call controls (#31).
 // Both need the repository; without DATABASE_URL neither route exists.
-func registerCallRuntime(mux *http.ServeMux, store calls.DraftStore, sessions *auth.Sessions, rt *liveRuntime) error {
+func registerCallRuntime(mux *http.ServeMux, store calls.DraftStore, sessions *auth.Sessions, rt *liveRuntime, real providers.Telephony) error {
 	if nilStore(store) {
 		return nil
 	}
@@ -64,8 +65,29 @@ func registerCallRuntime(mux *http.ServeMux, store calls.DraftStore, sessions *a
 			return err
 		}
 	}
+	if rs, ok := store.(telephony.ReconcileStore); ok {
+		// Orphan dialing cleanup (#36) for the life of the process.
+		reconciler := &telephony.Reconciler{Store: rs, Calls: rt.calls, Publish: rt.publish, Providers: map[string]providers.Telephony{}}
+		if real != nil {
+			reconciler.Providers["real"] = real
+		}
+		go reconciler.Run(context.Background(), 30*time.Second)
+	}
 	if up, ok := store.(updateStore); ok {
 		return control.Register(mux, control.Config{Store: control.Repository{Store: up}, Runtime: rt.calls, Publish: rt.publish, RequireOwner: sessions.RequireOwner})
 	}
 	return nil
+}
+
+// realTelephony returns the Twilio client for hanging up calls placed before a
+// restart, or nil when real calls are disabled. startService already validated it.
+func realTelephony(cfg apiStartConfig) providers.Telephony {
+	if !cfg.policy.EnableReal {
+		return nil
+	}
+	client, err := telephony.New(cfg.provider)
+	if err != nil {
+		return nil
+	}
+	return client
 }

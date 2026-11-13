@@ -59,7 +59,7 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	if err := registerTwilioCallbacks(mux, store, config, rt); err != nil {
 		return nil, err
 	}
-	if err := registerCallRuntime(mux, store, sessions, rt); err != nil {
+	if err := registerCallRuntime(mux, store, sessions, rt, realTelephony(config)); err != nil {
 		return nil, err
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

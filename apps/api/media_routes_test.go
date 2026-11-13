@@ -364,3 +364,69 @@ func (*clearCounter) Send(context.Context, providers.AudioChunk) error { return 
 func (*clearCounter) Mark(context.Context, string) error               { return nil }
 func (c *clearCounter) Clear(context.Context) (int, error)             { c.clears.Add(1); return 1600, nil }
 func (*clearCounter) Close() error                                     { return nil }
+
+type failureLog struct {
+	mu    sync.Mutex
+	codes []string
+}
+
+func (f *failureLog) RecordProviderFailure(_ context.Context, callID string, pf repository.ProviderFailure) ([]repository.Event, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if !pf.FailCall {
+		return nil, errors.New("a lost stream must fail the call")
+	}
+	f.codes = append(f.codes, callID+":"+pf.Code)
+	return []repository.Event{{CallID: callID, Type: "provider.error"}, {CallID: callID, Type: "call.updated"}}, nil
+}
+
+func (f *failureLog) count() int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return len(f.codes)
+}
+
+// A Twilio socket that drops without a stop must not leave a media session or a
+// silent call behind (#36).
+func TestDroppedMediaSocketEndsTheCallVisibly(t *testing.T) {
+	calls := telephony.NewCalls()
+	live := newLiveMedia(calls)
+	failures := &failureLog{}
+	var published atomic.Int32
+	live.failures, live.publish = failures, func(e ...repository.Event) { published.Add(int32(len(e))) }
+	provider := &hangupCounter{}
+	if err := calls.Started(mediaCallID, provider, mediaCallSID); err != nil {
+		t.Fatal(err)
+	}
+	c := mediaClient(t, live)
+	write(t, c, twilioStart(media.SignStream([]byte(mediaSecret), mediaCallID, mediaCallSID)))
+	waitUntil(t, "attached stream", func() bool { _, ok := live.Stream(mediaCallID); return ok })
+	c.CloseNow() // abrupt: no stop message
+	waitUntil(t, "failure recorded", func() bool { return failures.count() == 1 })
+	if failures.codes[0] != mediaCallID+":media_disconnected" || published.Load() != 2 {
+		t.Fatalf("failures=%v published=%d", failures.codes, published.Load())
+	}
+	if _, ok := live.Stream(mediaCallID); ok || !calls.Ended(mediaCallID) || provider.ends.Load() != 1 {
+		t.Fatalf("leaked: stream registered=%v ended=%v hangups=%d", ok, calls.Ended(mediaCallID), provider.ends.Load())
+	}
+}
+
+func TestCleanStopAndShutdownRecordNoFailure(t *testing.T) {
+	calls := telephony.NewCalls()
+	live := newLiveMedia(calls)
+	failures := &failureLog{}
+	live.failures = failures
+	live.closed(mediaCallID, nil)
+	live.closed(mediaCallID, context.Canceled)
+	if failures.count() != 0 || calls.Ended(mediaCallID) {
+		t.Fatal("a clean stop or shutdown was treated as a lost stream")
+	}
+}
+
+type hangupCounter struct{ ends atomic.Int32 }
+
+func (*hangupCounter) Start(context.Context, providers.Dial) (string, error) { return "", nil }
+func (h *hangupCounter) End(context.Context, string) error                   { h.ends.Add(1); return nil }
+func (*hangupCounter) Media(context.Context, string, func(providers.MediaEvent) error) (providers.MediaStream, error) {
+	return nil, providers.ErrUnavailable
+}

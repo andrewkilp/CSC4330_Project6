@@ -10,6 +10,7 @@ import (
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/webhooks"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/transcription"
@@ -44,6 +45,9 @@ type liveMedia struct {
 	calls *telephony.Calls
 	mu    sync.Mutex
 	sink  MediaSink
+	// failures and publish record a lost stream as a visible call failure (#36).
+	failures webhooks.FailureRecorder
+	publish  func(...repository.Event)
 }
 
 func newLiveMedia(calls *telephony.Calls) *liveMedia { return &liveMedia{calls: calls} }
@@ -108,6 +112,28 @@ func (l *liveMedia) config(secret []byte, lookup ActiveCallLookup, stt providers
 		OnStart:      l.attach,
 		OnTranscript: l.transcript,
 		OnEvent:      l.event,
+		OnClose:      l.closed,
+	}
+}
+
+// closed handles a verified stream that ended without a provider stop (#36): a
+// dropped socket, protocol error or recognition failure. The call has lost its media,
+// so its live work is ended and the provider call hung up (no orphan call without
+// audio), then it is failed with a user-safe media_disconnected error. A clean stop and
+// server shutdown need nothing here.
+func (l *liveMedia) closed(callID string, err error) {
+	if err == nil || errors.Is(err, context.Canceled) {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_ = l.calls.End(ctx, callID)
+	if l.failures == nil {
+		return
+	}
+	events, ferr := l.failures.RecordProviderFailure(ctx, callID, repository.ProviderFailure{Provider: "telephony", Code: "media_disconnected", FailCall: true})
+	if ferr == nil && l.publish != nil && len(events) > 0 {
+		l.publish(events...)
 	}
 }
 

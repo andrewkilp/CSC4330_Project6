@@ -73,6 +73,10 @@ func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start a
 	}
 	config.MediaEnabled, config.MediaSecret = mediaEnabled, secret
 	config.Publish = func(_ context.Context, evs []repository.Event) { rt.publish(evs...) }
+	if failures, ok := ledger.(webhooks.FailureRecorder); ok {
+		config.Failures = failures
+		rt.media.failures, rt.media.publish = failures, rt.publish
+	}
 	handler, err := webhooks.New(config, ledger)
 	if err != nil {
 		return errors.New("invalid callback configuration")

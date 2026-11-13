@@ -1,0 +1,29 @@
+{
+  "_note": "Fault-injection deliveries for #36. Each case starts from a dialing real call. ledger=unavailable makes storage fail for that delivery; signature=forged breaks the Twilio signature. want is the HTTP status (default 204).",
+  "cases": [
+    {"name": "duplicate deliveries apply once",
+     "deliveries": [{"status": "ringing"}, {"status": "in-progress"}, {"status": "in-progress"}, {"status": "in-progress"}],
+     "final": "connected", "call_events": 1, "provider_errors": []},
+    {"name": "retry after storage outage applies once",
+     "deliveries": [{"status": "in-progress", "ledger": "unavailable", "want": 503}, {"status": "in-progress"}, {"status": "in-progress"}],
+     "final": "connected", "call_events": 1, "provider_errors": []},
+    {"name": "forged signatures never reach storage",
+     "deliveries": [{"status": "completed", "signature": "forged", "want": 403}, {"status": "in-progress"}, {"status": "failed", "signature": "forged", "want": 403}],
+     "final": "connected", "call_events": 1, "provider_errors": []},
+    {"name": "late and out-of-order callbacks never reopen a terminal call",
+     "deliveries": [{"status": "in-progress"}, {"status": "completed"}, {"status": "ringing"}, {"status": "in-progress"}, {"status": "failed"}],
+     "final": "ended", "call_events": 2, "provider_errors": []},
+    {"name": "busy is a visible failure recorded once",
+     "deliveries": [{"status": "ringing"}, {"status": "busy"}, {"status": "busy"}, {"status": "completed"}],
+     "final": "failed", "call_events": 1, "provider_errors": ["call_busy"]},
+    {"name": "no answer is a retryable visible failure",
+     "deliveries": [{"status": "no-answer", "ledger": "unavailable", "want": 503}, {"status": "no-answer"}],
+     "final": "failed", "call_events": 1, "provider_errors": ["call_no_answer"]},
+    {"name": "provider failure after connect",
+     "deliveries": [{"status": "in-progress"}, {"status": "failed"}, {"status": "in-progress"}],
+     "final": "failed", "call_events": 2, "provider_errors": ["call_failed"]},
+    {"name": "cancelled is terminal without a provider error",
+     "deliveries": [{"status": "canceled"}, {"status": "in-progress"}],
+     "final": "cancelled", "call_events": 1, "provider_errors": []}
+  ]
+}
