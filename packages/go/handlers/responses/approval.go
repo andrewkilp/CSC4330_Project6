@@ -1,5 +1,5 @@
 // Package responses implements the existing response approval route with injected
-// authenticated identity and call lookup. It is not mounted by the template API.
+// authenticated identity and either durable approval or component call lookup.
 package responses
 
 import (
@@ -16,6 +16,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/conversation"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
 )
 
 var ErrNotFound = errors.New("call not found")
@@ -29,13 +30,17 @@ type Config struct {
 	// OwnerID reads identity from authenticated middleware context, e.g. auth.OwnerID.
 	OwnerID func(context.Context) (string, bool)
 	Lookup  func(context.Context, string) (OwnedCall, error)
+	// Approve is an owner-scoped durable service. When set, it replaces Loop lookup.
+	Approve func(context.Context, string, string, conversation.Approval) (any, error)
 	// Origin is a configured web origin; request Host/forwarded headers are not trusted.
 	Origin string
+	// AllowHTTP is set only by development composition after origin validation.
+	AllowHTTP bool
 }
 
 func New(config Config) (http.Handler, error) {
 	u, err := url.Parse(config.Origin)
-	if config.OwnerID == nil || config.Lookup == nil || err != nil || u.Host == "" || (u.Scheme != "https" && !(u.Scheme == "http" && (u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" || u.Hostname() == "::1"))) || u.User != nil || u.Path != "" || u.RawQuery != "" || u.Fragment != "" {
+	if config.OwnerID == nil || (config.Lookup == nil && config.Approve == nil) || (config.Origin != "" && (err != nil || u.Host == "" || (u.Scheme != "https" && !(u.Scheme == "http" && (config.AllowHTTP || u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" || u.Hostname() == "::1"))) || u.User != nil || u.Path != "" || u.RawQuery != "" || u.ForceQuery || u.Fragment != "")) {
 		return nil, errors.New("approval handler requires identity, call storage and an explicit origin")
 	}
 	mux := http.NewServeMux()
@@ -56,14 +61,17 @@ func New(config Config) (http.Handler, error) {
 			fail(w, 400, "invalid_argument", "Expected a JSON request.", "request")
 			return
 		}
-		call, err := config.Lookup(r.Context(), r.PathValue("id"))
-		if errors.Is(err, ErrNotFound) || (err == nil && (call.OwnerID != owner || call.ID != r.PathValue("id"))) {
-			fail(w, 404, "not_found", "Call not found.", "")
-			return
-		}
-		if err != nil || call.Loop == nil || call.Loop.CallID() != call.ID {
-			fail(w, 500, "internal", "The request could not be completed.", "")
-			return
+		var call OwnedCall
+		if config.Approve == nil {
+			call, err = config.Lookup(r.Context(), r.PathValue("id"))
+			if errors.Is(err, ErrNotFound) || (err == nil && (call.OwnerID != owner || call.ID != r.PathValue("id"))) {
+				fail(w, 404, "not_found", "Call not found.", "")
+				return
+			}
+			if err != nil || call.Loop == nil || call.Loop.CallID() != call.ID {
+				fail(w, 500, "internal", "The request could not be completed.", "")
+				return
+			}
 		}
 		a, field := decode(w, r)
 		if field != "" {
@@ -71,7 +79,12 @@ func New(config Config) (http.Handler, error) {
 			return
 		}
 		a.ResponseID = r.PathValue("response_id")
-		reply, err := call.Loop.ApproveResponse(r.Context(), a)
+		var reply any
+		if config.Approve != nil {
+			reply, err = config.Approve(r.Context(), owner, r.PathValue("id"), a)
+		} else {
+			reply, err = call.Loop.ApproveResponse(r.Context(), a)
+		}
 		if err != nil {
 			var approval *conversation.ApprovalError
 			switch {
@@ -92,6 +105,10 @@ func New(config Config) (http.Handler, error) {
 				fail(w, 404, "not_found", "Response not found.", "")
 			case errors.Is(err, conversation.ErrApprovalLimit):
 				fail(w, 429, "rate_limited", "This call has reached its approval limit.", "")
+			case errors.Is(err, repository.ErrUnavailable):
+				fail(w, 503, "provider_unavailable", "Call storage is unavailable.", "")
+			case errors.Is(err, repository.ErrInvalid):
+				fail(w, 400, "invalid_argument", "Invalid approval request.", "request")
 			default:
 				fail(w, 500, "internal", "The request could not be completed.", "")
 			}
