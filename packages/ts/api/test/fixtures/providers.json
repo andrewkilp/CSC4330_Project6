@@ -1,0 +1,178 @@
+{
+  "note": "Synthetic GET /v1/providers fixtures. Keys are fake sentinels that must never appear in a response.",
+  "secret_sentinels": [
+    "sk-test-SENTINEL",
+    "AC-SENTINEL",
+    "auth-SENTINEL",
+    "dg-SENTINEL",
+    "xi-SENTINEL"
+  ],
+  "cases": [
+    {
+      "name": "template defaults: no keys, real calling off",
+      "env": { "CALL_MODE": "mock", "ENABLE_REAL_CALLS": "false" },
+      "implemented": {
+        "telephony": false,
+        "stt": true,
+        "llm": true,
+        "tts": true
+      },
+      "outages": [],
+      "expected": {
+        "mode": "mock",
+        "telephony": {
+          "available": false,
+          "reason": "Phone calling is not available in this server version yet."
+        },
+        "stt": {
+          "available": false,
+          "reason": "Speech recognition is not set up on this server."
+        },
+        "llm": {
+          "available": false,
+          "reason": "Reply generation is not set up on this server."
+        },
+        "tts": {
+          "available": false,
+          "reason": "Speech playback is not set up on this server."
+        }
+      }
+    },
+    {
+      "name": "missing keys with real calling requested",
+      "env": {
+        "CALL_MODE": "real",
+        "ENABLE_REAL_CALLS": "true",
+        "TWILIO_ACCOUNT_SID": "AC-SENTINEL",
+        "TWILIO_AUTH_TOKEN": "auth-SENTINEL",
+        "TWILIO_FROM_NUMBER": "+15555550100",
+        "PUBLIC_BASE_URL": "http://insecure.example.test",
+        "ANTHROPIC_API_KEY": "sk-test-SENTINEL",
+        "CLAUDE_MODEL": "claude-test-model",
+        "ELEVENLABS_API_KEY": "xi-SENTINEL"
+      },
+      "implemented": {
+        "telephony": true,
+        "stt": true,
+        "llm": true,
+        "tts": true
+      },
+      "outages": [],
+      "expected": {
+        "mode": "mock",
+        "telephony": {
+          "available": false,
+          "reason": "Phone calling is not set up on this server."
+        },
+        "stt": {
+          "available": false,
+          "reason": "Speech recognition is not set up on this server."
+        },
+        "llm": { "available": true },
+        "tts": {
+          "available": false,
+          "reason": "Speech playback is not set up on this server."
+        }
+      }
+    },
+    {
+      "name": "all configured but real calling switched off",
+      "env": {
+        "CALL_MODE": "real",
+        "ENABLE_REAL_CALLS": "false",
+        "TWILIO_ACCOUNT_SID": "AC-SENTINEL",
+        "TWILIO_AUTH_TOKEN": "auth-SENTINEL",
+        "TWILIO_FROM_NUMBER": "+15555550100",
+        "PUBLIC_BASE_URL": "https://switchboard.example.test",
+        "DEEPGRAM_API_KEY": "dg-SENTINEL",
+        "ANTHROPIC_API_KEY": "sk-test-SENTINEL",
+        "CLAUDE_MODEL": "claude-test-model",
+        "ELEVENLABS_API_KEY": "xi-SENTINEL",
+        "ELEVENLABS_VOICE_ID": "voice_test",
+        "ELEVENLABS_MODEL_ID": "model_test"
+      },
+      "implemented": {
+        "telephony": true,
+        "stt": true,
+        "llm": true,
+        "tts": true
+      },
+      "outages": [],
+      "expected": {
+        "mode": "mock",
+        "telephony": {
+          "available": false,
+          "reason": "Real calling is turned off on this server."
+        },
+        "stt": { "available": true },
+        "llm": { "available": true },
+        "tts": { "available": true }
+      }
+    },
+    {
+      "name": "speech recognition outage",
+      "env": {
+        "CALL_MODE": "real",
+        "ENABLE_REAL_CALLS": "true",
+        "TWILIO_ACCOUNT_SID": "AC-SENTINEL",
+        "TWILIO_AUTH_TOKEN": "auth-SENTINEL",
+        "TWILIO_FROM_NUMBER": "+15555550100",
+        "PUBLIC_BASE_URL": "https://switchboard.example.test",
+        "DEEPGRAM_API_KEY": "dg-SENTINEL",
+        "ANTHROPIC_API_KEY": "sk-test-SENTINEL",
+        "CLAUDE_MODEL": "claude-test-model",
+        "ELEVENLABS_API_KEY": "xi-SENTINEL",
+        "ELEVENLABS_VOICE_ID": "voice_test",
+        "ELEVENLABS_MODEL_ID": "model_test"
+      },
+      "implemented": {
+        "telephony": true,
+        "stt": true,
+        "llm": true,
+        "tts": true
+      },
+      "outages": ["stt"],
+      "expected": {
+        "mode": "mock",
+        "telephony": { "available": true },
+        "stt": {
+          "available": false,
+          "reason": "Speech recognition is temporarily unavailable. Try again later."
+        },
+        "llm": { "available": true },
+        "tts": { "available": true }
+      }
+    },
+    {
+      "name": "everything ready",
+      "env": {
+        "CALL_MODE": "real",
+        "ENABLE_REAL_CALLS": "true",
+        "TWILIO_ACCOUNT_SID": "AC-SENTINEL",
+        "TWILIO_AUTH_TOKEN": "auth-SENTINEL",
+        "TWILIO_FROM_NUMBER": "+15555550100",
+        "PUBLIC_BASE_URL": "https://switchboard.example.test",
+        "DEEPGRAM_API_KEY": "dg-SENTINEL",
+        "ANTHROPIC_API_KEY": "sk-test-SENTINEL",
+        "CLAUDE_MODEL": "claude-test-model",
+        "ELEVENLABS_API_KEY": "xi-SENTINEL",
+        "ELEVENLABS_VOICE_ID": "voice_test",
+        "ELEVENLABS_MODEL_ID": "model_test"
+      },
+      "implemented": {
+        "telephony": true,
+        "stt": true,
+        "llm": true,
+        "tts": true
+      },
+      "outages": [],
+      "expected": {
+        "mode": "real",
+        "telephony": { "available": true },
+        "stt": { "available": true },
+        "llm": { "available": true },
+        "tts": { "available": true }
+      }
+    }
+  ]
+}
