@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText, Badge, Button, RuledPanel } from "../../components";
 import { theme as t } from "../../theme";
 import { API_URL } from "./api-url";
+import { CallControls } from "./controls";
 import { InstructionComposer } from "./instructions";
 import { SuggestedReply } from "./suggested-reply";
 import { Transcript } from "./transcript";
@@ -137,10 +138,13 @@ export default function ConnectedCall({ id }: { id: string }) {
           )}
         </View>
         {update?.state.call && (
-          <InstructionComposer
-            state={update.state}
-            live={update.status === "live"}
-          />
+          <>
+            <InstructionComposer
+              state={update.state}
+              live={update.status === "live"}
+            />
+            <CallControls state={update.state} />
+          </>
         )}
         <Button
           label="Reconnect call updates"
