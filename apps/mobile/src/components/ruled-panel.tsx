@@ -20,7 +20,7 @@ export function RuledPanel({
     <View {...props} style={[s.panel, style]}>
       {(title || accessory) && (
         <View style={s.header}>
-          {title && (
+          {title ? (
             <AppText
               accessibilityRole="header"
               variant="heading"
@@ -28,7 +28,7 @@ export function RuledPanel({
             >
               {title}
             </AppText>
-          )}
+          ) : null}
           {accessory}
         </View>
       )}
