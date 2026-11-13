@@ -385,6 +385,49 @@ func TestDeliversBeforeTheResponseFinishes(t *testing.T) {
 	}
 }
 
+func TestTruncatedContentLengthNeverFinalizes(t *testing.T) {
+	c := localClient(t, config(), func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Length", "3200")
+		_, _ = w.Write(bytes.Repeat([]byte{0xff}, 1600))
+		// Returning closes the response before the declared body is complete.
+	})
+	last := false
+	err := c.Stream(context.Background(), speech(), func(chunk providers.SpeechChunk) error {
+		last = last || chunk.Last
+		return nil
+	})
+	if !errors.Is(err, providers.ErrUnavailable) || last {
+		t.Fatalf("truncated response error=%v final=%v", err, last)
+	}
+}
+
+func TestTruncatedChunkedTransferNeverFinalizes(t *testing.T) {
+	c := localClient(t, config(), func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		conn, writer, err := w.(http.Hijacker).Hijack()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer conn.Close()
+		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nTransfer-Encoding: chunked\r\n\r\nc80\r\n")
+		// Advertise a 3200-byte chunk but disconnect after 1600 bytes. The
+		// client sees ContentLength=-1 and the chunk decoder's unexpected EOF.
+		_, _ = writer.Write(bytes.Repeat([]byte{0xff}, 1600))
+		_ = writer.Flush()
+	})
+	last := false
+	err := c.Stream(context.Background(), speech(), func(chunk providers.SpeechChunk) error {
+		last = last || chunk.Last
+		return nil
+	})
+	if !errors.Is(err, providers.ErrUnavailable) || last {
+		t.Fatalf("truncated chunked response error=%v final=%v", err, last)
+	}
+}
+
 func TestRedirectDoesNotForwardKey(t *testing.T) {
 	var calls atomic.Int32
 	c := localClient(t, config(), func(w http.ResponseWriter, r *http.Request) {

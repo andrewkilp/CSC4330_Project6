@@ -116,15 +116,19 @@ func (c *Client) Stream(ctx context.Context, req providers.SpeechRequest, emit f
 			return err
 		}
 		data := make([]byte, ChunkBytes)
-		n, readErr := io.ReadFull(res.Body, data)
+		n, readErr := readChunk(ctx, res.Body, data)
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if readErr != nil && readErr != io.EOF && readErr != io.ErrUnexpectedEOF {
+		if readErr != nil && readErr != io.EOF {
 			return failure(ctx)
 		}
 		total += n
 		if total > MaxAudioBytes {
+			return providers.ErrUnavailable
+		}
+		// A clean transport EOF must also agree with an advertised length.
+		if res.ContentLength >= 0 && (int64(total) > res.ContentLength || (readErr != nil && int64(total) != res.ContentLength)) {
 			return providers.ErrUnavailable
 		}
 		if n > 0 {
@@ -153,6 +157,32 @@ func (c *Client) Stream(ctx context.Context, req providers.SpeechRequest, emit f
 			return ctx.Err()
 		}
 	}
+}
+
+// Preserve the body's actual framing errors. io.ReadFull would turn a clean
+// short final read into ErrUnexpectedEOF, making it indistinguishable from a
+// truncated Content-Length or chunked HTTP response.
+func readChunk(ctx context.Context, body io.Reader, data []byte) (int, error) {
+	total, emptyReads := 0, 0
+	for total < len(data) {
+		if err := ctx.Err(); err != nil {
+			return total, err
+		}
+		n, err := body.Read(data[total:])
+		total += n
+		if err != nil {
+			return total, err
+		}
+		if n == 0 {
+			emptyReads++
+			if emptyReads >= 100 {
+				return total, io.ErrNoProgress
+			}
+		} else {
+			emptyReads = 0
+		}
+	}
+	return total, nil
 }
 
 func failure(ctx context.Context) error {
