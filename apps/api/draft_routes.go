@@ -55,6 +55,9 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	session.Register(mux, sessions, environment != "" && environment != "development")
 	calls.RegisterDrafts(mux, calls.NewDraftHandler(store, sessions))
 	calls.RegisterStart(mux, calls.NewStartHandler(starter, sessions))
+	if err := registerApprovals(mux, store, sessions, origin, environment == "" || environment == "development"); err != nil {
+		return nil, err
+	}
 	if err := registerCallEvents(mux, store, sessions); err != nil {
 		return nil, err
 	}
