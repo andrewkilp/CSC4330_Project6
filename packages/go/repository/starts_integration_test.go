@@ -89,7 +89,7 @@ func TestIntegrationCallbackBeforeRESTResponseAndWrongCorrelation(t *testing.T) 
 	if err != nil || !out.Changed || len(out.Events) != 1 || out.Call.Status != "connected" {
 		t.Fatalf("answered=%+v %v", out, err)
 	}
-	for _, status := range []string{"in-progress", "ringing", "queued"} {
+	for _, status := range []string{"in-progress", "ringing", "queued", "initiated"} {
 		cb.Status = status
 		again, err := r.ApplyTwilioCallback(ctx, cb)
 		if err != nil || again.Changed || again.Call.Status != "connected" {
