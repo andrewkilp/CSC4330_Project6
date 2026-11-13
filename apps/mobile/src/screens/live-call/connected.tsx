@@ -26,6 +26,14 @@ import {
 } from "./announce";
 import { API_URL } from "./api-url";
 import { CallControls } from "./controls";
+import {
+  businessTag,
+  callTitle,
+  describeGoal,
+  formatPhone,
+  kindLabel,
+  statusBadge,
+} from "./goal-text";
 import { InstructionComposer, InstructionHistory } from "./instructions";
 import { SuggestedReply } from "./suggested-reply";
 import { Transcript } from "./transcript";
@@ -114,15 +122,32 @@ export default function ConnectedCall({ id }: { id: string }) {
               onPress={() => router.push("/")}
             />
           </View>
-          <AppText variant="display" accessibilityRole="header">
-            {call?.business_name ?? "Your call"}
-          </AppText>
-          {call && (
-            <Badge
-              label={`${call.mode.toUpperCase()} · ${call.status.toUpperCase()}`}
-              tone={call.mode === "mock" ? "warning" : "neutral"}
-            />
-          )}
+          <View style={s.titleRow}>
+            <View style={s.titleText}>
+              <AppText
+                variant="display"
+                accessibilityRole="header"
+                // Long business names are capped here; the goal panel shows the full name.
+                numberOfLines={wide ? 2 : 3}
+                accessibilityLabel={call ? callTitle(call) : "Your call"}
+              >
+                {call ? callTitle(call) : "Your call"}
+              </AppText>
+              {call ? (
+                <AppText variant="label" tone="muted" numberOfLines={2}>
+                  {kindLabel(call.goal)} · {call.business_name.toUpperCase()}
+                </AppText>
+              ) : null}
+            </View>
+            {call ? (
+              <View style={s.badges}>
+                <Badge {...statusBadge(call.status)} />
+                {call.mode === "mock" ? (
+                  <Badge label="MOCK CALL" tone="warning" />
+                ) : null}
+              </View>
+            ) : null}
+          </View>
           <AppText
             tone={
               update?.status === "unauthenticated" || update?.status === "error"
@@ -137,23 +162,34 @@ export default function ConnectedCall({ id }: { id: string }) {
           <View style={[s.workspace, wide && s.wide]}>
             <View style={s.transcript}>
               {update?.state.call && (
-                <Transcript key={id} state={update.state} />
+                <Transcript
+                  key={id}
+                  state={update.state}
+                  businessTag={businessTag(update.state.call.goal)}
+                />
               )}
             </View>
             {call && (
               <View style={[s.rail, wide && { width: 300 }]}>
                 <RuledPanel title="Current goal">
-                  <AppText>
-                    {call.goal.kind === "restaurant"
-                      ? `Table for ${call.goal.party_size}`
-                      : call.goal.service}
-                  </AppText>
-                  <AppText>
-                    {call.goal.preferred_at} · {call.goal.timezone}
-                  </AppText>
-                  {call.goal.constraints.map((text, index) => (
-                    <AppText key={`${index}-${text}`}>{text}</AppText>
-                  ))}
+                  <View style={s.goal}>
+                    <AppText style={s.goalWhat}>
+                      {describeGoal(call.goal).what}
+                    </AppText>
+                    <AppText>{describeGoal(call.goal).when}</AppText>
+                    <AppText variant="caption" tone="muted">
+                      {call.goal.timezone} / for {call.goal.contact_name}
+                    </AppText>
+                    <AppText variant="caption" tone="muted">
+                      Calling {call.business_name} at{" "}
+                      {formatPhone(call.destination)}
+                    </AppText>
+                    {call.goal.constraints.map((text, index) => (
+                      <AppText key={`${index}-${text}`} variant="caption">
+                        • {text}
+                      </AppText>
+                    ))}
+                  </View>
                 </RuledPanel>
                 {update && (
                   <>
@@ -218,6 +254,22 @@ const s = StyleSheet.create({
   wide: { flexDirection: "row" },
   transcript: { flex: 1, minWidth: 0 },
   rail: { gap: 24 },
+  titleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    gap: t.space.lg,
+  },
+  titleText: { flex: 1, minWidth: 220, gap: t.space.sm },
+  badges: { flexDirection: "row", flexWrap: "wrap", gap: t.space.sm },
+  goal: {
+    borderWidth: 1,
+    borderColor: t.green,
+    borderRadius: t.radius,
+    padding: t.space.lg,
+    gap: t.space.xs,
+  },
+  goalWhat: { fontWeight: "600" },
   dock: {
     borderTopWidth: 1,
     borderColor: t.line,
