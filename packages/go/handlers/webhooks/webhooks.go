@@ -8,6 +8,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
+	"log/slog"
 	"mime"
 	"net/http"
 	"net/url"
@@ -17,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 )
 
 const (
@@ -47,12 +49,44 @@ type Config struct {
 	PublicBaseURL string
 	// MediaURL is the server-owned WSS endpoint, with no query or fragment.
 	MediaURL string
-	// MediaEnabled must remain false until #21's authenticated bridge is mounted.
-	// A verified voice request otherwise receives safe Hangup TwiML.
+	// MediaEnabled connects verified active calls to the #21 media bridge. When false,
+	// a verified voice request receives safe Hangup TwiML.
 	MediaEnabled bool
+	// MediaSecret (at least 32 bytes, MEDIA_STREAM_SECRET) signs the per-call stream
+	// token with media.SignStream. It is required when MediaEnabled is true. The
+	// callback token is never placed in TwiML.
+	MediaSecret []byte
 	// Publish is an optional post-commit fanout hint, not the durable event store.
 	// Implementations must return promptly; durable replay belongs to #23.
 	Publish func(context.Context, []repository.Event)
+	// Failures, when set, records a user-safe provider.error the first time a status
+	// callback fails the call (busy, no answer, provider failure) (#36).
+	Failures FailureRecorder
+}
+
+// FailureRecorder is the subset of *repository.Repository that records provider
+// failures as durable, user-safe events.
+type FailureRecorder interface {
+	RecordProviderFailure(ctx context.Context, callID string, f repository.ProviderFailure) ([]repository.Event, error)
+}
+
+// Twilio retries a webhook with the same I-Twilio-Idempotency-Token, which makes it
+// the correlation id for logs. Nothing else from the request is logged: no form
+// values, SIDs, tokens or numbers.
+var correlationToken = regexp.MustCompile(`^[A-Za-z0-9-]{1,80}$`)
+
+func correlation(r *http.Request) string {
+	if v := r.Header.Get("I-Twilio-Idempotency-Token"); correlationToken.MatchString(v) {
+		return v
+	}
+	return ""
+}
+
+// failureCodes maps failing Twilio statuses to user-safe provider.error codes.
+var failureCodes = map[string]repository.ProviderFailure{
+	"busy":      {Provider: "telephony", Code: "call_busy", Retryable: true},
+	"no-answer": {Provider: "telephony", Code: "call_no_answer", Retryable: true},
+	"failed":    {Provider: "telephony", Code: "call_failed", Retryable: false},
 }
 
 type Handler struct {
@@ -69,6 +103,9 @@ func New(config Config, ledger Ledger) (*Handler, error) {
 		mediaErr != nil || m.Scheme != "wss" || m.Hostname() == "" || m.Opaque != "" || m.User != nil || m.RawQuery != "" || m.ForceQuery || m.Fragment != "" {
 		return nil, errors.New("Twilio callbacks require configured account credentials, HTTPS origin, WSS media URL and durable ledger")
 	}
+	if config.MediaEnabled && len(config.MediaSecret) < 32 {
+		return nil, errors.New("Twilio media streams require a stream secret of at least 32 bytes")
+	}
 	config.MediaURL = m.String()
 	return &Handler{config: config, ledger: ledger, origin: strings.TrimSuffix(config.PublicBaseURL, "/"), noPort: noPortOrigin(u)}, nil
 }
@@ -82,6 +119,7 @@ func (h *Handler) verified(w http.ResponseWriter, r *http.Request, path string, 
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	bad := func(status int) (repository.TwilioCallback, bool) {
+		slog.Warn("twilio callback rejected", "route", path, "http_status", status, "correlation", correlation(r))
 		http.Error(w, "Callback rejected.", status)
 		return repository.TwilioCallback{}, false
 	}
@@ -171,9 +209,11 @@ func (h *Handler) apply(w http.ResponseWriter, r *http.Request, c repository.Twi
 		if errors.Is(err, repository.ErrNotFound) || errors.Is(err, repository.ErrConflict) {
 			status = http.StatusNotFound
 		}
+		slog.Warn("twilio callback not applied", "call_id", c.CallID, "http_status", status, "correlation", correlation(r))
 		http.Error(w, "Callback could not be accepted.", status)
 		return repository.CallbackResult{}, false
 	}
+	slog.Info("twilio callback applied", "call_id", c.CallID, "call_status", result.Call.Status, "changed", result.Changed, "correlation", correlation(r))
 	if h.config.Publish != nil && len(result.Events) > 0 {
 		h.config.Publish(r.Context(), append([]repository.Event(nil), result.Events...))
 	}
@@ -185,8 +225,21 @@ func (h *Handler) status(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	if _, ok = h.apply(w, r, c); !ok {
+	result, ok := h.apply(w, r, c)
+	if !ok {
 		return
+	}
+	// The status change is committed; the failure event is best-effort and only for
+	// the callback that actually failed the call, so retries never duplicate it.
+	if f, failing := failureCodes[c.Status]; failing && h.config.Failures != nil && result.Changed && result.Call.Status == "failed" {
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		events, err := h.config.Failures.RecordProviderFailure(ctx, c.CallID, f)
+		cancel()
+		if err != nil {
+			slog.Warn("provider failure not recorded", "call_id", c.CallID, "correlation", correlation(r))
+		} else if h.config.Publish != nil && len(events) > 0 {
+			h.config.Publish(r.Context(), events)
+		}
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -222,7 +275,9 @@ func (h *Handler) voice(w http.ResponseWriter, r *http.Request) {
 	}
 	response := twiml{Hangup: &struct{}{}}
 	if h.config.MediaEnabled && (result.Call.Status == "dialing" || result.Call.Status == "connected" || result.Call.Status == "paused") {
-		response = twiml{Connect: &connect{Stream: stream{URL: h.config.MediaURL, Parameters: []parameter{{Name: "call_id", Value: c.CallID}, {Name: "attempt_id", Value: c.AttemptID}, {Name: "token", Value: c.Token}}}}}
+		response = twiml{Connect: &connect{Stream: stream{URL: h.config.MediaURL, Parameters: []parameter{{Name: "call_id", Value: c.CallID}, {Name: "attempt_id", Value: c.AttemptID},
+			// The stream credential binds our call id to the verified provider SID (#21).
+			{Name: "token", Value: media.SignStream(h.config.MediaSecret, c.CallID, c.CallSID)}}}}}
 	}
 	data, err := xml.Marshal(response)
 	if err != nil {

@@ -12,3 +12,5 @@ apps/mobile/ios/
 *.log
 .DS_Store
 Thumbs.db
+# go build output in apps/api
+/apps/api/api

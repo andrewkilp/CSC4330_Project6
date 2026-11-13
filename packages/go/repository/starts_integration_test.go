@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -157,5 +158,97 @@ func TestIntegrationStartChecksStoredConsentOwnerAndPolicy(t *testing.T) {
 	}
 	if _, err = r.ApplyTwilioCallback(ctx, TwilioCallback{CallID: mockCall.ID, AttemptID: intent.AttemptID, Token: startTestToken, AccountSID: startTestAccount, CallSID: startTestSID}); !errors.Is(err, ErrNotFound) {
 		t.Fatal("mock accepted real callback")
+	}
+}
+
+func TestIntegrationActiveProviderCallIDOnlyForBoundActiveRealCalls(t *testing.T) {
+	r, ctx := startDB(t)
+	owner := NewID()
+	c, err := r.Create(ctx, owner, NewID(), realDraft())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("draft call has a provider SID: %v", err)
+	}
+	intent := startIntent()
+	if _, err = r.ReserveCallStart(ctx, owner, c.ID, NewID(), startPolicy(), intent); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("unconfirmed start has a provider SID: %v", err)
+	}
+	cb := TwilioCallback{CallID: c.ID, AttemptID: intent.AttemptID, Token: startTestToken, AccountSID: startTestAccount, CallSID: startTestSID, Status: "in-progress"}
+	if _, err = r.ApplyTwilioCallback(ctx, cb); err != nil {
+		t.Fatal(err)
+	}
+	if sid, err := r.ActiveProviderCallID(ctx, c.ID); err != nil || sid != startTestSID {
+		t.Fatalf("connected call sid=%q err=%v", sid, err)
+	}
+	for _, id := range []string{NewID(), "not-a-uuid"} {
+		if _, err := r.ActiveProviderCallID(ctx, id); !errors.Is(err, ErrNotFound) {
+			t.Fatalf("unknown call %q: %v", id, err)
+		}
+	}
+	cb.Status = "completed"
+	if _, err = r.ApplyTwilioCallback(ctx, cb); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("ended call still accepts media: %v", err)
+	}
+}
+
+func TestIntegrationProviderFailureIsVisibleAndFailsOnce(t *testing.T) {
+	r, ctx := startDB(t)
+	owner := NewID()
+	c, err := r.Create(ctx, owner, NewID(), realDraft())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = r.ReserveCallStart(ctx, owner, c.ID, NewID(), startPolicy(), startIntent()); err != nil {
+		t.Fatal(err)
+	}
+	// Immediately stale with a zero-ish threshold.
+	stale, err := r.StaleDialing(ctx, time.Nanosecond, 10)
+	if err != nil || len(stale) != 1 || stale[0].CallID != c.ID || stale[0].ProviderSID != "" {
+		t.Fatalf("stale = %+v %v", stale, err)
+	}
+	if _, err := r.StaleDialing(ctx, time.Hour, 10); err != nil {
+		t.Fatal(err)
+	}
+	events, err := r.RecordProviderFailure(ctx, c.ID, ProviderFailure{Provider: "telephony", Code: "dial_timeout", Retryable: true, FailCall: true})
+	if err != nil || len(events) != 2 || events[0].Type != "provider.error" || events[1].Type != "call.updated" {
+		t.Fatalf("failure events = %+v %v", events, err)
+	}
+	if again, _ := r.StaleDialing(ctx, time.Nanosecond, 10); len(again) != 0 {
+		t.Fatal("failed call still listed as dialing")
+	}
+	// A second failure on a terminal call is recorded but never changes its status.
+	events, err = r.RecordProviderFailure(ctx, c.ID, ProviderFailure{Provider: "telephony", Code: "media_disconnected", FailCall: true})
+	if err != nil || len(events) != 1 {
+		t.Fatalf("terminal failure = %+v %v", events, err)
+	}
+	got, _ := r.GetCall(ctx, owner, c.ID)
+	if got.Status != "failed" {
+		t.Fatalf("status = %s", got.Status)
+	}
+	for _, bad := range []ProviderFailure{{Provider: "twilio", Code: "x"}, {Provider: "telephony", Code: "Vendor said: 500"}} {
+		if _, err := r.RecordProviderFailure(ctx, c.ID, bad); !errors.Is(err, ErrInvalid) {
+			t.Fatalf("unsafe failure %+v accepted: %v", bad, err)
+		}
+	}
+}
+
+func TestTwilioStatusIsMonotonic(t *testing.T) {
+	for _, tc := range []struct{ current, status, want string }{
+		{"dialing", "ringing", "dialing"}, {"dialing", "in-progress", "connected"},
+		{"connected", "ringing", "connected"}, {"paused", "in-progress", "paused"},
+		{"connected", "completed", "ended"}, {"dialing", "busy", "failed"},
+		{"ended", "in-progress", "ended"}, {"failed", "completed", "failed"}, {"cancelled", "ringing", "cancelled"},
+	} {
+		if got := TwilioStatus(tc.current, tc.status); got != tc.want {
+			t.Errorf("%s + %s = %s, want %s", tc.current, tc.status, got, tc.want)
+		}
 	}
 }

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -97,6 +98,7 @@ func TestIntegrationSignedCallbacksCommitBeforePublishAndNeverRegress(t *testing
 	call, owner, key, f := reservedFixture(t, r, ctx, "real")
 	cfg := config(t)
 	cfg.MediaEnabled = true
+	cfg.MediaSecret = []byte(strings.Repeat("fixture-only-secret-", 2))
 	published := 0
 	cfg.Publish = func(_ context.Context, events []repository.Event) {
 		stored, err := r.GetCall(ctx, owner, call.ID)
@@ -121,6 +123,10 @@ func TestIntegrationSignedCallbacksCommitBeforePublishAndNeverRegress(t *testing
 	h.ServeHTTP(voice, request(t, f, VoicePath))
 	if voice.Code != 200 || !strings.Contains(voice.Body.String(), "<Connect>") {
 		t.Fatalf("signed pre-REST voice=%d", voice.Code)
+	}
+	streamToken := media.SignStream(cfg.MediaSecret, call.ID, "CA"+strings.Repeat("b", 32))
+	if !strings.Contains(voice.Body.String(), streamToken) {
+		t.Fatal("voice did not carry the authenticated media credential")
 	}
 	stored, err := r.GetCall(ctx, owner, call.ID)
 	if err != nil || stored.Status != "dialing" || published != 0 {

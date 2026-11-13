@@ -79,17 +79,15 @@ Unknown or conflicting associations produce generic 404s; invalid signatures 403
 The [Stream reference](https://www.twilio.com/docs/voice/twiml/stream) defines WSS
 media URLs and nested custom parameters. With media explicitly enabled and a
 nonterminal owned call, the handler returns XML-escaped `<Connect><Stream>` with
-the configured URL and verified `call_id`, `attempt_id`, `token` parameters.
-Token/account/SID checks for the WebSocket itself remain #21's responsibility;
-these values alone do not authorize a browser or prove playback.
+the configured URL and verified `call_id` and `attempt_id`, plus
+`token = media.SignStream(MediaSecret, call_id, CallSid)`. The webhook's own callback
+token never appears in TwiML. The #21 bridge recomputes that HMAC and checks the
+stored provider SID, so the stream credential is bound to this exact provider call.
+These values alone do not authorize a browser or prove playback.
 
-`MediaEnabled` defaults false and must remain false until #21's authenticated
-bridge is mounted. Verified voice callbacks then receive safe Hangup TwiML;
-terminal calls always receive Hangup. This task does not claim a functioning
-media/audio pipeline, AI introduction, approved speech or booking result.
-The API hardcodes this setting false, with no environment switch that could
-pretend the bridge is installed. Enabled-media TwiML is exercised only in isolated
-handler fixtures for the later bridge's integration boundary.
+`MediaEnabled` requires a `MediaSecret` of at least 32 bytes. The API sets it only
+when it also mounts the #21 bridge (see `docs/providers/twilio-media.md`). Otherwise
+verified voice callbacks receive safe Hangup TwiML, and terminal calls always do.
 
 ## Verification
 
@@ -119,3 +117,16 @@ request across retries, signed callbacks before the REST acknowledgement,
 bad signatures, duplicate/out-of-order delivery, four durable lifecycle events,
 and terminal voice Hangup. Unexpected outbound destinations are rejected by the
 fake transport; no real provider request occurs.
+
+## Failure recovery (#36)
+
+| Fault | Behavior | Evidence |
+| --- | --- | --- |
+| Retried or duplicate status callback | The ledger applies it idempotently and status mapping is monotonic (`repository.TwilioStatus`). A retry after a 503 storage outage applies once. | `testdata/faults.json`, `faults_test.go` |
+| Out-of-order or late callback | Never regresses `connected`/`paused` and never reopens a terminal call | same |
+| Invalid signature | 403 before storage; nothing is applied or published | same, plus `TestRejectsBeforeLedger` |
+| Busy, no answer, provider failure | The call becomes `failed`, and a user-safe `provider.error` (`call_busy`, `call_no_answer`, `call_failed`) is recorded and published once, only by the callback that failed the call | same |
+| Media socket drops without `stop` | `media.Config.OnClose` reports it once, after recognition has closed. The API ends the call's live work, hangs up the provider call and fails the call with `media_disconnected`. A clean stop or server shutdown records nothing. | `telephony/media/close_test.go`, `apps/api/media_routes_test.go` |
+| Orphan dialing (no answer or callback, ambiguous start) | `telephony.Reconciler` sweeps every 30 s. A call dialing for more than 90 s is hung up (through the live registry, or the stored SID after a restart), then failed with `dial_timeout`. It never redials. Each sweep handles at most 50 calls, and every hang-up has a 5 s timeout. A start still in flight is hung up when the provider answers. | `telephony/reconcile_test.go`, `repository/starts_integration_test.go` |
+
+**Logs.** Logs carry the route, our call id, the HTTP status, the call status and Twilio's `I-Twilio-Idempotency-Token` as the correlation id; a malformed header is dropped. They never carry form values, SIDs, tokens, phone numbers, signatures or transcript text (`TestCallbackLogsAreRedactedAndCorrelated`). `provider.error` payloads are `{provider, code, retryable}` with fixed codes, never vendor messages.

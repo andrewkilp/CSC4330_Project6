@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 )
 
 type signedFixture struct {
@@ -246,8 +247,11 @@ func TestVoiceTwiMLIsEscapedOwnedAndMediaGated(t *testing.T) {
 				f := fixture(t, "status")
 				cfg := config(t)
 				cfg.MediaEnabled = enabled
+				cfg.MediaSecret = []byte(strings.Repeat("s", 32))
 				cfg.MediaURL = "wss://media.example.invalid/webhooks/twilio/media&safe"
+				var verified repository.TwilioCallback
 				h := handler(t, cfg, ledgerFunc(func(ctx context.Context, c repository.TwilioCallback) (repository.CallbackResult, error) {
+					verified = c
 					if c.Status != "" {
 						t.Fatal("voice invented status")
 					}
@@ -291,8 +295,28 @@ func TestVoiceTwiMLIsEscapedOwnedAndMediaGated(t *testing.T) {
 				for _, p := range xmlResult.Connect.Stream.Parameters {
 					params[p.Name] = p.Value
 				}
-				if len(params) != 3 || params["call_id"] != r.URL.Query().Get("call_id") || params["attempt_id"] != r.URL.Query().Get("attempt_id") || params["token"] != r.URL.Query().Get("token") {
+				if len(params) != 3 || params["call_id"] != r.URL.Query().Get("call_id") || params["attempt_id"] != r.URL.Query().Get("attempt_id") ||
+					params["token"] != media.SignStream(cfg.MediaSecret, verified.CallID, verified.CallSID) {
 					t.Fatal("wrong verified stream parameters")
+				}
+				// The webhook callback credential never leaves the server in TwiML.
+				if strings.Contains(w.Body.String(), r.URL.Query().Get("token")) {
+					t.Fatal("callback token leaked into TwiML")
+				}
+				// The TwiML token is exactly what the #21 bridge accepts for this call.
+				auth := media.TokenAuthorizer{Secret: cfg.MediaSecret, ProviderCallID: func(_ context.Context, id string) (string, error) {
+					if id != verified.CallID {
+						return "", repository.ErrNotFound
+					}
+					return verified.CallSID, nil
+				}}
+				start := media.Start{CallSID: verified.CallSID, CustomParameters: params}
+				if got, err := auth.Authorize(context.Background(), start); err != nil || got != verified.CallID {
+					t.Fatalf("bridge rejected TwiML stream credential: %v", err)
+				}
+				start.CallSID = "CA" + strings.Repeat("0", 32)
+				if _, err := auth.Authorize(context.Background(), start); err == nil {
+					t.Fatal("bridge accepted the TwiML token for another provider call")
 				}
 			})
 		}
@@ -376,7 +400,7 @@ func TestConfigurationAndConfiguredPortVariants(t *testing.T) {
 	store := ledgerFunc(func(ctx context.Context, c repository.TwilioCallback) (repository.CallbackResult, error) {
 		return validResult(c), nil
 	})
-	for _, mutate := range []func(*Config){func(c *Config) { c.AuthToken = "" }, func(c *Config) { c.AccountSID = "AC-short" }, func(c *Config) { c.PublicBaseURL = "http://callbacks.example.invalid" }, func(c *Config) { c.PublicBaseURL = "https://user:secret@callbacks.example.invalid" }, func(c *Config) { c.PublicBaseURL += "/prefix" }, func(c *Config) { c.PublicBaseURL += "?query=1" }, func(c *Config) { c.MediaURL = "https://media.example.invalid" }, func(c *Config) { c.MediaURL += "?token=secret" }} {
+	for _, mutate := range []func(*Config){func(c *Config) { c.AuthToken = "" }, func(c *Config) { c.AccountSID = "AC-short" }, func(c *Config) { c.PublicBaseURL = "http://callbacks.example.invalid" }, func(c *Config) { c.PublicBaseURL = "https://user:secret@callbacks.example.invalid" }, func(c *Config) { c.PublicBaseURL += "/prefix" }, func(c *Config) { c.PublicBaseURL += "?query=1" }, func(c *Config) { c.MediaURL = "https://media.example.invalid" }, func(c *Config) { c.MediaURL += "?token=secret" }, func(c *Config) { c.MediaEnabled, c.MediaSecret = true, []byte("short") }} {
 		cfg := config(t)
 		mutate(&cfg)
 		if _, err := New(cfg, store); err == nil {

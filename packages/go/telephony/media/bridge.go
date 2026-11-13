@@ -64,6 +64,11 @@ type Config struct {
 	OnTranscript func(callID string, u providers.TranscriptUpdate) error
 	// OnEvent receives acknowledged marks and the final stop.
 	OnEvent func(callID string, e providers.MediaEvent)
+	// OnClose runs exactly once after a verified stream ends, after every other
+	// callback. err is nil for a clean provider stop; anything else (a dropped
+	// socket, a protocol error, backlog, server shutdown) means the call lost its
+	// media without a stop (#36).
+	OnClose func(callID string, err error)
 	// InboundFrames bounds audio waiting for recognition. Zero means 250 (5 s).
 	InboundFrames int
 	// OutboundMessages bounds unsent outbound messages. Zero means 512.
@@ -109,7 +114,7 @@ type inbound struct {
 
 // Serve runs the protocol until stop, a protocol error, ctx cancellation or a read
 // error. It returns nil after a clean stop.
-func Serve(ctx context.Context, conn Conn, cfg Config) error {
+func Serve(ctx context.Context, conn Conn, cfg Config) (err error) {
 	if cfg.Authorizer == nil || cfg.Transcriber == nil {
 		return errors.New("media bridge requires an authorizer and transcriber")
 	}
@@ -132,6 +137,10 @@ func Serve(ctx context.Context, conn Conn, cfg Config) error {
 	callID, err := cfg.Authorizer.Authorize(ctx, start.Start)
 	if err != nil || !providers.ValidUUID(callID) {
 		return ErrUnauthorized
+	}
+	if cfg.OnClose != nil {
+		// Deferred first, so it runs last: after recognition and outbound stop.
+		defer func() { cfg.OnClose(callID, err) }()
 	}
 	out := newOutbound(ctx, conn, start.StreamSID, cfg.OutboundMessages)
 	defer out.Close()

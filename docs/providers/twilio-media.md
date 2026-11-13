@@ -3,9 +3,25 @@
 `packages/go/telephony/media` is the server end of a bidirectional
 [Media Stream](https://www.twilio.com/docs/voice/media-streams/websocket-messages);
 `packages/go/handlers/webhooks` serves it at `WSS /webhooks/twilio/media` with
-`github.com/coder/websocket` (already the #20 transport dependency). It is not
-mounted yet: the outbound start (#11) and the signed voice webhook that returns the
-`<Connect><Stream>` TwiML (#16) come first.
+`github.com/coder/websocket` (already the #20 transport dependency).
+
+## Mounting (apps/api)
+
+The API mounts the route only when all of these are configured. A partial
+configuration is a startup error:
+
+| Setting | Purpose |
+| --- | --- |
+| Signed callbacks enabled (`ENABLE_REAL_CALLS=true` or `TWILIO_WEBHOOKS_ENABLED=true`) | #16 voice TwiML points Twilio at the stream |
+| `MEDIA_STREAM_SECRET` (at least 32 bytes, server-only) | Signs and verifies the per-call stream token |
+| `DATABASE_URL` | `repository.ActiveProviderCallID` binds the stream to the stored provider SID of a dialing, connected or paused real call |
+| `DEEPGRAM_API_KEY` | Inbound audio goes to the #20 transcriber |
+
+Without `MEDIA_STREAM_SECRET`, the route is absent and verified voice callbacks
+hang up. The API keeps each call's outbound `providers.MediaStream` in a live-call
+registry, so call controls (#31) and the conversation runtime (#41) can clear or close
+it. Transcript updates and media events go to that runtime's sink; until a sink is
+set they are discarded, never stored.
 
 ## Binding a stream to a call
 
@@ -52,3 +68,23 @@ moon run :build :lint :typecheck :test
 
 Tests use an in-memory socket for protocol and ownership cases and a real WebSocket
 client that plays Twilio for the end-to-end stream. No real call was placed.
+
+## Remote interruption (#26)
+
+**Detection.** The selected recognizer (#20, Deepgram with `interim_results=true`) delivers interim text within a few hundred milliseconds of the business starting to talk. `telephony.Calls.ObserveRemoteSpeech` treats the first non-empty transcript update while the assistant's audio is still playing as an interruption. No separate voice-activity dependency is used. The API runs this check on every update before forwarding it.
+
+**Playback tracking.** Each approved reply is sent chunk by chunk with its own mark (`media.Playback`, mark `<responseID>.<n>`). Twilio reports marks in buffer order, so the acknowledged marks are exactly the audio that played.
+
+**On interruption:**
+1. The ledger is frozen, which makes every outstanding mark stale.
+2. Twilio `clear` drops the unplayed audio.
+3. `Loop.InterruptPlayback` cancels the reply and retires its generation token.
+4. The caller gets the words actually heard (`conversation.SpokenPortion`, rounded down to a whole word) to record as the assistant's turn.
+
+**Late marks.** A late mark for cleared audio is `media.ErrStaleMark`. It can neither complete nor restart the cancelled reply, and the loop rejects `CompletePlayback`, `BeginPlayback` and a second synthesis for it. Pause and end freeze the ledger the same way.
+
+**Evidence:**
+- `packages/go/telephony/interrupt_test.go`: deterministic interruption after two acknowledged chunks, plus a 24-run race in which marks arrive while the business speaks and exactly one of interrupt or complete wins each run, with both outcomes exercised.
+- `packages/go/telephony/media/playback_test.go`
+- `packages/go/conversation/interrupt_test.go`
+- `apps/api/media_routes_test.go`

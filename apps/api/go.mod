@@ -44,3 +44,10 @@ replace github.com/andrewkilp/CSC4330_Project6/packages/go/providers => ../../pa
 replace github.com/andrewkilp/CSC4330_Project6/packages/go/repository => ../../packages/go/repository
 
 replace github.com/andrewkilp/CSC4330_Project6/packages/go/telephony => ../../packages/go/telephony
+
+require (
+	github.com/andrewkilp/CSC4330_Project6/packages/go/transcription v0.0.0
+	github.com/coder/websocket v1.8.14
+)
+
+replace github.com/andrewkilp/CSC4330_Project6/packages/go/transcription => ../../packages/go/transcription

@@ -290,3 +290,93 @@ func TestPausedIsAConnectedSubstate(t *testing.T) {
 		})
 	}
 }
+
+// The validator follows the #1 contract for streamed and retired responses, which the
+// live conversation loop produces, while still rejecting real lifecycle violations.
+func TestValidateAcceptsContractResponseUpdates(t *testing.T) {
+	f := mustGenerate(t, RestaurantTimeConflict, DefaultSeed)
+	at := -1
+	for i, e := range f.Events {
+		if r, ok := e.Payload.(Response); ok && r.Status == "generating" {
+			at = i
+			break
+		}
+	}
+	gen := f.Events[at]
+	draft := gen.Payload.(Response)
+	draft.Text = "Hi, this is"
+	draft.NeedsApproval, draft.Reason = true, "Operator approval required before speech."
+	withDraft := func(mutate func(*Response)) Fixture {
+		g := f
+		r := draft
+		mutate(&r)
+		e := gen
+		e.Payload = r
+		g.Events = append(append(append([]Event(nil), f.Events[:at+1]...), e), f.Events[at+1:]...)
+		renumber(&g)
+		return g
+	}
+	// A streamed draft with growing text and a provisional approval requirement.
+	if err := Validate(withDraft(func(*Response) {})); err != nil {
+		t.Fatalf("streamed draft rejected: %v", err)
+	}
+	// Still rejected: going backward, and changing approved text.
+	for name, mutate := range map[string]func(*Response){
+		"suggested before generating": func(r *Response) { r.Status = "approved" },
+		"blank suggestion":            func(r *Response) { r.Status, r.Text = "suggested", " " },
+	} {
+		var ve *ValidationError
+		if err := Validate(withDraft(mutate)); !errors.As(err, &ve) {
+			t.Errorf("%s: %v", name, err)
+		}
+	}
+}
+
+// Interrupted speech (#26) records the heard prefix of a cancelled response.
+func TestValidateAcceptsInterruptedSpeechPrefix(t *testing.T) {
+	base := mustGenerate(t, RestaurantTimeConflict, DefaultSeed)
+	// Find the first spoken response and its assistant turn.
+	spokenAt, turnAt := -1, -1
+	for i, e := range base.Events {
+		if r, ok := e.Payload.(Response); ok && r.Status == "spoken" && spokenAt < 0 {
+			spokenAt = i
+		}
+		if tr, ok := e.Payload.(Turn); ok && tr.Speaker == "assistant" && turnAt < 0 {
+			turnAt = i
+		}
+	}
+	full := base.Events[spokenAt].Payload.(Response).Text
+	build := func(prefix string) Fixture {
+		f := base
+		f.Events = append([]Event(nil), base.Events...)
+		r := f.Events[spokenAt].Payload.(Response)
+		r.Status, r.Text = "cancelled", ""
+		f.Events[spokenAt].Payload = r
+		tr := f.Events[turnAt].Payload.(Turn)
+		tr.Text = prefix
+		f.Events[turnAt].Payload = tr
+		// The scripted approval input targets this response, which is now cancelled.
+		var inputs []OperatorInput
+		for _, in := range f.Expected.OperatorInputs {
+			if in.ResponseID != r.ID {
+				inputs = append(inputs, in)
+			}
+		}
+		f.Expected.OperatorInputs = inputs
+		return f
+	}
+	words := strings.Fields(full)
+	if err := Validate(build(strings.Join(words[:3], " "))); err != nil {
+		t.Fatalf("heard prefix rejected: %v", err)
+	}
+	for name, text := range map[string]string{
+		"half a word":  full[:len(strings.Join(words[:3], " "))+2],
+		"not a prefix": "Something never said",
+		"empty":        "",
+	} {
+		var ve *ValidationError
+		if err := Validate(build(text)); !errors.As(err, &ve) || ve.Field != "payload.response_id" && ve.Field != "payload.text" {
+			t.Errorf("%s accepted: %v", name, err)
+		}
+	}
+}

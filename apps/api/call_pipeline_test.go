@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -144,8 +145,23 @@ func TestIntegrationComposedDraftStartAndSignedCallbackPipeline(t *testing.T) {
 	originalTransport := http.DefaultTransport
 	var router http.Handler
 	var providerPosts atomic.Int32
+	var hangupOnce sync.Once
+	hangupDone := make(chan struct{})
 	var voiceURL, statusURL string
 	http.DefaultTransport = pipelineTransportFunc(func(r *http.Request) (*http.Response, error) {
+		// #31/#36 now hang up registered live work after a committed terminal
+		// callback. Accept only that exact synthetic provider request as well.
+		if r.Method == http.MethodPost && r.URL.Scheme == "https" && r.URL.Host == "api.twilio.com" && r.URL.Path == "/2010-04-01/Accounts/"+pipelineAccount+"/Calls/"+pipelineSID+".json" {
+			account, token, ok := r.BasicAuth()
+			if !ok || account != pipelineAccount || token != pipelineAuthToken {
+				t.Error("invalid fixture hangup credentials")
+			}
+			if err := r.ParseForm(); err != nil || r.PostForm.Get("Status") != "completed" {
+				t.Error("invalid fixture hangup request")
+			}
+			defer hangupOnce.Do(func() { close(hangupDone) })
+			return &http.Response{StatusCode: 200, Header: http.Header{"Content-Type": {"application/json"}}, Body: io.NopCloser(strings.NewReader(`{"sid":"` + pipelineSID + `"}`))}, nil
+		}
 		if r.Method != http.MethodPost || r.URL.Scheme != "https" || r.URL.Host != "api.twilio.com" || r.URL.Path != "/2010-04-01/Accounts/"+pipelineAccount+"/Calls.json" {
 			t.Error("unexpected HTTP request blocked by pipeline test transport")
 			return nil, errors.New("unexpected test request")
@@ -263,5 +279,10 @@ func TestIntegrationComposedDraftStartAndSignedCallbackPipeline(t *testing.T) {
 	}
 	if providerPosts.Load() != 1 {
 		t.Fatal("callbacks or reads contacted the provider")
+	}
+	select {
+	case <-hangupDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("terminal callback did not hang up live work")
 	}
 }

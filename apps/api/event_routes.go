@@ -18,10 +18,10 @@ func (unavailableEventStore) EventsAfter(context.Context, string, string, int64,
 func (unavailableEventStore) Snapshot(context.Context, string, string) (repository.Snapshot, error) {
 	return repository.Snapshot{}, repository.ErrUnavailable
 }
-func registerCallEvents(mux *http.ServeMux, store calls.DraftStore, sessions *auth.Sessions) error {
+func registerCallEvents(mux *http.ServeMux, store calls.DraftStore, sessions *auth.Sessions, hub *events.Hub) error {
 	var source eventhandler.Store = unavailableEventStore{}
 	if candidate, ok := store.(eventhandler.Store); ok && !nilStore(candidate) {
 		source = candidate
 	}
-	return eventhandler.Register(mux, eventhandler.Config{Store: source, Hub: events.NewHub(0), RequireOwner: sessions.RequireOwner})
+	return eventhandler.Register(mux, eventhandler.Config{Store: source, Hub: hub, RequireOwner: sessions.RequireOwner})
 }

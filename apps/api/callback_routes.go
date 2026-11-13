@@ -39,7 +39,7 @@ func callbackEnvironment(start apiStartConfig) (webhooks.Config, bool, error) {
 	}
 	return webhooks.Config{AccountSID: account, AuthToken: token, PublicBaseURL: base,
 		MediaURL: strings.Replace(strings.TrimSuffix(base, "/"), "https://", "wss://", 1) + "/webhooks/twilio/media",
-		// No environment toggle can claim #21's missing authenticated bridge.
+		// registerTwilioCallbacks enables media only after mounting the #21 bridge.
 		MediaEnabled: false}, true, nil
 }
 
@@ -49,8 +49,12 @@ func (unavailableCallbackLedger) ApplyTwilioCallback(context.Context, repository
 	return repository.CallbackResult{}, repository.ErrUnavailable
 }
 
-func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start apiStartConfig) error {
+func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start apiStartConfig, rt *liveRuntime) error {
 	config, enabled, err := callbackEnvironment(start)
+	if err != nil {
+		return err
+	}
+	secret, lookup, stt, mediaEnabled, err := mediaEnvironment(enabled, store)
 	if err != nil {
 		return err
 	}
@@ -67,10 +71,20 @@ func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start a
 			return errors.New("invalid callback storage configuration")
 		}
 	}
+	config.MediaEnabled, config.MediaSecret = mediaEnabled, secret
+	config.Publish = func(_ context.Context, evs []repository.Event) { rt.publish(evs...) }
+	if failures, ok := ledger.(webhooks.FailureRecorder); ok {
+		config.Failures = failures
+		rt.media.failures, rt.media.publish = failures, rt.publish
+	}
 	handler, err := webhooks.New(config, ledger)
 	if err != nil {
 		return errors.New("invalid callback configuration")
 	}
 	handler.Register(mux)
+	// TwiML only points Twilio at the stream when the bridge is mounted here.
+	if mediaEnabled {
+		registerMedia(mux, rt.media, secret, lookup, stt)
+	}
 	return nil
 }
