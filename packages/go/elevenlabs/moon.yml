@@ -1,0 +1,4 @@
+id: elevenlabs
+layer: library
+language: go
+dependsOn: ['providers']
