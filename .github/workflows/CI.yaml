@@ -10,7 +10,10 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CALL_MODE: mock
+      ENABLE_REAL_CALLS: 'false'
+      EXPO_NO_DOTENV: '1'
+      EXPO_OFFLINE: '1'
     steps:
       - uses: actions/checkout@v5
         with:
@@ -20,4 +23,5 @@ jobs:
           proto-version: '0.57.4'
           auto-install: true
       - run: pnpm install --frozen-lockfile
-      - run: moon run :build :lint :typecheck :test
+      - name: Validate offline fixtures and run inherited moon checks
+        run: node scripts/verify-fixtures/run.cjs --ci
