@@ -64,16 +64,19 @@ type ResponseEvent struct {
 // Public operations may run concurrently. ObserveBusinessTurn, Instruct and
 // Resume block until generation returns, so their contexts must be cancellable.
 type Loop struct {
-	mu           sync.Mutex
-	callID       string
-	goal         json.RawMessage
-	responder    Responder
-	state        State
-	turns        []BusinessTurn
-	instructions []string
-	reply        Reply
-	cancel       context.CancelFunc
-	events       []ResponseEvent
+	mu            sync.Mutex
+	callID        string
+	goal          json.RawMessage
+	responder     Responder
+	state         State
+	turns         []BusinessTurn
+	instructions  []string
+	reply         Reply
+	cancel        context.CancelFunc
+	events        []ResponseEvent
+	approvals     map[string]approvalRecord
+	speechCancel  context.CancelFunc
+	speechClaimed bool
 }
 
 func NewLoop(callID string, goal json.RawMessage, responder Responder) (*Loop, error) {
@@ -109,6 +112,10 @@ func uuid() string {
 // syncLocked executes cancellation after an invalidating state transition.
 func (l *Loop) syncLocked(next State) {
 	l.state = next
+	if l.speechCancel != nil {
+		l.speechCancel()
+		l.speechCancel = nil
+	}
 	if l.cancel != nil {
 		l.cancel()
 		l.cancel = nil
@@ -287,6 +294,7 @@ func (l *Loop) generateLocked(parent context.Context) error {
 	l.state = next
 	l.cancel = cancel
 	l.reply = Reply{ID: id, CallID: l.callID, ContextRevision: token.ContextRevision, Status: Generating, NeedsApproval: true, Reason: "Operator approval required before speech."}
+	l.speechClaimed = false
 	l.emitLocked()
 	l.mu.Unlock()
 	defer cancel()

@@ -69,7 +69,7 @@ func TestLoopFinalsOnlyAndReplay(t *testing.T) {
 	if snap.Response.Status != Suggested {
 		t.Fatalf("not awaiting approval: %+v", snap)
 	}
-	// The loop has no approval or playback method, so it cannot cross this gate.
+	// Generation alone cannot cross the explicit approval gate.
 	for i, event := range l.Events() {
 		if event.Seq != uint64(i+1) || event.Type != "response.updated" || event.CallID != "call-a" || !event.Payload.NeedsApproval {
 			t.Fatalf("invalid event: %+v", event)
