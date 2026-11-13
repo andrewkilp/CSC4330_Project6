@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	callID = "0b6c4f7e-3f1a-4c2b-9d3e-1a2b3c4d5e6f"
-	stream = "MZ" + "0123456789abcdef" + "0123456789abcdef"
-	sid    = "CA" + "0123456789abcdef" + "0123456789abcdef"
+	callID             = "0b6c4f7e-3f1a-4c2b-9d3e-1a2b3c4d5e6f"
+	mediaTestStreamSID = "MZ" + "0123456789abcdef" + "0123456789abcdef"
+	sid                = "CA" + "0123456789abcdef" + "0123456789abcdef"
 )
 
 var secret = []byte("0123456789abcdef0123456789abcdef-test-only")
@@ -92,8 +92,8 @@ func send(t *testing.T, c *websocket.Conn, v any) {
 }
 
 func start(token string) map[string]any {
-	return map[string]any{"event": "start", "sequenceNumber": "1", "streamSid": stream, "start": map[string]any{
-		"streamSid": stream, "callSid": sid, "accountSid": "AC" + "0123456789abcdef" + "0123456789abcdef", "tracks": []string{"inbound"},
+	return map[string]any{"event": "start", "sequenceNumber": "1", "streamSid": mediaTestStreamSID, "start": map[string]any{
+		"streamSid": mediaTestStreamSID, "callSid": sid, "accountSid": "AC" + "0123456789abcdef" + "0123456789abcdef", "tracks": []string{"inbound"},
 		"customParameters": map[string]string{"call_id": callID, "token": token},
 		"mediaFormat":      map[string]any{"encoding": "audio/x-mulaw", "sampleRate": 8000, "channels": 1}}}
 }
@@ -108,7 +108,7 @@ func TestSimulatedTwilioStream(t *testing.T) {
 	defer cancel()
 	send(t, c, map[string]any{"event": "connected", "protocol": "Call", "version": "1.0.0"})
 	send(t, c, start(media.SignStream(secret, callID, sid)))
-	send(t, c, map[string]any{"event": "media", "sequenceNumber": "2", "streamSid": stream,
+	send(t, c, map[string]any{"event": "media", "sequenceNumber": "2", "streamSid": mediaTestStreamSID,
 		"media": map[string]any{"track": "inbound", "payload": base64.StdEncoding.EncodeToString(make([]byte, 160))}})
 	var got []string
 	for len(got) < 2 {
@@ -118,7 +118,7 @@ func TestSimulatedTwilioStream(t *testing.T) {
 		}
 		var m map[string]any
 		_ = json.Unmarshal(data, &m)
-		if m["streamSid"] != stream {
+		if m["streamSid"] != mediaTestStreamSID {
 			t.Fatalf("outbound for another stream: %s", data)
 		}
 		got = append(got, m["event"].(string))
@@ -126,8 +126,8 @@ func TestSimulatedTwilioStream(t *testing.T) {
 	if strings.Join(got, ",") != "media,mark" {
 		t.Fatalf("outbound = %v", got)
 	}
-	send(t, c, map[string]any{"event": "mark", "sequenceNumber": "3", "streamSid": stream, "mark": map[string]any{"name": "greeting"}})
-	send(t, c, map[string]any{"event": "stop", "sequenceNumber": "4", "streamSid": stream})
+	send(t, c, map[string]any{"event": "mark", "sequenceNumber": "3", "streamSid": mediaTestStreamSID, "mark": map[string]any{"name": "greeting"}})
+	send(t, c, map[string]any{"event": "stop", "sequenceNumber": "4", "streamSid": mediaTestStreamSID})
 	if e := <-events; e.Kind != providers.MediaMark || e.Mark != "greeting" {
 		t.Fatalf("event = %+v", e)
 	}
