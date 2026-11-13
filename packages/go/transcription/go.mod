@@ -1,0 +1,9 @@
+module github.com/andrewkilp/CSC4330_Project6/packages/go/transcription
+
+go 1.26.4
+
+require github.com/andrewkilp/CSC4330_Project6/packages/go/providers v0.0.0
+
+require github.com/coder/websocket v1.8.14
+
+replace github.com/andrewkilp/CSC4330_Project6/packages/go/providers => ../providers

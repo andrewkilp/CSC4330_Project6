@@ -8,7 +8,7 @@ Draft callbacks contain cumulative text and the input revision. They are synchro
 
 Requests have a 30-second timeout, bounded input, bounded SSE frames and a 1 MiB stream limit. Redirects are disabled to avoid forwarding keys. HTTP 429 maps to ErrRateLimited; other HTTP/network/provider failures have fixed user-safe errors. Vendor bodies and transport errors are never returned or logged. There is no automatic retry of partial output.
 
-The #1 contract freeze and #6 shared Responder interface are still open. Input/Update are an isolated local boundary using the documented capabilities, not a replacement shared interface. #6 integration must wrap/adapt this client; it is not wired into production or the demo.
+`Responder{Client}` (`responder.go`, #6) implements the shared `providers.Responder`. It maps `ResponseRequest`/`ResponseDraft` to `Input`/`Update` without adding behavior. Invalid input wraps `providers.ErrInvalid`; provider failures wrap `providers.ErrUnavailable` while still matching this package's specific errors. The adapter is not yet wired into production or the demo.
 
 Protocol checked November 10, 2026 against [Messages streaming](https://platform.claude.com/docs/en/build-with-claude/streaming). `testdata/*.sse` are sanitized, synthetic recordings of the documented HTTP stream format, with fictional text, not claims of a paid live-provider run. Tests cover complete response, partial provider failure, HTTP rate limit, truncation, malformed data, token exhaustion, output bounds, callback cancellation and cancellation while reading. No real-call or paid-provider check was performed.
 

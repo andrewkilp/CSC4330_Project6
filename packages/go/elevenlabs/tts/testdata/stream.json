@@ -1,0 +1,7 @@
+{
+  "description": "Synthetic G.711 bytes only; not a recording or an audible speech-quality sample.",
+  "content_type": "audio/basic; rate=8000; channels=1",
+  "pattern_hex": "ff7f008180fe",
+  "repeat": 601,
+  "output_format": "ulaw_8000"
+}

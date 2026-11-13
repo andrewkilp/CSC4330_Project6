@@ -1,3 +1,4 @@
 id: conversation
 layer: library
 language: go
+dependsOn: ['claude', 'providers']

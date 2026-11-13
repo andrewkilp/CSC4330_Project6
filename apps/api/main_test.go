@@ -11,6 +11,11 @@ func TestSessionCookieEnvironment(t *testing.T) {
 	for _, env := range []string{"development", "production"} {
 		t.Run(env, func(t *testing.T) {
 			router := newRouter(env)
+			health := httptest.NewRecorder()
+			router.ServeHTTP(health, httptest.NewRequest(http.MethodGet, "/health", nil))
+			if health.Code != http.StatusOK || strings.TrimSpace(health.Body.String()) != `{"mode":"template","status":"ok"}` {
+				t.Fatalf("session router lost health route: %d %s", health.Code, health.Body)
+			}
 			req := httptest.NewRequest(http.MethodPost, "/v1/session", strings.NewReader("{}"))
 			recorder := httptest.NewRecorder()
 			router.ServeHTTP(recorder, req)

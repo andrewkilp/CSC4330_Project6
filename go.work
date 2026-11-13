@@ -5,6 +5,9 @@ use (
   ./apps/api
   ./packages/go/auth
   ./packages/go/conversation
+  ./packages/go/transcription
   ./packages/go/handlers
   ./packages/go/mock
+  ./packages/go/providers
+  ./packages/go/elevenlabs
 )

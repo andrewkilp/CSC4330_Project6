@@ -69,6 +69,31 @@ func TestCompleteRequest(t *testing.T) {
 		t.Fatalf("updates: %+v", updates)
 	}
 }
+
+func TestServerPolicyIsSeparateFromUserContext(t *testing.T) {
+	c := client(t, func(r *http.Request) (*http.Response, error) {
+		var b struct {
+			System   string
+			Messages []struct{ Content string }
+		}
+		if err := json.NewDecoder(r.Body).Decode(&b); err != nil {
+			t.Fatal(err)
+		}
+		if b.System != "Trusted server policy" || strings.Contains(b.Messages[0].Content, "Trusted server policy") {
+			t.Fatal("policy boundary lost")
+		}
+		return response(200, fixture(t, "complete")), nil
+	})
+	in := input()
+	in.SystemPolicy = "Trusted server policy"
+	if err := c.Generate(context.Background(), in, func(Update) error { return nil }); err != nil {
+		t.Fatal(err)
+	}
+	var decoded Input
+	if err := json.Unmarshal([]byte(`{"SystemPolicy":"remote override"}`), &decoded); err != nil || decoded.SystemPolicy != "" {
+		t.Fatal("JSON can set server policy")
+	}
+}
 func TestFailuresNeverFinalize(t *testing.T) {
 	complete := fixture(t, "complete")
 	cases := []struct {

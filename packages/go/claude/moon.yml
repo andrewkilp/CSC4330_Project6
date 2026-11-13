@@ -1,3 +1,4 @@
 id: claude
 layer: library
 language: go
+dependsOn: ['providers']

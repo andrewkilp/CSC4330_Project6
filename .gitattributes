@@ -1,5 +1,5 @@
-# Normalize line endings on checkin
-* text=auto
+# Keep byte-checked generated fixtures and formatter input stable on Windows too.
+* text=auto eol=lf
 
 # Lockfiles: collapse in diffs and exclude from language stats
 go.sum             linguist-generated=true
