@@ -1,4 +1,5 @@
 import { getHealth } from "@switchboard/api";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Platform,
@@ -13,7 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme as t } from "../theme";
 
-type Page = "Calls" | "New call" | "Settings";
+type Page = "Calls" | "Settings";
 const transcript = [
   {
     time: "00:00",
@@ -65,6 +66,7 @@ function Button({
 }
 
 export default function CallPreview() {
+  const router = useRouter();
   const wide = useWindowDimensions().width >= 1000;
   const [page, setPage] = useState<Page>("Calls");
   const [instruction, setInstruction] = useState("");
@@ -74,9 +76,9 @@ export default function CallPreview() {
   );
   const [paused, setPaused] = useState(false);
   const [ended, setEnded] = useState(false);
-  const [business, setBusiness] = useState("Marigold");
-  const [goal, setGoal] = useState("Table for 4, Friday around 7 pm");
-  const [kind, setKind] = useState("Restaurant reservation");
+  const business = "Marigold";
+  const goal = "Table for 4, Friday around 7 pm";
+  const kind: string = "Restaurant reservation";
   const [health, setHealth] = useState("Not checked");
   const [checking, setChecking] = useState(false);
   const inactive = ended || paused;
@@ -111,7 +113,9 @@ export default function CallPreview() {
                 key={item}
                 accessibilityRole="button"
                 accessibilityState={{ selected: page === item }}
-                onPress={() => setPage(item)}
+                onPress={() =>
+                  item === "New call" ? router.push("/new") : setPage(item)
+                }
                 style={[
                   s.navItem,
                   page === item && { backgroundColor: t.green },
@@ -290,56 +294,6 @@ export default function CallPreview() {
                   />
                 </View>
               </View>
-            </>
-          ) : page === "New call" ? (
-            <>
-              <Text accessibilityRole="header" style={s.heading}>
-                What can we take off your list?
-              </Text>
-              <Text style={s.subtitle}>
-                PREPARE A RESERVATION OR AN APPOINTMENT
-              </Text>
-              <Text style={s.help}>
-                This starter opens a local design preview. Calling and
-                persistence are upcoming tasks.
-              </Text>
-              <View style={s.actions}>
-                {["Restaurant reservation", "Appointment"].map((option) => (
-                  <Button
-                    key={option}
-                    label={option}
-                    secondary={kind !== option}
-                    onPress={() => setKind(option)}
-                  />
-                ))}
-              </View>
-              <Text style={s.sectionLabel}>BUSINESS NAME</Text>
-              <TextInput
-                accessibilityLabel="Business name"
-                value={business}
-                onChangeText={setBusiness}
-                style={s.input}
-              />
-              <Text style={s.sectionLabel}>YOUR GOAL</Text>
-              <TextInput
-                accessibilityLabel="Call goal"
-                value={goal}
-                onChangeText={setGoal}
-                multiline
-                style={s.input}
-              />
-              <Button
-                label="Open design preview"
-                disabled={!business.trim() || !goal.trim()}
-                onPress={() => {
-                  setPage("Calls");
-                  setEnded(false);
-                  setPaused(false);
-                  setNotice(
-                    "Your goal is shown with a fixed restaurant example. No call is connected.",
-                  );
-                }}
-              />
             </>
           ) : (
             <>

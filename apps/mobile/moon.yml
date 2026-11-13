@@ -3,6 +3,8 @@ layer: application
 language: typescript
 dependsOn: ['client']
 tasks:
+  test:
+    command: 'node --test test/*.test.mjs'
   dev:
     command: 'pnpm exec expo start'
     options: {cache: false, runInCI: false, persistent: true}
