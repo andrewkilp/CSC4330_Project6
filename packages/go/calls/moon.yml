@@ -1,0 +1,4 @@
+id: calls
+layer: library
+language: go
+dependsOn: ['conversation', 'events', 'mock', 'providers', 'repository']

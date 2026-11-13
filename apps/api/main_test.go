@@ -10,7 +10,7 @@ import (
 func TestSessionCookieEnvironment(t *testing.T) {
 	for _, env := range []string{"development", "production"} {
 		t.Run(env, func(t *testing.T) {
-			router := newRouter(env)
+			router := newRouter(env, nil)
 			health := httptest.NewRecorder()
 			router.ServeHTTP(health, httptest.NewRequest(http.MethodGet, "/health", nil))
 			if health.Code != http.StatusOK || strings.TrimSpace(health.Body.String()) != `{"mode":"template","status":"ok"}` {
@@ -38,7 +38,7 @@ func TestProvidersRouteIsSecretFreeAndMock(t *testing.T) {
 	t.Setenv("ANTHROPIC_API_KEY", "sk-test-SENTINEL")
 	t.Setenv("CLAUDE_MODEL", "claude-test-model")
 	recorder := httptest.NewRecorder()
-	newRouter("development").ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/v1/providers", nil))
+	newRouter("development", nil).ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/v1/providers", nil))
 	body := recorder.Body.String()
 	if recorder.Code != http.StatusOK || strings.Contains(body, "SENTINEL") || !strings.Contains(body, `"mode":"mock"`) ||
 		!strings.Contains(body, `"llm":{"available":true}`) || !strings.Contains(body, `"telephony":{"available":false`) {

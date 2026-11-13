@@ -12,5 +12,6 @@ use (
   ./packages/go/providers
   ./packages/go/elevenlabs
   ./packages/go/events
+  ./packages/go/calls
   ./packages/go/policy
 )
