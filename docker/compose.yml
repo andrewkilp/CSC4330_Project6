@@ -12,5 +12,18 @@ services:
       test: ['CMD-SHELL', 'pg_isready -U switchboard']
       interval: 5s
       retries: 10
+  repository-test-db:
+    image: postgres:17-alpine
+    profiles: ['repository-test']
+    environment:
+      POSTGRES_DB: switchboard_repository_test
+      POSTGRES_USER: switchboard_test
+      POSTGRES_PASSWORD: test-only-local
+    ports: ['127.0.0.1::5432']
+    tmpfs: ['/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U switchboard_test -d switchboard_repository_test']
+      interval: 2s
+      retries: 15
 volumes:
   switchboard-db:
