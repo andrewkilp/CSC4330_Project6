@@ -7,4 +7,5 @@ use (
   ./packages/go/handlers
   ./packages/go/mock
   ./packages/go/providers
+  ./packages/go/elevenlabs
 )
