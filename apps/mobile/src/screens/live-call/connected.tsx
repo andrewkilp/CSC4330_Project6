@@ -19,6 +19,7 @@ import { AppText, Badge, Button, RuledPanel } from "../../components";
 import { theme as t } from "../../theme";
 import { API_URL } from "./api-url";
 import { InstructionComposer } from "./instructions";
+import { SuggestedReply } from "./suggested-reply";
 import { Transcript } from "./transcript";
 
 const messages = {
@@ -76,10 +77,7 @@ export default function ConnectedCall({ id }: { id: string }) {
       // retry intentionally replaces the closed subscription with a fresh snapshot.
     }, [id, retry]),
   );
-  const call = update?.state.call,
-    response = update?.state.currentResponseId
-      ? update.state.responses[update.state.currentResponseId]
-      : null;
+  const call = update?.state.call;
   return (
     <SafeAreaView style={s.safe}>
       <ScrollView contentContainerStyle={s.content}>
@@ -129,17 +127,12 @@ export default function ConnectedCall({ id }: { id: string }) {
                   <AppText key={`${index}-${text}`}>{text}</AppText>
                 ))}
               </RuledPanel>
-              <RuledPanel title="Suggested reply">
-                <AppText>
-                  {update?.status === "live" && response?.status === "suggested"
-                    ? response.text
-                    : "No current suggestion available."}
-                </AppText>
-                <AppText variant="caption" tone="muted">
-                  Suggestions are not spoken transcript. Approval controls are
-                  not connected on this screen yet.
-                </AppText>
-              </RuledPanel>
+              {update && (
+                <SuggestedReply
+                  state={update.state}
+                  live={update.status === "live"}
+                />
+              )}
             </View>
           )}
         </View>
