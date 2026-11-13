@@ -17,6 +17,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText, Badge, Button, RuledPanel } from "../../components";
 import { theme as t } from "../../theme";
+import { API_URL } from "./api-url";
+import { InstructionComposer } from "./instructions";
 import { Transcript } from "./transcript";
 
 const messages = {
@@ -44,7 +46,7 @@ export default function ConnectedCall({ id }: { id: string }) {
       try {
         setUpdate({ state: createEventState(id), status: "connecting" });
         subscription = subscribeCall({
-          baseUrl: process.env.EXPO_PUBLIC_API_URL || "http://localhost:8080",
+          baseUrl: API_URL,
           callId: id,
           fetch: expoFetch as typeof globalThis.fetch,
           onUpdate: (value) => {
@@ -141,6 +143,12 @@ export default function ConnectedCall({ id }: { id: string }) {
             </View>
           )}
         </View>
+        {update?.state.call && (
+          <InstructionComposer
+            state={update.state}
+            live={update.status === "live"}
+          />
+        )}
         <Button
           label="Reconnect call updates"
           variant="secondary"

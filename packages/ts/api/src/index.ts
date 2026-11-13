@@ -1,5 +1,6 @@
 export * from "./calls.ts";
 export * from "./events.ts";
+export * from "./instructions.ts";
 export * from "./providers.ts";
 export * from "./stream.ts";
 export * from "./types.ts";
