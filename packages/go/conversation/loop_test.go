@@ -246,6 +246,12 @@ func TestFailedStreamsNeverSuggest(t *testing.T) {
 		{"oversized", func(ctx context.Context, in claude.Input, emit func(claude.Update) error) error {
 			return emit(claude.Update{Text: strings.Repeat("x", 1501), Final: true})
 		}},
+		{"UTF-16 limit", func(ctx context.Context, in claude.Input, emit func(claude.Update) error) error {
+			return emit(claude.Update{Text: strings.Repeat("😀", 751), Final: true})
+		}},
+		{"invented contact", func(ctx context.Context, in claude.Input, emit func(claude.Update) error) error {
+			return emit(claude.Update{Text: "Use +12025550199", Final: true})
+		}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			l := connectedLoop(t, tc.r)

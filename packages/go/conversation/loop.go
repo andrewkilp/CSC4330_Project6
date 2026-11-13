@@ -9,9 +9,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf16"
 	"unicode/utf8"
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/claude"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/conversation/prompt"
 )
 
 // Responder uses #14's existing cancellable boundary until #6 owns the shared
@@ -269,6 +271,12 @@ func (l *Loop) generateLocked(parent context.Context) error {
 		l.mu.Unlock()
 		return nil
 	}
+	prepared, buildErr := prompt.Build(in)
+	if buildErr != nil {
+		l.mu.Unlock()
+		return ErrInvalidInput
+	}
+	in = prepared
 	id := uuid()
 	next, token, err := l.state.BeginResponse(id)
 	if err != nil {
@@ -302,9 +310,18 @@ func (l *Loop) generateLocked(parent context.Context) error {
 		if callbackErr != nil {
 			return callbackErr
 		}
-		if final || len(l.events) >= 4094 || update.ContextRevision != in.ContextRevision || !utf8.ValidString(update.Text) || utf8.RuneCountInString(update.Text) > 1500 || (update.Final && strings.TrimSpace(update.Text) == "") {
+		if final || len(l.events) >= 4094 || update.ContextRevision != in.ContextRevision || !utf8.ValidString(update.Text) || len(utf16.Encode([]rune(update.Text))) > 1500 || (update.Final && strings.TrimSpace(update.Text) == "") {
 			callbackErr = ErrInvalidInput
 			return callbackErr
+		}
+		if update.Final {
+			decision, e := prompt.Validate(in, update)
+			if e != nil {
+				callbackErr = ErrInvalidInput
+				return callbackErr
+			}
+			l.reply.NeedsApproval = decision.NeedsApproval
+			l.reply.Reason = decision.Reason
 		}
 		l.reply.Text = update.Text
 		final = update.Final
