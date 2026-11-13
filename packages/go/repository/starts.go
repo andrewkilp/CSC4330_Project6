@@ -194,7 +194,7 @@ func (r *Repository) ApplyTwilioCallback(ctx context.Context, cb TwilioCallback)
 	if !uuidPattern.MatchString(cb.CallID) || !uuidPattern.MatchString(cb.AttemptID) || len(cb.Token) < 32 || len(cb.Token) > 128 || !twilioAccountSID.MatchString(cb.AccountSID) || !twilioCallSID.MatchString(cb.CallSID) {
 		return CallbackResult{}, ErrNotFound
 	}
-	if cb.Status != "" && !oneOf(cb.Status, "queued", "ringing", "in-progress", "completed", "busy", "no-answer", "failed", "canceled") {
+	if cb.Status != "" && !oneOf(cb.Status, "queued", "initiated", "ringing", "in-progress", "completed", "busy", "no-answer", "failed", "canceled") {
 		return CallbackResult{}, ErrInvalid
 	}
 	db, err := r.pool.Begin(ctx)
@@ -258,7 +258,7 @@ func twilioStatus(current, status string) string {
 	}
 	next := current
 	switch status {
-	case "queued", "ringing":
+	case "queued", "initiated", "ringing":
 		next = "dialing"
 	case "in-progress":
 		next = "connected"
