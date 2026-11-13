@@ -4,7 +4,9 @@ A base template for an AI phone concierge: restaurant reservations and appointme
 
 ![Switchboard design direction](docs/design/switchboard-mockup.png)
 
-**Current behavior:** a responsive Expo design preview with local controls and a Go `/health` endpoint. It makes no calls, generates no AI responses and stores no data. The GitHub issues implement those features in five balanced stages over two weeks.
+**Current behavior:** responsive Expo goal entry/review, explicit call-draft saving, and a labelled design preview. The Go API provides health, local sessions and private call create/read endpoints backed by optional PostgreSQL. Creating or opening a draft never dials. [Call-service setup and evidence](packages/go/handlers/calls/README.md) describes database migrations, same-site browser configuration and tests; live conversation features remain separate issues.
+
+The API also mounts an authenticated, explicitly gated [call-start endpoint](packages/go/telephony/README.md), with mock mode by default and a durable fence against duplicate dials. Real starts require explicit server opt-in, credentials, consent and an allowlisted destination. The media bridge and full live conversation remain separate work.
 
 ## Start
 

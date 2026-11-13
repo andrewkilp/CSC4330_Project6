@@ -8,6 +8,7 @@ import (
 )
 
 func TestSessionCookieEnvironment(t *testing.T) {
+	t.Setenv("ENABLE_REAL_CALLS", "false")
 	for _, env := range []string{"development", "production"} {
 		t.Run(env, func(t *testing.T) {
 			router := newRouter(env)
