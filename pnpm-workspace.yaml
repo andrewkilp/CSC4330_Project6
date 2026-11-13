@@ -6,3 +6,6 @@ overrides:
   react-dom: 19.2.3
   '@react-native/metro-config': 0.86.3
   react-native-worklets: 0.10.1
+  # expo-router accepts any reanimated, so pnpm picked 4.7.1, which needs worklets 0.13
+  # and fails pod install. 4.5.1 is the SDK 57 version (expo/bundledNativeModules.json).
+  react-native-reanimated: 4.5.1
