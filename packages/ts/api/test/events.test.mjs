@@ -8,12 +8,64 @@ import {
   hydrateSnapshot,
   parseEvent,
   reduceEvent,
+  selectTranscript,
 } from "../src/events.ts";
 
 const fixtures = JSON.parse(
   readFileSync(new URL("./fixtures/events.json", import.meta.url), "utf8"),
 );
 const callId = fixtures.call.id;
+
+test("transcript separates provisional replacements and waits for playback acknowledgement", () => {
+  let state = initial();
+  state = reduceEvent(state, event(2, "turn.updated", fixtures.partial_turn));
+  assert.equal(selectTranscript(state).provisional.length, 1);
+  assert.equal(selectTranscript(state).finalized.length, 0);
+  state = reduceEvent(state, event(3, "turn.updated", fixtures.final_turn));
+  assert.equal(selectTranscript(state).provisional.length, 0);
+  assert.equal(selectTranscript(state).finalized.length, 1);
+  const response = fixtures.response;
+  state = reduceEvent(state, event(4, "response.updated", response));
+  state = reduceEvent(
+    state,
+    event(5, "response.updated", { ...response, status: "approved" }),
+  );
+  const assistant = {
+    ...fixtures.final_turn,
+    id: secondReply,
+    speaker: "assistant",
+    response_id: response.id,
+    text: response.text,
+    started_at_ms: 120000,
+    ended_at_ms: 123000,
+  };
+  state = reduceEvent(state, event(6, "turn.updated", assistant));
+  assert.equal(
+    selectTranscript(state).finalized.length,
+    1,
+    "early assistant turn is hidden",
+  );
+  state = reduceEvent(
+    state,
+    event(7, "response.updated", { ...response, status: "speaking" }),
+  );
+  assert.equal(selectTranscript(state).finalized.length, 1);
+  state = reduceEvent(
+    state,
+    event(8, "response.updated", { ...response, status: "spoken" }),
+  );
+  assert.equal(selectTranscript(state).finalized.length, 2);
+  assert.equal(selectTranscript(state).finalized[1].id, assistant.id);
+  assert.equal(
+    selectTranscript(
+      reduceEvent(
+        state,
+        event(8, "response.updated", { ...response, status: "spoken" }),
+      ),
+    ).finalized.length,
+    2,
+  );
+});
 const otherCall = "99999999-9999-4999-8999-999999999999";
 const secondReply = "66666666-6666-4666-8666-666666666666";
 function event(seq, type, payload, revision = payload.context_revision ?? 0) {
