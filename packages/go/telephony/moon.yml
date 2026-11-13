@@ -1,4 +1,4 @@
 id: telephony
 layer: library
 language: go
-dependsOn: ['providers', 'repository', 'mock']
+dependsOn: ['conversation', 'mock', 'providers', 'repository']

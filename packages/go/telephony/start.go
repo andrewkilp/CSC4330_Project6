@@ -28,6 +28,15 @@ type StartService struct {
 	real, mock providers.Telephony
 	cfg        StartConfig
 	base       string
+	live       *Calls
+}
+
+// WithLive records every acknowledged provider call in the live-call registry, so
+// controls (#31) can hang it up. A call ended while still dialing is hung up as soon
+// as the provider returns its id.
+func (s *StartService) WithLive(calls *Calls) *StartService {
+	s.live = calls
+	return s
 }
 
 func NewStartService(store StartStore, real, mock providers.Telephony, cfg StartConfig) (*StartService, error) {
@@ -90,6 +99,11 @@ func (s *StartService) Start(ctx context.Context, owner, callID, key string) (re
 	if err != nil {
 		s.ambiguous(owner, callID, attempt)
 		return repository.Call{}, repository.ErrUnavailable
+	}
+	if s.live != nil {
+		// ErrCallEnded means end won the race and the call was just hung up; the
+		// SID is still recorded below so the attempt is reconciled.
+		_ = s.live.Started(callID, provider, sid)
 	}
 	// Use a bounded independent context so a disconnected browser does not prevent
 	// retaining an acknowledged SID. Failure still leaves the permanent intent.

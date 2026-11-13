@@ -47,15 +47,19 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	if err != nil {
 		return nil, err
 	}
+	rt := newLiveRuntime()
+	starter.WithLive(rt.calls)
 	mux := http.NewServeMux()
 	mux.Handle("/", handlers.NewRouter())
-	// The complete real conversation pipeline is not mounted in this build.
 	providers.Register(mux, providers.New(providers.FromEnv(os.LookupEnv, providers.Implemented{STT: true, LLM: true, TTS: true}), nil))
 	sessions := auth.NewSessions()
 	session.Register(mux, sessions, environment != "" && environment != "development")
 	calls.RegisterDrafts(mux, calls.NewDraftHandler(store, sessions))
 	calls.RegisterStart(mux, calls.NewStartHandler(starter, sessions))
-	if err := registerTwilioCallbacks(mux, store, config, newLiveMedia()); err != nil {
+	if err := registerTwilioCallbacks(mux, store, config, rt); err != nil {
+		return nil, err
+	}
+	if err := registerCallRuntime(mux, store, sessions, rt); err != nil {
 		return nil, err
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

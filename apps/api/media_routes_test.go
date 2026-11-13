@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 )
 
@@ -237,7 +239,7 @@ func waitUntil(t *testing.T, what string, ok func() bool) {
 }
 
 func TestMountedBridgeTracksLiveStreamAndForwardsToSink(t *testing.T) {
-	live := newLiveMedia()
+	live := newLiveMedia(telephony.NewCalls())
 	sink := &recordingSink{changed: make(chan struct{}, 16)}
 	live.SetSink(sink)
 	c := mediaClient(t, live)
@@ -274,7 +276,7 @@ func TestMountedBridgeRejectsForgedStreamsBeforeRegistering(t *testing.T) {
 		"other key":  media.SignStream([]byte(strings.Repeat("x", 40)), mediaCallID, mediaCallSID),
 	} {
 		t.Run(name, func(t *testing.T) {
-			live := newLiveMedia()
+			live := newLiveMedia(telephony.NewCalls())
 			c := mediaClient(t, live)
 			write(t, c, twilioStart(token))
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -291,11 +293,11 @@ func TestMountedBridgeRejectsForgedStreamsBeforeRegistering(t *testing.T) {
 }
 
 func TestLiveMediaReplacesAndClosesPreviousStream(t *testing.T) {
-	live := newLiveMedia()
+	live := newLiveMedia(telephony.NewCalls())
 	first, second := &closeCounter{}, &closeCounter{}
 	live.attach(mediaCallID, first)
 	live.attach(mediaCallID, second)
-	if got, _ := live.Stream(mediaCallID); got != second || first.closed != 1 || second.closed != 0 {
+	if got, _ := live.Stream(mediaCallID); got != second || first.closed.Load() != 1 || second.closed.Load() != 0 {
 		t.Fatal("a reconnecting stream did not replace and close the previous one")
 	}
 	if err := live.transcript(mediaCallID, providers.TranscriptUpdate{Text: "dropped"}); err != nil {
@@ -307,9 +309,9 @@ func TestLiveMediaReplacesAndClosesPreviousStream(t *testing.T) {
 	}
 }
 
-type closeCounter struct{ closed int }
+type closeCounter struct{ closed atomic.Int32 }
 
 func (*closeCounter) Send(context.Context, providers.AudioChunk) error { return errors.New("unused") }
 func (*closeCounter) Mark(context.Context, string) error               { return errors.New("unused") }
 func (*closeCounter) Clear(context.Context) (int, error)               { return 0, nil }
-func (c *closeCounter) Close() error                                   { c.closed++; return nil }
+func (c *closeCounter) Close() error                                   { c.closed.Add(1); return nil }

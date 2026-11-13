@@ -9,6 +9,7 @@ import (
 
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/webhooks"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/transcription"
 )
@@ -32,15 +33,16 @@ type MediaSink interface {
 	Event(callID string, e providers.MediaEvent)
 }
 
-// liveMedia tracks each live call's outbound stream so call controls (#31) and the
-// runtime can clear or close it.
+// liveMedia registers each live call's outbound stream in the shared live-call
+// registry, so call controls (#31) and the runtime can clear or close it, and forwards
+// transcripts and events to the runtime's sink.
 type liveMedia struct {
-	mu      sync.Mutex
-	streams map[string]providers.MediaStream
-	sink    MediaSink
+	calls *telephony.Calls
+	mu    sync.Mutex
+	sink  MediaSink
 }
 
-func newLiveMedia() *liveMedia { return &liveMedia{streams: map[string]providers.MediaStream{}} }
+func newLiveMedia(calls *telephony.Calls) *liveMedia { return &liveMedia{calls: calls} }
 
 func (l *liveMedia) SetSink(sink MediaSink) {
 	l.mu.Lock()
@@ -50,20 +52,13 @@ func (l *liveMedia) SetSink(sink MediaSink) {
 
 // Stream returns the call's current outbound stream, if it is attached.
 func (l *liveMedia) Stream(callID string) (providers.MediaStream, bool) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	s, ok := l.streams[callID]
-	return s, ok
+	return l.calls.Media(callID)
 }
 
+// attach replaces and closes any previous stream; a stream for an ended call is
+// closed at once (so it hangs up) instead of being registered.
 func (l *liveMedia) attach(callID string, out providers.MediaStream) {
-	l.mu.Lock()
-	previous := l.streams[callID]
-	l.streams[callID] = out
-	l.mu.Unlock()
-	if previous != nil && previous != out {
-		_ = previous.Close()
-	}
+	_ = l.calls.AttachMedia(callID, out)
 }
 
 func (l *liveMedia) transcript(callID string, u providers.TranscriptUpdate) error {
@@ -79,10 +74,15 @@ func (l *liveMedia) transcript(callID string, u providers.TranscriptUpdate) erro
 func (l *liveMedia) event(callID string, e providers.MediaEvent) {
 	l.mu.Lock()
 	sink := l.sink
-	if e.Kind == providers.MediaStop {
-		delete(l.streams, callID)
-	}
 	l.mu.Unlock()
+	if e.Kind == providers.MediaStop {
+		// The bridge reports stop per call, not per stream. If Twilio reconnected and a
+		// new stream already replaced this one, that new stream is detached too; it
+		// still works, and the next attach or End handles it.
+		if current, ok := l.calls.Media(callID); ok {
+			l.calls.DetachMedia(callID, current)
+		}
+	}
 	if sink != nil {
 		sink.Event(callID, e)
 	}

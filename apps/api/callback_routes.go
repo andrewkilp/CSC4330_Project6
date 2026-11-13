@@ -49,7 +49,7 @@ func (unavailableCallbackLedger) ApplyTwilioCallback(context.Context, repository
 	return repository.CallbackResult{}, repository.ErrUnavailable
 }
 
-func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start apiStartConfig, live *liveMedia) error {
+func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start apiStartConfig, rt *liveRuntime) error {
 	config, enabled, err := callbackEnvironment(start)
 	if err != nil {
 		return err
@@ -72,6 +72,7 @@ func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start a
 		}
 	}
 	config.MediaEnabled, config.MediaSecret = mediaEnabled, secret
+	config.Publish = func(_ context.Context, evs []repository.Event) { rt.publish(evs...) }
 	handler, err := webhooks.New(config, ledger)
 	if err != nil {
 		return errors.New("invalid callback configuration")
@@ -79,7 +80,7 @@ func registerTwilioCallbacks(mux *http.ServeMux, store calls.DraftStore, start a
 	handler.Register(mux)
 	// TwiML only points Twilio at the stream when the bridge is mounted here.
 	if mediaEnabled {
-		registerMedia(mux, live, secret, lookup, stt)
+		registerMedia(mux, rt.media, secret, lookup, stt)
 	}
 	return nil
 }
