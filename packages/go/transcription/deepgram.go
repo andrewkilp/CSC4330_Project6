@@ -294,9 +294,9 @@ func (s *segmenter) consume(data []byte) (*providers.TranscriptUpdate, error) {
 	combined := strings.TrimSpace(s.committed + " " + text)
 	if r.SpeechFinal && combined == "" {
 		// An empty endpoint cannot promote an unconfirmed interim hypothesis.
-		s.id = ""
-		s.committed = ""
-		s.end = 0
+		// Keep its delivered TurnID: the shared interface has no turn-removal
+		// event, so abandoning it would strand a partial in the conversation
+		// loop. Later recognized text replaces/finalizes this same pending turn.
 		return nil, nil
 	}
 	if len(utf16.Encode([]rune(combined))) > providers.MaxTurnText {

@@ -51,6 +51,10 @@ Duplicate final segments are suppressed; a repeated segment carrying the endpoin
 can finalize accumulated text once. Silence alone creates no turn. An endpoint
 with empty text may complete previously accumulated speech. Timestamps are rounded
 to milliseconds relative to the audio stream; the earliest start survives updates.
+An empty endpoint after only an interim hypothesis emits no blank/invented final.
+It preserves that pending TurnID so subsequent recognized text can replace and
+finalize it. The shared interface has no partial-removal event; abandoning the ID
+would strand a partial downstream and block further conversation generation.
 See [Deepgram endpointing semantics](https://developers.deepgram.com/docs/understand-endpointing-interim-results).
 
 The adapter bounds inbound messages to 64 KiB, text to 10,000 UTF-16 code units and

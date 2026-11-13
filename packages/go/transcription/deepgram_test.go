@@ -416,9 +416,16 @@ func TestEndpointDoesNotInventFinalTextAndRepeatedEndpointFinalizesOnce(t *testi
 	if _, err := s.consume(msgs[2]); err != nil {
 		t.Fatal(err)
 	}
+	pendingID := s.id
 	empty := []byte(`{"type":"Results","start":0.2,"duration":0.8,"is_final":true,"speech_final":true,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":""}]}}`)
 	if u, err := s.consume(empty); err != nil || u != nil {
 		t.Fatalf("invented final from interim: %+v %v", u, err)
+	}
+	if s.id != pendingID {
+		t.Fatal("empty endpoint abandoned a delivered pending turn")
+	}
+	if u, err := s.consume(msgs[6]); err != nil || u == nil || !u.IsFinal || u.TurnID != pendingID || u.Text != "Thank you." {
+		t.Fatalf("later final did not resolve the same pending turn: %+v %v", u, err)
 	}
 	s = segmenter{}
 	if _, err := s.consume(msgs[3]); err != nil {
