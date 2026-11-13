@@ -4,8 +4,8 @@ use (
   ./packages/go/claude
   ./apps/api
   ./packages/go/conversation
+  ./packages/go/transcription
   ./packages/go/handlers
   ./packages/go/mock
   ./packages/go/providers
-  ./packages/go/transcription
 )
