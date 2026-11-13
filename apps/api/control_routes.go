@@ -10,7 +10,6 @@ import (
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/events"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/calls"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/control"
-	eventroutes "github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/events"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/providers"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/repository"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony"
@@ -54,16 +53,11 @@ type updateStore interface {
 	Update(ctx context.Context, owner, callID, action, key string, request any, fn func(*repository.Tx) (any, error)) (json.RawMessage, error)
 }
 
-// registerCallRuntime mounts the durable event stream (#23) and call controls (#31).
-// Both need the repository; without DATABASE_URL neither route exists.
+// registerCallRuntime mounts call controls (#31) and recovery (#36).
+// Event routes are mounted once by registerCallEvents using this runtime's hub.
 func registerCallRuntime(mux *http.ServeMux, store calls.DraftStore, sessions *auth.Sessions, rt *liveRuntime, real providers.Telephony) error {
 	if nilStore(store) {
 		return nil
-	}
-	if es, ok := store.(eventroutes.Store); ok {
-		if err := eventroutes.Register(mux, eventroutes.Config{Store: es, Hub: rt.hub, RequireOwner: sessions.RequireOwner}); err != nil {
-			return err
-		}
 	}
 	if rs, ok := store.(telephony.ReconcileStore); ok {
 		// Orphan dialing cleanup (#36) for the life of the process.

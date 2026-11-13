@@ -77,6 +77,11 @@ export default function DraftCallScreen() {
               label={`${call.mode.toUpperCase()} · ${call.status.toUpperCase()}`}
               tone={call.status === "draft" ? "neutral" : "warning"}
             />
+            <Button
+              label="Open live updates"
+              variant="secondary"
+              onPress={() => router.push(`/calls/${call.id}?live=1`)}
+            />
             <AppText>
               {call.status === "draft"
                 ? "Draft saved. No call has been placed."

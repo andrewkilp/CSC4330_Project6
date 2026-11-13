@@ -49,8 +49,10 @@ func TestControlAndEventRoutesNeedDurableStorage(t *testing.T) {
 	if got := status(t, nil, "POST", control); got != 404 {
 		t.Fatalf("control without storage = %d, want 404", got)
 	}
-	if got := status(t, nil, "GET", events); got != 404 {
-		t.Fatalf("events without storage = %d, want 404", got)
+	// #22 keeps event routes mounted: authenticate first, then return 503
+	// for unavailable storage instead of hiding the endpoint.
+	if got := status(t, nil, "GET", events); got != 401 {
+		t.Fatalf("events without a session = %d, want 401", got)
 	}
 	// Mounted and owner-gated with storage.
 	if got := status(t, durableStore{}, "POST", control); got != 401 {

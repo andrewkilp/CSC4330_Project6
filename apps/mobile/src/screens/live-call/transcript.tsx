@@ -1,6 +1,11 @@
 import { type EventState, selectTranscript, type Turn } from "@switchboard/api";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { AppText, Button } from "../../components";
 import { theme as t } from "../../theme";
 
@@ -13,24 +18,52 @@ function Timestamp({ ms }: { ms: number }) {
     </AppText>
   );
 }
+// From this text scale up, timestamps sit above the words instead of beside them.
+const LARGE_TEXT = 1.3;
+function clockLabel(ms: number) {
+  const seconds = Math.floor(ms / 1000);
+  const m = Math.floor(seconds / 60),
+    r = seconds % 60;
+  return `${m} minute${m === 1 ? "" : "s"} ${r} second${r === 1 ? "" : "s"}`;
+}
 function TranscriptTurn({
   turn,
+  businessTag,
   provisional = false,
 }: {
   turn: Turn;
+  businessTag: string;
   provisional?: boolean;
 }) {
+  const stacked = useWindowDimensions().fontScale >= LARGE_TEXT;
+  const speaker = turn.speaker === "assistant" ? "AI" : "Business";
   return (
-    <View testID={`turn-${turn.id}`} style={s.turn}>
+    <View
+      testID={`turn-${turn.id}`}
+      style={[s.turn, stacked && s.stacked]}
+      // Read as one item: speaker, time and words, instead of three fragments.
+      accessible
+      accessibilityLabel={`${speaker}${provisional ? ", still being transcribed" : ""}, at ${clockLabel(turn.started_at_ms)}: ${turn.text || "listening"}`}
+    >
       <Timestamp ms={turn.started_at_ms} />
       <View style={[s.body, turn.speaker === "business" && s.business]}>
-        <AppText
-          variant="label"
-          tone={turn.speaker === "assistant" ? "green" : "danger"}
-        >
-          {turn.speaker === "assistant" ? "AI" : "BUSINESS"}
-          {provisional ? " · PROVISIONAL" : ""}
-        </AppText>
+        <View style={s.tagRow}>
+          <View
+            style={[
+              s.tag,
+              turn.speaker === "assistant" ? s.tagAi : s.tagBusiness,
+            ]}
+          >
+            <AppText variant="label" style={s.tagText}>
+              {turn.speaker === "assistant" ? "AI" : businessTag}
+            </AppText>
+          </View>
+          {provisional ? (
+            <AppText variant="label" tone="muted">
+              PROVISIONAL
+            </AppText>
+          ) : null}
+        </View>
         <AppText tone={provisional ? "muted" : "ink"}>
           {turn.text || "Listening…"}
         </AppText>
@@ -38,7 +71,16 @@ function TranscriptTurn({
     </View>
   );
 }
-export function Transcript({ state }: { state: EventState }) {
+export function Transcript({
+  state,
+  preview = false,
+  businessTag = "BUSINESS",
+}: {
+  state: EventState;
+  preview?: boolean;
+  // The reference's short label for the business side, such as RESTAURANT.
+  businessTag?: string;
+}) {
   const { finalized, provisional } = selectTranscript(state);
   const scroll = useRef<ScrollView>(null);
   const following = useRef(true);
@@ -48,12 +90,16 @@ export function Transcript({ state }: { state: EventState }) {
   return (
     <View style={s.container}>
       <AppText variant="label" tone="muted">
-        ON THE LINE / SAMPLE TRANSCRIPT
+        {preview
+          ? "ON THE LINE / SAMPLE TRANSCRIPT"
+          : "ON THE LINE / TRANSCRIPT"}
       </AppText>
       <ScrollView
         ref={scroll}
         testID="transcript-scroll"
         accessibilityLabel="Call transcript"
+        // Keyboard users can focus the transcript and scroll it with the arrow keys.
+        focusable
         style={s.scroll}
         contentContainerStyle={s.content}
         nestedScrollEnabled
@@ -83,7 +129,7 @@ export function Transcript({ state }: { state: EventState }) {
           <AppText tone="muted">No finalized speech yet.</AppText>
         )}
         {finalized.map((turn) => (
-          <TranscriptTurn key={turn.id} turn={turn} />
+          <TranscriptTurn key={turn.id} turn={turn} businessTag={businessTag} />
         ))}
         {provisional.length > 0 && (
           <View testID="provisional-turns" style={s.provisional}>
@@ -91,7 +137,12 @@ export function Transcript({ state }: { state: EventState }) {
               Still being transcribed · wording may change
             </AppText>
             {provisional.map((turn) => (
-              <TranscriptTurn key={turn.id} turn={turn} provisional />
+              <TranscriptTurn
+                key={turn.id}
+                turn={turn}
+                businessTag={businessTag}
+                provisional
+              />
             ))}
           </View>
         )}
@@ -118,6 +169,7 @@ const s = StyleSheet.create({
   scroll: { height: 420, flexGrow: 0 },
   content: { gap: 28, paddingVertical: 12, paddingRight: 8 },
   turn: { flexDirection: "row", gap: 12 },
+  stacked: { flexDirection: "column", gap: 4 },
   body: {
     flex: 1,
     minWidth: 0,
@@ -127,6 +179,22 @@ const s = StyleSheet.create({
     gap: 8,
   },
   business: { borderColor: t.vermilion },
+  tagRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    alignItems: "center",
+  },
+  tag: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
+    borderRadius: t.radius,
+    paddingHorizontal: t.space.sm,
+    paddingVertical: 1,
+  },
+  tagAi: { backgroundColor: t.green },
+  tagBusiness: { backgroundColor: t.vermilion },
+  tagText: { color: t.white, letterSpacing: 1 },
   provisional: {
     gap: 16,
     paddingTop: 16,

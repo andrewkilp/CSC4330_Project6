@@ -260,11 +260,11 @@ export function NewGoalScreen() {
                       />
                     ))}
                   </View>
-                  {errors.offset && (
+                  {errors.offset ? (
                     <AppText tone="danger" accessibilityRole="alert">
                       {errors.offset}
                     </AppText>
-                  )}
+                  ) : null}
                 </View>
               )}
               <Field
@@ -364,11 +364,11 @@ export function NewGoalScreen() {
                   </AppText>
                 </Pressable>
               )}
-              {errors.acknowledged && (
+              {errors.acknowledged ? (
                 <AppText tone="danger" accessibilityRole="alert">
                   {errors.acknowledged}
                 </AppText>
-              )}
+              ) : null}
               <Button label="Review goal" onPress={review} />
             </View>
           </RuledPanel>
@@ -502,11 +502,11 @@ export function ReviewGoalScreen() {
                   void saveDraft();
                 }}
               />
-              {createError && (
+              {createError ? (
                 <AppText accessibilityRole="alert" tone="danger">
                   {createError}
                 </AppText>
-              )}
+              ) : null}
               <Button
                 label="Edit goal"
                 variant="secondary"

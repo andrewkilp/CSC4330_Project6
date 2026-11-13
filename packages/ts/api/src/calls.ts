@@ -74,7 +74,22 @@ async function callJSON(response: Response): Promise<unknown> {
     throw new CallRequestError("internal", 500);
   }
 }
-async function readCall(response: Response, status: number): Promise<Call> {
+// Reads a JSON result, turning any other status into the contract's error. A plain
+// 404 or 405 without a JSON body means the route itself is missing on this server.
+async function readResult(
+  response: Response,
+  status: number,
+): Promise<unknown> {
+  if (
+    (response.status === 404 || response.status === 405) &&
+    !response.headers
+      .get("content-type")
+      ?.toLowerCase()
+      .startsWith("application/json")
+  ) {
+    void response.body?.cancel().catch(() => {});
+    throw new CallRequestError("not_found", 404);
+  }
   const data = await callJSON(response);
   if (response.status !== status) {
     try {
@@ -89,11 +104,42 @@ async function readCall(response: Response, status: number): Promise<Call> {
       throw new CallRequestError("internal", 500);
     }
   }
+  return data;
+}
+async function readCall(response: Response, status: number): Promise<Call> {
+  const data = await readResult(response, status);
   try {
     return parseCall(data);
   } catch {
     throw new CallRequestError("internal", 500);
   }
+}
+
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+// Shared by the call action routes (instructions, approval, control). A 401 here means
+// the session that owns the call is gone; a new anonymous session would not own it, so
+// it is reported instead of recovered.
+export async function postCallAction(
+  baseUrl: string,
+  callId: string,
+  path: string,
+  body: unknown,
+  status: number,
+  signal?: AbortSignal,
+): Promise<unknown> {
+  if (!UUID.test(callId)) throw new CallRequestError("not_found", 404);
+  const response = await callFetch(
+    callURL(baseUrl, `/v1/calls/${encodeURIComponent(callId)}/${path}`),
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    },
+  );
+  return readResult(response, status);
 }
 
 // A stale concurrent 401 rechecks under this lock before opening a new anonymous

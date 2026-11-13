@@ -22,13 +22,16 @@ func TestIntegrationControlsCommitAtomicallyAndIdempotently(t *testing.T) {
 		t.Fatal(err)
 	}
 	reply := repository.NewID()
-	if _, err := db.Repo.Update(ctx, owner, call.ID, "setup", repository.NewID(), "connect", func(tx *repository.Tx) (any, error) {
+	if _, err := db.Repo.Update(ctx, owner, call.ID, "setup", repository.NewID(), map[string]string{"action": "connect"}, func(tx *repository.Tx) (any, error) {
 		for _, s := range []string{"dialing", "connected"} {
 			if err := tx.SetCall(0, s, 0); err != nil {
 				return nil, err
 			}
 		}
-		return nil, tx.PutResponse(repository.Response{ID: reply, CallID: call.ID, Text: "Table for four at seven?", Status: "suggested", NeedsApproval: true})
+		if err := tx.PutResponse(repository.Response{ID: reply, CallID: call.ID, Text: "Table for four at seven?", Status: "suggested", NeedsApproval: true}); err != nil {
+			return nil, err
+		}
+		return tx.Call(), nil
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -75,8 +78,9 @@ func TestIntegrationControlsCommitAtomicallyAndIdempotently(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// pause: response + call; resume: call; end: call. Contiguous, end last.
-	if len(events) != 4 || events[3].Type != "call.updated" {
+	// create: call; pause: response + call; resume: call; end: call.
+	// The initial create event is durable too. Contiguous, end last.
+	if len(events) != 5 || events[4].Type != "call.updated" {
 		t.Fatalf("events = %d", len(events))
 	}
 	for i, e := range events {
