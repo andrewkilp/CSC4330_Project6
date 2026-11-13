@@ -5,4 +5,4 @@ tasks:
   build:
     command: 'pnpm exec tsc --noEmit'
   test:
-    command: 'node --experimental-strip-types --test test/events.test.mjs test/contracts.test.mjs'
+    command: 'node --experimental-strip-types --test test/*.test.mjs'
