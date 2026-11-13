@@ -145,6 +145,11 @@ export default function CallPreview() {
           </View>
           {page === "Calls" ? (
             <>
+              <Button
+                label="Open live layout preview"
+                secondary
+                onPress={() => router.push("/calls/preview")}
+              />
               <View style={s.headingRow}>
                 <View style={{ flex: 1 }}>
                   <Text accessibilityRole="header" style={s.heading}>

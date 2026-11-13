@@ -77,6 +77,17 @@ L1 is the primary view. At wide widths use a slim sidebar, a large transcript, a
 
 The operator can type a private instruction, inspect a revised suggestion, edit it, and approve it. Suggested text must not appear in the transcript as spoken until playback is confirmed. Mid-call unknowns need a clear approval state. Display instruction pending/applied/stale/failed states. Pause AI and End call stay reachable.
 
+## Live layout preview (#12)
+
+`/calls/preview` renders typed fictional call/turn/response fixtures using shared
+primitives. Wide screens use navigation, transcript and goal/reply rail; narrow
+screens stack in reading order. Preview controls show connecting, awaiting
+approval, paused and ended states. All actions are local and labelled; approving
+a suggestion does not add it to the transcript. End disables approval, instruction
+and pause controls. The state selector opens a fresh visual example. Existing
+`/calls/{uuid}` draft reads retain their owner-gated behavior. No event subscription
+or vendor request is added.
+
 ## Source prompt
 
 Use case: ui-mockup. A mobile-first AI phone concierge named Switchboard for restaurant reservations and appointments. Show desktop and narrow mobile live-call workspaces. Editorial telephone exchange aesthetic: ivory paper, dark ink, forest green, restrained vermilion and brass; thin ruled borders; serif headings, humanist body, monospaced timestamps. Reservation at Marigold, transcript with AI and Restaurant labels, current goal table for four Friday around seven, editable suggested reply, Approve, instruction composer with “Accept 7:30, but ask for the patio,” Pause AI and End call. Avoid generic card grids, purple gradients and glowing AI orbs. Flat crisp interface reference.
