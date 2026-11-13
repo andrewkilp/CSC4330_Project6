@@ -79,17 +79,15 @@ Unknown or conflicting associations produce generic 404s; invalid signatures 403
 The [Stream reference](https://www.twilio.com/docs/voice/twiml/stream) defines WSS
 media URLs and nested custom parameters. With media explicitly enabled and a
 nonterminal owned call, the handler returns XML-escaped `<Connect><Stream>` with
-the configured URL and verified `call_id`, `attempt_id`, `token` parameters.
-Token/account/SID checks for the WebSocket itself remain #21's responsibility;
-these values alone do not authorize a browser or prove playback.
+the configured URL and verified `call_id` and `attempt_id`, plus
+`token = media.SignStream(MediaSecret, call_id, CallSid)`. The webhook's own callback
+token never appears in TwiML. The #21 bridge recomputes that HMAC and checks the
+stored provider SID, so the stream credential is bound to this exact provider call.
+These values alone do not authorize a browser or prove playback.
 
-`MediaEnabled` defaults false and must remain false until #21's authenticated
-bridge is mounted. Verified voice callbacks then receive safe Hangup TwiML;
-terminal calls always receive Hangup. This task does not claim a functioning
-media/audio pipeline, AI introduction, approved speech or booking result.
-The API hardcodes this setting false, with no environment switch that could
-pretend the bridge is installed. Enabled-media TwiML is exercised only in isolated
-handler fixtures for the later bridge's integration boundary.
+`MediaEnabled` requires a `MediaSecret` of at least 32 bytes. The API sets it only
+when it also mounts the #21 bridge (see `docs/providers/twilio-media.md`). Otherwise
+verified voice callbacks receive safe Hangup TwiML, and terminal calls always do.
 
 ## Verification
 

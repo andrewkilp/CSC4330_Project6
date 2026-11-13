@@ -55,7 +55,7 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	session.Register(mux, sessions, environment != "" && environment != "development")
 	calls.RegisterDrafts(mux, calls.NewDraftHandler(store, sessions))
 	calls.RegisterStart(mux, calls.NewStartHandler(starter, sessions))
-	if err := registerTwilioCallbacks(mux, store, config); err != nil {
+	if err := registerTwilioCallbacks(mux, store, config, newLiveMedia()); err != nil {
 		return nil, err
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -159,3 +159,41 @@ func TestIntegrationStartChecksStoredConsentOwnerAndPolicy(t *testing.T) {
 		t.Fatal("mock accepted real callback")
 	}
 }
+
+func TestIntegrationActiveProviderCallIDOnlyForBoundActiveRealCalls(t *testing.T) {
+	r, ctx := startDB(t)
+	owner := NewID()
+	c, err := r.Create(ctx, owner, NewID(), realDraft())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("draft call has a provider SID: %v", err)
+	}
+	intent := startIntent()
+	if _, err = r.ReserveCallStart(ctx, owner, c.ID, NewID(), startPolicy(), intent); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("unconfirmed start has a provider SID: %v", err)
+	}
+	cb := TwilioCallback{CallID: c.ID, AttemptID: intent.AttemptID, Token: startTestToken, AccountSID: startTestAccount, CallSID: startTestSID, Status: "in-progress"}
+	if _, err = r.ApplyTwilioCallback(ctx, cb); err != nil {
+		t.Fatal(err)
+	}
+	if sid, err := r.ActiveProviderCallID(ctx, c.ID); err != nil || sid != startTestSID {
+		t.Fatalf("connected call sid=%q err=%v", sid, err)
+	}
+	for _, id := range []string{NewID(), "not-a-uuid"} {
+		if _, err := r.ActiveProviderCallID(ctx, id); !errors.Is(err, ErrNotFound) {
+			t.Fatalf("unknown call %q: %v", id, err)
+		}
+	}
+	cb.Status = "completed"
+	if _, err = r.ApplyTwilioCallback(ctx, cb); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.ActiveProviderCallID(ctx, c.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("ended call still accepts media: %v", err)
+	}
+}

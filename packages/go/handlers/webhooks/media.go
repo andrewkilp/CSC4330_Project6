@@ -16,8 +16,8 @@ import (
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/telephony/media"
 )
 
-// RegisterMedia mounts the media stream route. It is not mounted by the API until the
-// real telephony start (#11) and voice webhook (#16) exist.
+// RegisterMedia mounts the media stream route. apps/api mounts it only when the stream
+// secret, durable storage and transcriber are configured.
 func RegisterMedia(mux *http.ServeMux, cfg media.Config) {
 	mux.Handle("GET /webhooks/twilio/media", MediaHandler(cfg))
 }

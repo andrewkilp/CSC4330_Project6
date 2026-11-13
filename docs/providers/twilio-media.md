@@ -3,9 +3,25 @@
 `packages/go/telephony/media` is the server end of a bidirectional
 [Media Stream](https://www.twilio.com/docs/voice/media-streams/websocket-messages);
 `packages/go/handlers/webhooks` serves it at `WSS /webhooks/twilio/media` with
-`github.com/coder/websocket` (already the #20 transport dependency). It is not
-mounted yet: the outbound start (#11) and the signed voice webhook that returns the
-`<Connect><Stream>` TwiML (#16) come first.
+`github.com/coder/websocket` (already the #20 transport dependency).
+
+## Mounting (apps/api)
+
+The API mounts the route only when all of these are configured. A partial
+configuration is a startup error:
+
+| Setting | Purpose |
+| --- | --- |
+| Signed callbacks enabled (`ENABLE_REAL_CALLS=true` or `TWILIO_WEBHOOKS_ENABLED=true`) | #16 voice TwiML points Twilio at the stream |
+| `MEDIA_STREAM_SECRET` (at least 32 bytes, server-only) | Signs and verifies the per-call stream token |
+| `DATABASE_URL` | `repository.ActiveProviderCallID` binds the stream to the stored provider SID of a dialing, connected or paused real call |
+| `DEEPGRAM_API_KEY` | Inbound audio goes to the #20 transcriber |
+
+Without `MEDIA_STREAM_SECRET`, the route is absent and verified voice callbacks
+hang up. The API keeps each call's outbound `providers.MediaStream` in a live-call
+registry, so call controls (#31) and the conversation runtime (#41) can clear or close
+it. Transcript updates and media events go to that runtime's sink; until a sink is
+set they are discarded, never stored.
 
 ## Binding a stream to a call
 

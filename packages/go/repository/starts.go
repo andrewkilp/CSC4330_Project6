@@ -277,3 +277,20 @@ func twilioStatus(current, status string) string {
 	}
 	return next
 }
+
+// ActiveProviderCallID returns the provider call SID bound to a real call that is still
+// dialing, connected or paused. The media bridge (#21) calls it only after verifying
+// the stream's HMAC token, to check that the stream belongs to that exact provider
+// call. It is not owner-scoped because provider media carries no user session; it
+// returns nothing but the SID, and ErrNotFound for any other call or state.
+func (r *Repository) ActiveProviderCallID(ctx context.Context, callID string) (string, error) {
+	if !uuidPattern.MatchString(callID) {
+		return "", ErrNotFound
+	}
+	var sid string
+	err := r.pool.QueryRow(ctx, `SELECT s.provider_sid FROM call_starts s JOIN calls c ON c.id=s.call_id WHERE c.id=$1 AND s.mode='real' AND s.state='confirmed' AND s.provider_sid IS NOT NULL AND c.status IN ('dialing','connected','paused')`, callID).Scan(&sid)
+	if err != nil {
+		return "", safe(err)
+	}
+	return sid, nil
+}
