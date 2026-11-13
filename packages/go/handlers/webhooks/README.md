@@ -2,9 +2,18 @@
 
 `New(Config, Ledger)` returns a handler with `Register(*http.ServeMux)` for the
 existing `POST /webhooks/twilio/voice` and `POST /webhooks/twilio/status` contracts.
-No browser session or supplied owner ID authorizes these routes. The parent API
-composition owns mounting them and supplying server-only configuration. This
-package performs no dialing, model generation or audio processing.
+No browser session or supplied owner ID authorizes these routes. API composition
+mounts them with the existing shared repository and server-only configuration.
+This package performs no dialing, model generation or audio processing.
+
+The API's optional `TWILIO_WEBHOOKS_ENABLED` accepts only exact `true`/`false` and
+defaults to `ENABLE_REAL_CALLS`. Explicit `true` preserves callback-only ingress
+after new outbound dialing is disabled; account SID, Auth Token and canonical
+`PUBLIC_BASE_URL` are still required, while source number/allowlist and outbound
+REST client are unnecessary. Default-disabled mode ignores unused credentials and
+mounts neither callback route. Real starts with explicitly disabled callbacks are
+rejected at startup. Missing optional database storage remains an explicit 503;
+the API creates no fallback call identities or second pool.
 
 Configuration: `AccountSID`, primary account `AuthToken`, `PublicBaseURL` (exact
 HTTPS origin used by #11), `MediaURL` (server-owned WSS endpoint without query),
@@ -78,6 +87,9 @@ these values alone do not authorize a browser or prove playback.
 bridge is mounted. Verified voice callbacks then receive safe Hangup TwiML;
 terminal calls always receive Hangup. This task does not claim a functioning
 media/audio pipeline, AI introduction, approved speech or booking result.
+The API hardcodes this setting false, with no environment switch that could
+pretend the bridge is installed. Enabled-media TwiML is exercised only in isolated
+handler fixtures for the later bridge's integration boundary.
 
 ## Verification
 
@@ -99,3 +111,11 @@ callback-before-REST association, duplicate/out-of-order delivery, durable event
 counts, terminal fencing, wrong association/mode, and event-failure rollback.
 Without this variable, database tests report skipped; fixture tests still run.
 No real Twilio endpoint, paid request, public callback tunnel or real call was used.
+
+`apps/api/call_pipeline_test.go` additionally runs the composed session/draft/start/
+callback router with actual isolated PostgreSQL storage and a process-local fake
+Twilio HTTP transport. It checks create/read never dial, one explicit outbound
+request across retries, signed callbacks before the REST acknowledgement,
+bad signatures, duplicate/out-of-order delivery, four durable lifecycle events,
+and terminal voice Hangup. Unexpected outbound destinations are rejected by the
+fake transport; no real provider request occurs.
