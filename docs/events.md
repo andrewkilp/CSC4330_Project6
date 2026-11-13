@@ -58,6 +58,43 @@ Run `moon run client:test` for the Node 24 built-in test runner. No new dependen
 
 ## Server stream (#23)
 
+## Authenticated client (#22)
+
+`subscribeCall` in `packages/ts/api/src/stream.ts` hydrates the owner-authorized
+snapshot, then reads bounded SSE frames using credentialed fetch and an explicit
+Last-Event-ID/after_seq cursor. Normal disconnects replay from the last applied
+sequence; gaps and 409s refresh the snapshot before resubscribing. Malformed
+framing or contracts stop with a safe error; 401/403/404 stop without rotating
+sessions. Retry is explicit after these errors. Idle reads abort after 45 seconds;
+network retries back off from one to eight seconds. Close cancels readers,
+requests and timers and fences late callbacks.
+
+The app injects SDK 57's installed `expo/fetch` for native streaming, following
+[Expo's streaming fetch documentation](https://docs.expo.dev/versions/v57.0.0/sdk/expo/).
+No EventSource, new SDK, provider socket or dependency is introduced. Its live
+updates view is reached from a saved call or `/calls/{uuid}?live=1`; `/calls/preview`
+remains a fictional local replay. Route blur/unmount closes the subscription;
+background/hidden state suspends it and foreground recovery takes a fresh
+snapshot. Suggestions are unavailable while reconnecting or recovering. The
+screen provides observation only; approval/instruction/control UI wiring belongs
+to its respective issues. No opening or reconnect action can dial.
+
+API composition now mounts snapshot/SSE with the same sessions and repository.
+Unavailable storage returns 503 after authentication. Allowed-origin preflight
+includes Last-Event-ID. A one-second durable poll supplements the optional hub
+so a committed-but-unpublished event is eventually delivered. This remains a
+single-instance design; session revocation is enforced on the next authenticated
+request, not retroactively on an already open stream.
+
+Evidence: bounded/split UTF-8 framing, cursor replay, duplicate suppression,
+expiry/gap resync, unauthorized stop and focus/navigation cleanup fixtures;
+actual PostgreSQL API snapshot and committed-event streaming race tests; browser
+fixture checks at 390/1440 with screenshots in `docs/design/event-stream/`.
+Native device cookie persistence and platform lifecycle behavior still need
+device verification; native support is based on the documented Expo transport.
+
+## Server stream details (#23)
+
 `packages/go/handlers/events` serves `GET /v1/calls/{id}/events` and
 `GET /v1/calls/{id}/snapshot` behind the session middleware; another owner's call is
 404. The cursor is `Last-Event-ID` when present, otherwise `?after_seq=` (absent means

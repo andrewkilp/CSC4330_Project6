@@ -4,6 +4,7 @@ go 1.26.4
 
 require (
 	github.com/andrewkilp/CSC4330_Project6/packages/go/auth v0.0.0
+	github.com/andrewkilp/CSC4330_Project6/packages/go/events v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/handlers v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/providers v0.0.0
 	github.com/andrewkilp/CSC4330_Project6/packages/go/repository v0.0.0
@@ -12,6 +13,7 @@ require (
 )
 
 require (
+	github.com/coder/websocket v1.8.14 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.3 // indirect
@@ -20,6 +22,8 @@ require (
 )
 
 replace github.com/andrewkilp/CSC4330_Project6/packages/go/auth => ../../packages/go/auth
+
+replace github.com/andrewkilp/CSC4330_Project6/packages/go/events => ../../packages/go/events
 
 require (
 	github.com/andrewkilp/CSC4330_Project6/packages/go/claude v0.0.0 // indirect

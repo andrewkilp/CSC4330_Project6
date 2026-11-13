@@ -114,7 +114,7 @@ export default function LiveCallPreview() {
                     Waiting for the fictional business to answer.
                   </AppText>
                 ) : (
-                  <Transcript state={replayTranscript(replayStep)} />
+                  <Transcript state={replayTranscript(replayStep)} preview />
                 )}
                 <AppText
                   variant="caption"

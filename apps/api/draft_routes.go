@@ -55,6 +55,9 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 	session.Register(mux, sessions, environment != "" && environment != "development")
 	calls.RegisterDrafts(mux, calls.NewDraftHandler(store, sessions))
 	calls.RegisterStart(mux, calls.NewStartHandler(starter, sessions))
+	if err := registerCallEvents(mux, store, sessions); err != nil {
+		return nil, err
+	}
 	if err := registerTwilioCallbacks(mux, store, config); err != nil {
 		return nil, err
 	}
@@ -77,7 +80,7 @@ func configuredRouterWithStart(environment string, store calls.DraftStore, origi
 				return
 			}
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Last-Event-ID")
 			w.Header().Set("Access-Control-Max-Age", "600")
 			w.WriteHeader(204)
 			return
