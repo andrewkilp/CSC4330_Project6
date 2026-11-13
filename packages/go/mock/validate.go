@@ -346,7 +346,9 @@ func (v *validator) responseEvent(e Event, r Response) error {
 	if r.CallID != v.callID || !uuidPattern.MatchString(r.ID) || r.ContextRevision != e.ContextRevision {
 		return v.bad("payload", "response needs a UUID, the envelope call id and the envelope revision")
 	}
-	if len(r.Text) > 1500 || (r.Status != "generating" && strings.TrimSpace(r.Text) == "") {
+	// Contract (#1): text may be empty only while generating or once cancelled/failed.
+	retired := r.Status == "cancelled" || r.Status == "failed"
+	if len(r.Text) > 1500 || (r.Status != "generating" && !retired && strings.TrimSpace(r.Text) == "") {
 		return v.bad("payload.text", "response text must be present after generation and at most 1500 characters")
 	}
 	if r.NeedsApproval && strings.TrimSpace(r.Reason) == "" {
@@ -366,13 +368,16 @@ func (v *validator) responseEvent(e Event, r Response) error {
 		if terminalReply[prev.Status] {
 			return v.bad("payload.status", "response %s reopened from %q", r.ID, prev.Status)
 		}
-		if prev.ContextRevision != r.ContextRevision || prev.NeedsApproval != r.NeedsApproval {
+		// The approval requirement is decided when generation finishes, then fixed.
+		if prev.ContextRevision != r.ContextRevision || (prev.Status != "generating" && prev.NeedsApproval != r.NeedsApproval) {
 			return v.bad("payload", "a response keeps its revision and approval requirement")
 		}
-		if r.Status != "cancelled" && r.Status != "failed" && responseOrder[r.Status] != responseOrder[prev.Status]+1 {
+		// Streamed drafts repeat generating with growing text.
+		draft := prev.Status == "generating" && r.Status == "generating"
+		if !retired && !draft && responseOrder[r.Status] != responseOrder[prev.Status]+1 {
 			return v.bad("payload.status", "illegal response transition %q -> %q", prev.Status, r.Status)
 		}
-		if prev.Status != "generating" && prev.Text != r.Text {
+		if prev.Status != "generating" && !retired && prev.Text != r.Text {
 			return v.bad("payload.text", "suggested text changed without a new response")
 		}
 	}

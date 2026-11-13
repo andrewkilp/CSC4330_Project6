@@ -290,3 +290,44 @@ func TestPausedIsAConnectedSubstate(t *testing.T) {
 		})
 	}
 }
+
+// The validator follows the #1 contract for streamed and retired responses, which the
+// live conversation loop produces, while still rejecting real lifecycle violations.
+func TestValidateAcceptsContractResponseUpdates(t *testing.T) {
+	f := mustGenerate(t, RestaurantTimeConflict, DefaultSeed)
+	at := -1
+	for i, e := range f.Events {
+		if r, ok := e.Payload.(Response); ok && r.Status == "generating" {
+			at = i
+			break
+		}
+	}
+	gen := f.Events[at]
+	draft := gen.Payload.(Response)
+	draft.Text = "Hi, this is"
+	draft.NeedsApproval, draft.Reason = true, "Operator approval required before speech."
+	withDraft := func(mutate func(*Response)) Fixture {
+		g := f
+		r := draft
+		mutate(&r)
+		e := gen
+		e.Payload = r
+		g.Events = append(append(append([]Event(nil), f.Events[:at+1]...), e), f.Events[at+1:]...)
+		renumber(&g)
+		return g
+	}
+	// A streamed draft with growing text and a provisional approval requirement.
+	if err := Validate(withDraft(func(*Response) {})); err != nil {
+		t.Fatalf("streamed draft rejected: %v", err)
+	}
+	// Still rejected: going backward, and changing approved text.
+	for name, mutate := range map[string]func(*Response){
+		"suggested before generating": func(r *Response) { r.Status = "approved" },
+		"blank suggestion":            func(r *Response) { r.Status, r.Text = "suggested", " " },
+	} {
+		var ve *ValidationError
+		if err := Validate(withDraft(mutate)); !errors.As(err, &ve) {
+			t.Errorf("%s: %v", name, err)
+		}
+	}
+}

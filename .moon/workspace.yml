@@ -1,4 +1,4 @@
-projects: ['apps/*', 'packages/ts/*', 'packages/go/*']
+projects: ['apps/*', 'packages/ts/*', 'packages/go/*', 'packages/go/conversation/integration']
 vcs:
   defaultBranch: main
   provider: github

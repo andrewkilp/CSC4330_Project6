@@ -1,0 +1,4 @@
+id: integration
+layer: library
+language: go
+dependsOn: ['conversation', 'handlers', 'mock', 'providers', 'repository', 'telephony']
