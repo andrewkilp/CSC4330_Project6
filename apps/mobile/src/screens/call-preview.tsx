@@ -374,7 +374,8 @@ const s = StyleSheet.create({
   previewTag: {
     fontFamily: mono,
     fontSize: 10,
-    color: t.brass,
+    // Brass text is 3.87:1 on paper; muted ink meets 4.5:1.
+    color: t.muted,
     letterSpacing: 1,
   },
   headingRow: {
