@@ -165,6 +165,9 @@ func (c *client) next(t *testing.T) repository.Event {
 			if err := json.Unmarshal([]byte(f.data), &e); err != nil {
 				t.Fatalf("bad data %q", f.data)
 			}
+			if !strings.HasSuffix(e.OccurredAt.Format(time.RFC3339Nano), "Z") || !strings.Contains(f.data, `Z","context_revision"`) {
+				t.Fatalf("occurred_at is not UTC: %s", f.data)
+			}
 			if f.id != strconv.FormatInt(e.Seq, 10) || f.event != e.Type {
 				t.Fatalf("frame %+v does not match event", f)
 			}
