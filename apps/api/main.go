@@ -53,7 +53,7 @@ func main() {
 	}
 	router, err := configuredRouter(os.Getenv("APP_ENV"), store, os.Getenv("APP_ORIGIN"))
 	if err != nil {
-		slog.Error("invalid app origin configuration")
+		slog.Error("invalid API configuration")
 		os.Exit(1)
 	}
 	server := &http.Server{Addr: ":" + port, Handler: router, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
