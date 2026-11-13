@@ -1,4 +1,4 @@
 id: handlers
 layer: library
 language: go
-dependsOn: ['conversation']
+dependsOn: ['auth', 'conversation']

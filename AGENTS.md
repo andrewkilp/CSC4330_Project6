@@ -16,7 +16,7 @@ Read this file, `docs/contracts.md`, `docs/architecture.md`, and the issue's Rea
 
 - Build one issue per branch from main. Include the issue number in the branch and PR. Respect Build and Not in this issue. Coordinate contract changes with their owner.
 - This repository preserves Project 5's apps, packages, proto, db, docker and moon layout. Its food app, vendor clients, native camera/location/sharing modules, old migrations, generated types and credentials are intentionally absent.
-- The starter implements only `/health` and an honest local design preview. The 50 issues implement the product. Do not mark an issue done because a mock exists.
+- The API exposes `/health` and local session creation and logout. The app opens an honest local design preview. The 50 issues implement the product. Do not mark an issue done because a mock exists.
 - Thin deployables in apps; reusable code in packages/go and packages/ts. Keep SQL in packages/go/repository, provider HTTP/audio integrations in separate Go packages, transport in handlers.
 - Only packages/ts/api calls our API. Never call vendors or ship secrets from the app. Never store a provider key in an EXPO_PUBLIC variable.
 - The server owns call state, goal revisions, response versions, approval checks, idempotency and billing limits. Instructions are context, not literal speech. Approval binds to one response and context revision.

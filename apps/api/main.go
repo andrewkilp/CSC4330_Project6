@@ -11,7 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/auth"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers"
+	"github.com/andrewkilp/CSC4330_Project6/packages/go/handlers/session"
 	"github.com/andrewkilp/CSC4330_Project6/packages/go/mock"
 )
 
@@ -32,7 +34,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	server := &http.Server{Addr: ":" + port, Handler: handlers.NewRouter(), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
+	server := &http.Server{Addr: ":" + port, Handler: newRouter(os.Getenv("APP_ENV")), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
 	go func() {
 		<-ctx.Done()
 		shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -41,9 +43,17 @@ func main() {
 			slog.Error("shutdown failed", "error", err)
 		}
 	}()
-	slog.Info("Switchboard template listening", "port", port)
+	slog.Info("Switchboard listening", "port", port)
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("server failed", "error", err)
 		os.Exit(1)
 	}
+}
+
+func newRouter(environment string) http.Handler {
+	mux := http.NewServeMux()
+	mux.Handle("/", handlers.NewRouter())
+	secure := environment != "" && environment != "development"
+	session.Register(mux, auth.NewSessions(), secure)
+	return mux
 }

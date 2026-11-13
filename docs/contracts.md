@@ -1,6 +1,6 @@
 # Contracts and ownership
 
-The template serves only `GET /health` with `{"status":"ok","mode":"template"}`. Everything below is the implementation contract for the issues, not an already available API. The schemas were frozen by #1 on November 10, 2026. Their executable form is `packages/ts/api/src/types.ts` (types, enums, `LIMITS`, request/error parsers), checked by `packages/ts/api/test/contracts.test.mjs` against the reviewed samples in `packages/ts/api/test/fixtures/contracts.json`. Server metadata timestamps are RFC 3339 UTC with `Z`; a goal's `preferred_at` carries the business's local offset; all durations use milliseconds unless a field ends in `_seconds`. Business scheduling includes an explicit IANA time zone.
+The API serves `GET /health` with `{"status":"ok","mode":"template"}` and implements the session endpoints below. The remaining routes describe the implementation contract for their owning issues. The schemas were frozen by #1 on November 10, 2026. Their executable form is `packages/ts/api/src/types.ts` (types, enums, `LIMITS`, request/error parsers), checked by `packages/ts/api/test/contracts.test.mjs` against the reviewed samples in `packages/ts/api/test/fixtures/contracts.json`. Server metadata timestamps are RFC 3339 UTC with `Z`; a goal's `preferred_at` carries the business's local offset; all durations use milliseconds unless a field ends in `_seconds`. Business scheduling includes an explicit IANA time zone.
 
 ## HTTP API
 
