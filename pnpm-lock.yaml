@@ -8,6 +8,7 @@ overrides:
   react-dom: 19.2.3
   '@react-native/metro-config': 0.86.3
   react-native-worklets: 0.10.1
+  react-native-reanimated: 4.5.1
 
 importers:
 
@@ -39,7 +40,7 @@ importers:
         version: 57.0.13(expo@57.0.32)(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       expo-router:
         specifier: ~57.0.25
-        version: 57.0.30(ce6e379d919faac0e82de7539c7ab436)
+        version: 57.0.30(723afb7cf6d659ddf62d29cfad6dc852)
       expo-status-bar:
         specifier: ~57.0.1
         version: 57.0.1(expo@57.0.32)(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -1545,7 +1546,7 @@ packages:
       react-dom: 19.2.3
       react-native: '*'
       react-native-gesture-handler: '*'
-      react-native-reanimated: '*'
+      react-native-reanimated: 4.5.1
       react-native-safe-area-context: '>= 5.4.0'
       react-native-screens: ^4.26.0
       react-native-web: '*'
@@ -2304,7 +2305,7 @@ packages:
       react: '>= 18.2.0'
       react-native: '*'
       react-native-gesture-handler: '>= 2.0.0'
-      react-native-reanimated: '>= 2.0.0'
+      react-native-reanimated: 4.5.1
 
   react-native-gesture-handler@3.5.0:
     resolution: {integrity: sha512-bm8yepwMBUhEOSeU7WQbNNrstD0Hbv6i+XsApARBJSlb+WlRvyaQsobi+tZ5Uyr5kDVgXzg6kPb+CWY9zvyfEw==}
@@ -2318,11 +2319,11 @@ packages:
       react: '*'
       react-native: '*'
 
-  react-native-reanimated@4.7.1:
-    resolution: {integrity: sha512-HviDFSZ6V4KTRsrLS6hRbBJ4j63l/L8a5az0EoWdJwaMLYnBNyYISTDxwXpEYkMbAbLzCMCviIdiOxXHYQWcNA==}
+  react-native-reanimated@4.5.1:
+    resolution: {integrity: sha512-RnMvtDuR+68ig864gAvZCOdZehqhC5rFmMo0kn+ARfgVSTvFeF6IFLBVgMPUu0KwihaapEyW24WRi6nEyy1kSA==}
     peerDependencies:
       react: '*'
-      react-native: 0.86 - 0.88
+      react-native: 0.83 - 0.86
       react-native-worklets: 0.10.1
 
   react-native-safe-area-context@5.7.0:
@@ -3410,7 +3411,7 @@ snapshots:
       wrap-ansi: 7.0.0
       ws: 8.22.1
     optionalDependencies:
-      expo-router: 57.0.30(ce6e379d919faac0e82de7539c7ab436)
+      expo-router: 57.0.30(723afb7cf6d659ddf62d29cfad6dc852)
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
     transitivePeerDependencies:
       - '@expo/dom-webview'
@@ -3694,7 +3695,7 @@ snapshots:
       react: 19.2.3
     optionalDependencies:
       '@expo/metro-runtime': 57.0.18(@expo/log-box@57.0.5)(expo@57.0.32)(react-dom@19.2.3(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
-      expo-router: 57.0.30(ce6e379d919faac0e82de7539c7ab436)
+      expo-router: 57.0.30(723afb7cf6d659ddf62d29cfad6dc852)
       react-dom: 19.2.3(react@19.2.3)
     transitivePeerDependencies:
       - supports-color
@@ -4093,7 +4094,9 @@ snapshots:
       metro-runtime: 0.84.6
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
@@ -4604,7 +4607,7 @@ snapshots:
     dependencies:
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
 
-  expo-router@57.0.30(ce6e379d919faac0e82de7539c7ab436):
+  expo-router@57.0.30(723afb7cf6d659ddf62d29cfad6dc852):
     dependencies:
       '@expo/log-box': 57.0.5(@expo/dom-webview@57.0.1)(expo@57.0.32)(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       '@expo/metro-runtime': 57.0.18(@expo/log-box@57.0.5)(expo@57.0.32)(react-dom@19.2.3(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -4631,7 +4634,7 @@ snapshots:
       react-fast-compare: 3.2.2
       react-is: 19.3.1
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
-      react-native-drawer-layout: 4.2.12(react-native-gesture-handler@3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native-reanimated@4.7.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
+      react-native-drawer-layout: 4.2.12(react-native-gesture-handler@3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native-reanimated@4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       react-native-safe-area-context: 5.7.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       react-native-screens: 4.26.2(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       server-only: 0.0.1
@@ -4642,7 +4645,7 @@ snapshots:
     optionalDependencies:
       react-dom: 19.2.3(react@19.2.3)
       react-native-gesture-handler: 3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
-      react-native-reanimated: 4.7.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
+      react-native-reanimated: 4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       react-native-web: 0.21.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     transitivePeerDependencies:
       - '@babel/core'
@@ -5554,13 +5557,13 @@ snapshots:
 
   react-is@19.3.1: {}
 
-  react-native-drawer-layout@4.2.12(react-native-gesture-handler@3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native-reanimated@4.7.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3):
+  react-native-drawer-layout@4.2.12(react-native-gesture-handler@3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native-reanimated@4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3):
     dependencies:
       color: 4.2.3
       react: 19.2.3
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
       react-native-gesture-handler: 3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
-      react-native-reanimated: 4.7.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
+      react-native-reanimated: 4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       use-latest-callback: 0.2.6(react@19.2.3)
 
   react-native-gesture-handler@3.5.0(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3):
@@ -5575,7 +5578,7 @@ snapshots:
       react: 19.2.3
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
 
-  react-native-reanimated@4.7.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3):
+  react-native-reanimated@4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3):
     dependencies:
       react: 19.2.3
       react-native: 0.86.3(@babel/core@7.29.13)(@react-native/metro-config@0.86.3(@babel/core@7.29.13))(@types/react@19.2.18)(react@19.2.3)
