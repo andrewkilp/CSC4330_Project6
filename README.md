@@ -8,6 +8,18 @@ A base template for an AI phone concierge: restaurant reservations and appointme
 
 The API also mounts an authenticated, explicitly gated [call-start endpoint](packages/go/telephony/README.md), with mock mode by default and a durable fence against duplicate dials. Real starts require explicit server opt-in, credentials, consent and an allowlisted destination. The media bridge and full live conversation remain separate work.
 
+[Signed Twilio voice/status callbacks](packages/go/handlers/webhooks/README.md)
+share the same call repository. `TWILIO_WEBHOOKS_ENABLED` is a strict optional
+true/false setting that defaults to `ENABLE_REAL_CALLS`. Set it explicitly to
+`true` to keep authenticated status updates for existing calls while disabling
+new outbound starts. Callback-only mode needs `TWILIO_ACCOUNT_SID`,
+`TWILIO_AUTH_TOKEN` and canonical HTTPS `PUBLIC_BASE_URL`; it constructs no outbound
+REST client and needs no source number or destination allowlist. Invalid enabled
+configuration fails startup, and enabling new real starts with callbacks explicitly
+disabled is rejected. The runtime media bridge remains disabled until #21 exists:
+verified voice callbacks currently return safe Hangup TwiML, never a claimed live
+audio connection.
+
 ## Start
 
 Install [proto](https://moonrepo.dev/docs/proto/install), then:

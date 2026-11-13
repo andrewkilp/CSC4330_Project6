@@ -1,0 +1,7 @@
+{
+  "description": "Published Twilio request-validation example; illustrative values, no actual credentials or call.",
+  "auth_token": "12345",
+  "url": "https://example.com/myapp.php?foo=1&bar=2",
+  "body": "CallSid=CA1234567890ABCDE&Caller=%2B14158675310&Digits=1234&From=%2B14158675310&To=%2B18005551212",
+  "signature": "L/OH5YylLD5NRKLltdqwSvS0BnU="
+}
