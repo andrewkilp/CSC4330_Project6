@@ -101,6 +101,11 @@ func (cfg Config) snapshot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	body := snapshotBody{Snapshot: snap}
+	// Contract metadata timestamps are UTC with Z, whatever the database session zone.
+	body.Call.CreatedAt, body.Call.UpdatedAt = body.Call.CreatedAt.UTC(), body.Call.UpdatedAt.UTC()
+	for i := range body.Instructions {
+		body.Instructions[i].CreatedAt = body.Instructions[i].CreatedAt.UTC()
+	}
 	// Scan only up to the checkpoint so the payloads belong to the same state.
 	for after := int64(0); after < snap.LastSeq; {
 		events, err := cfg.Store.EventsAfter(r.Context(), owner, id, after, page)
@@ -212,6 +217,7 @@ func (cfg Config) stream(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	sent := after
 	write := func(e repository.Event) error {
+		e.OccurredAt = e.OccurredAt.UTC() // contract timestamps are UTC with Z
 		data, err := json.Marshal(e)
 		if err != nil {
 			return err
