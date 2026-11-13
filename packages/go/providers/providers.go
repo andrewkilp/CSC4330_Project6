@@ -9,12 +9,17 @@
 //   - Methods that take an emit callback call it synchronously, from one goroutine at a
 //     time, and never after the method has returned.
 //   - Cancelling the context stops further callbacks promptly; a blocking method then
-//     returns an error wrapping context.Canceled. A callback already running may finish.
+//     returns an error wrapping context.Canceled. For sessions, callback invocation
+//     begins logically when delivery is admitted under the session's state lock.
+//     An admitted callback may finish even if Close/cancellation happens before its
+//     user function enters. No callback may be admitted after closure/cancellation.
 //   - An error returned by the callback stops delivery and is returned unchanged
 //     (sessions instead close, and later use returns ErrClosed).
-//   - Sessions (MediaStream, TranscriptSession) start no callback after Close returns or
+//   - Sessions (MediaStream, TranscriptSession) admit no callback after Close returns or
 //     their context is cancelled, and reject later use with ErrClosed. Close may be
-//     called from inside the session's own callback.
+//     called from inside the session's own callback, so Close does not wait for an
+//     admitted callback to finish. Consumers must recheck their context/generation
+//     token before persisting or playing in-flight updates.
 package providers
 
 import (

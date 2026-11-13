@@ -1,0 +1,7 @@
+{"type":"Metadata"}
+{"type":"Results","start":0,"duration":0.2,"is_final":false,"speech_final":false,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":""}]}}
+{"type":"Results","start":0.2,"duration":0.4,"is_final":false,"speech_final":false,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":"Table for"}]}}
+{"type":"Results","start":0.2,"duration":0.8,"is_final":true,"speech_final":false,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":"Table for four."}]}}
+{"type":"Results","start":1,"duration":0.4,"is_final":false,"speech_final":false,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":"At seven"}]}}
+{"type":"Results","start":1,"duration":0.6,"is_final":true,"speech_final":true,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":"At seven?"}]}}
+{"type":"Results","start":2,"duration":0.5,"is_final":true,"speech_final":true,"channel_index":[0,1],"channel":{"alternatives":[{"transcript":"Thank you."}]}}
