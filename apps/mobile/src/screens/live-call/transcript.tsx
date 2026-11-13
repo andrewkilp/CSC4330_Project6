@@ -42,6 +42,7 @@ export function Transcript({ state }: { state: EventState }) {
   const { finalized, provisional } = selectTranscript(state);
   const scroll = useRef<ScrollView>(null);
   const following = useRef(true);
+  const lastOffset = useRef(0);
   const [away, setAway] = useState(false);
   const [unread, setUnread] = useState(false);
   return (
@@ -63,8 +64,13 @@ export function Transcript({ state }: { state: EventState }) {
           const nearEnd =
             contentSize.height - layoutMeasurement.height - contentOffset.y <
             48;
-          following.current = nearEnd;
-          setAway(!nearEnd);
+          // A content resize also emits scroll events. Only movement upward
+          // retires following; growth below the reader must not impersonate it.
+          if (nearEnd) following.current = true;
+          else if (contentOffset.y < lastOffset.current - 1)
+            following.current = false;
+          lastOffset.current = contentOffset.y;
+          setAway(!following.current);
           if (nearEnd) setUnread(false);
         }}
         onContentSizeChange={() => {
