@@ -1,9 +1,10 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { GoalProvider } from "../screens/goal-context";
 import { theme } from "../theme";
 export default function RootLayout() {
   return (
-    <>
+    <GoalProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -11,6 +12,6 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: theme.paper },
         }}
       />
-    </>
+    </GoalProvider>
   );
 }
