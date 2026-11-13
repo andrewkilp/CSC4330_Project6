@@ -55,3 +55,29 @@ Instructions replace pending entries by ID; applied/failed entries are final. Us
 `packages/ts/api/test/fixtures/events.json` contains synthetic projection data, not Arthur's scenario runner from #5. It uses a fictional phone number and no real user data. No provider or application network request runs in these tests.
 
 Run `moon run client:test` for the Node 24 built-in test runner. No new dependency was added. Tests cover partial/final replacement, duplicate/older replay, sequence gaps, context changes, obsolete response IDs, approval/playback ordering, terminal calls, evidence references, cursor expiry, snapshot rejection and malformed events. Run the repository gate with `moon run :build :lint :typecheck :test` before publishing.
+
+## Server stream (#23)
+
+`packages/go/handlers/events` serves `GET /v1/calls/{id}/events` and
+`GET /v1/calls/{id}/snapshot` behind the session middleware; another owner's call is
+404. The cursor is `Last-Event-ID` when present, otherwise `?after_seq=` (absent means
+0). The handler subscribes to the in-process hub (`packages/go/events`) **before**
+reading the replay from the repository, writes replayed events, then a `: connected`
+comment, then live events, skipping any `seq` already sent. If a published event
+arrives ahead of an earlier commit, the gap is filled from the repository so `seq`
+stays contiguous. Heartbeats are `: heartbeat` comments every 15 s.
+
+A cursor beyond the latest `seq`, or more than 500 events behind, is expired:
+409 `conflict` with `field: "after_seq"`, and the client hydrates the snapshot. A
+subscriber that falls 256 events behind is disconnected and reconnects with
+`Last-Event-ID`. Events are published only after their transaction commits, so the
+stream never shows an event that a restart could lose. The handler reads through
+the #13 repository (`EventsAfter` pages of 100, `Snapshot`); the snapshot route adds
+the latest `summary.ready` and `usage.updated` payloads from the log. A cursor is
+valid only if that exact `seq` exists for the call (or is 0).
+
+Integration tests use `repositorytest.Open`, which follows the repository suite's
+convention (`SWITCHBOARD_REPOSITORY_TEST_DATABASE_URL` naming a `*_test` database, one
+disposable schema per test; see `packages/go/repository/README.md`). They cover
+wrong-owner denial, replay cursors, two subscribers, storage gap fill, expired
+cursors, disconnect cleanup and replay after a restart with a new connection pool.
