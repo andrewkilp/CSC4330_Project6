@@ -34,6 +34,16 @@ In a second terminal: `moon run api:dev`. The API listens on port 8080; `GET /he
 
 For native development use `moon run mobile:dev`, or `moon run mobile:android` / `moon run mobile:ios` with the appropriate Android SDK / Xcode installed. For a phone or Android emulator set `EXPO_PUBLIC_API_URL` as documented in `.env.example`. Expo loads the app's local environment; the Go baseline reads shell environment variables directly. Do not copy server secrets into the mobile app.
 
+If local setup fails, see [Mock-only troubleshooting](#mock-only-troubleshooting).
+
+### Mock-only troubleshooting
+
+Use these checks with the default mock configuration. The walkthrough needs no provider credentials or phone calls.
+
+- **API startup reports that port 8080 is in use.** Check the listener with `Get-NetTCPConnection -LocalPort 8080 -State Listen` in PowerShell, or `lsof -nP -iTCP:8080 -sTCP:LISTEN` on macOS or Linux. If it is already Switchboard, reuse it. Otherwise free the port or set the API's shell `PORT` to a free port and point Expo at that same port.
+- **Settings → Check API connection says “Server unavailable” while the API is running.** Run `curl -fsS http://localhost:8080/health` (use `curl.exe` in PowerShell). Expect `{"status":"ok","mode":"template"}` with the default setup. If that works, check the app's `EXPO_PUBLIC_API_URL` and request `/health` at that address from the browser or device running the preview. The URL should be the API base, with no `/health` suffix. Use `localhost` on the development computer, `10.0.2.2` on the Android emulator, or the development computer's LAN address on a physical device. Restart Expo after changing the value.
+- **The scripted preview opens while the API is stopped.** With the API stopped, launch `moon run mobile:web`, open Calls, and look for the **Design preview** label and scripted transcript. Then open Settings and select **Check API connection**. “Server unavailable” is expected. Start the API separately if you need to use server-backed features.
+
 ## Check
 
 ```sh
