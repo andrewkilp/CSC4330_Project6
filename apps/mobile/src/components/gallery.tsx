@@ -219,6 +219,23 @@ export default function ComponentGallery() {
               editable={false}
             />
           </RuledPanel>
+          <RuledPanel title="Theme colors">
+            <View style={s.actions}>
+              {Object.entries(t).map(([name, value]) =>
+                typeof value === "string" ? (
+                  <View key={name} style={s.token}>
+                    <View style={[s.swatch, { backgroundColor: value }]} />
+                    <View>
+                      <AppText variant="mono">{name}</AppText>
+                      <AppText variant="mono" tone="muted">
+                        {value}
+                      </AppText>
+                    </View>
+                  </View>
+                ) : null,
+              )}
+            </View>
+          </RuledPanel>
           <AppText variant="label" tone="muted">
             SWITCHBOARD / PAPER, INK & A LITTLE ORDER
           </AppText>
@@ -283,4 +300,17 @@ const s = StyleSheet.create({
     gap: t.space.sm,
   },
   actions: { flexDirection: "row", flexWrap: "wrap", gap: t.space.md },
+  token: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: t.space.sm,
+    minWidth: 130,
+  },
+  swatch: {
+    width: 32,
+    height: 32,
+    borderWidth: 1,
+    borderColor: t.muted,
+    borderRadius: t.radius,
+  },
 });
