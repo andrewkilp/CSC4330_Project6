@@ -60,6 +60,20 @@ and visible focus in a reduced-motion browser context. No page errors occurred.
 The browser plugin's execution tool was unavailable, so the screenshots and checks
 used the existing local Playwright/Chrome fallback, without changing dependencies.
 
+### Gallery smoke check
+
+1. Start `moon run mobile:web` and open `/components` on the local Expo URL.
+   The gallery runs with the API stopped and needs no provider credentials.
+2. At 390 px, compare with the [narrow capture](design/gallery-390.png).
+   Confirm the navigation and transcript stack, speaker labels and timestamps
+   are readable, and the page has no horizontal scrollbar.
+3. At 1440 px, compare with the [wide capture](design/gallery-1440.png).
+   Confirm the navigation, transcript, and goal/reply rail sit side by side,
+   with the same paper, forest, and vermilion palette and thin rules.
+4. At either width, tab to **Preview feedback** and check the visible focus
+   ring. Activate it with an empty instruction, check for the required-field
+   message, then type an instruction and check that the error clears.
+
 ## Screens and routes
 
 The template has one route with local preview navigation. Issue implementations introduce these routes:
