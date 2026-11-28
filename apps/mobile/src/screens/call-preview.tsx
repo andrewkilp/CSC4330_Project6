@@ -65,15 +65,16 @@ function Button({
   );
 }
 
+const initialReply = "7:30 works. Is patio seating available?";
+const initialNotice = "Scripted example. No call is connected.";
+
 export default function CallPreview() {
   const router = useRouter();
   const wide = useWindowDimensions().width >= 1000;
   const [page, setPage] = useState<Page>("Calls");
   const [instruction, setInstruction] = useState("");
-  const [reply, setReply] = useState("7:30 works. Is patio seating available?");
-  const [notice, setNotice] = useState(
-    "Scripted example. No call is connected.",
-  );
+  const [reply, setReply] = useState(initialReply);
+  const [notice, setNotice] = useState(initialNotice);
   const [paused, setPaused] = useState(false);
   const [ended, setEnded] = useState(false);
   const business = "Marigold";
@@ -82,6 +83,14 @@ export default function CallPreview() {
   const [health, setHealth] = useState("Not checked");
   const [checking, setChecking] = useState(false);
   const inactive = ended || paused;
+  function resetPreview() {
+    setInstruction("");
+    setReply(initialReply);
+    setNotice(initialNotice);
+    setPaused(false);
+    setEnded(false);
+  }
+
   async function checkServer() {
     setChecking(true);
     try {
@@ -286,17 +295,15 @@ export default function CallPreview() {
                   />
                   <Button
                     destructive
-                    label={ended ? "Restart preview" : "End call"}
+                    label="End call"
+                    disabled={ended}
                     onPress={() => {
-                      setEnded(!ended);
+                      setEnded(true);
                       setPaused(false);
-                      setNotice(
-                        ended
-                          ? "Scripted example restarted. No call is connected."
-                          : "Preview ended. No telephone call was made.",
-                      );
+                      setNotice("Preview ended. No telephone call was made.");
                     }}
                   />
+                  <Button secondary label="Start over" onPress={resetPreview} />
                 </View>
               </View>
             </>
